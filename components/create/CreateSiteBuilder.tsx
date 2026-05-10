@@ -401,24 +401,25 @@ export function CreateSiteBuilder() {
             }}
           />
         ) : null}
-        <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[minmax(460px,0.9fr)_minmax(0,1.1fr)]">
-          <div className={builderStarted ? "" : "hidden"}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your preview</p>
-            <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-              Try your direct booking website before you subscribe.
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-[#51635b]">
-              Add your resort details step by step, switch templates, and preview how Travelseed can turn
-              your listing into a direct booking brand.
-            </p>
+        {builderStarted ? (
+          <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[minmax(460px,0.9fr)_minmax(0,1.1fr)]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your preview</p>
+              <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+                Try your direct booking website before you subscribe.
+              </h1>
+              <p className="mt-5 text-lg leading-8 text-[#51635b]">
+                Add your resort details step by step, switch templates, and preview how Travelseed can turn
+                your listing into a direct booking brand.
+              </p>
 
-            <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
-              {importStatus ? (
-                <p className="mb-5 rounded-md bg-[#f8f5ef] p-3 text-sm leading-6 text-[#51635b]">
-                  {importStatus}
-                </p>
-              ) : null}
-              <StepProgress activeStep={activeStep} onSelect={setActiveStep} />
+              <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
+                {importStatus ? (
+                  <p className="mb-5 rounded-md bg-[#f8f5ef] p-3 text-sm leading-6 text-[#51635b]">
+                    {importStatus}
+                  </p>
+                ) : null}
+                <StepProgress activeStep={activeStep} onSelect={setActiveStep} />
 
               <div className="mt-7 border-t border-[#eadfce] pt-7">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">
@@ -493,6 +494,7 @@ export function CreateSiteBuilder() {
             </div>
           </aside>
         </div>
+        ) : null}
       </section>
     </main>
   );
