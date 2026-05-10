@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f8f5ef;
+  color: #17211f;
+}
+
+a {
+  text-decoration: none;
+}
+
+.site-preview .min-h-screen {
+  min-height: 680px;
+}
+
+.site-preview .min-h-\[86vh\] {
+  min-height: 680px;
+}

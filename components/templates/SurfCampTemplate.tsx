@@ -1,0 +1,162 @@
+import Image from "next/image";
+import { FooterSection } from "@/components/resort/FooterSection";
+import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
+import type { Resort } from "@/types/resort";
+
+type TemplateProps = {
+  resort: Resort;
+};
+
+function bookingUrlFor(resort: Resort) {
+  return createWhatsAppBookingUrl(
+    resort.whatsapp_number,
+    resort.booking_message_template || createDefaultBookingMessage(resort.name),
+  );
+}
+
+// Surf camp template for energetic beach stays, camps, retreats, and activity-led resorts.
+export function SurfCampTemplate({ resort }: TemplateProps) {
+  const bookingUrl = bookingUrlFor(resort);
+  const featuredImage = resort.hero_image_url || resort.gallery[0];
+  const stats = [
+    resort.capacity ? { label: "Guests", value: resort.capacity } : null,
+    resort.bedrooms ? { label: "Rooms", value: resort.bedrooms } : null,
+    resort.bathrooms ? { label: "Baths", value: resort.bathrooms } : null,
+  ].filter(Boolean) as Array<{ label: string; value: number }>;
+
+  return (
+    <main className="bg-[#f5fbf8] text-[#0c2f35]">
+      <section className="relative overflow-hidden bg-[#0b5f6f] px-5 pb-14 pt-6 text-white sm:px-6 lg:pb-20">
+        <div className="-mx-5 -mt-6 sm:-mx-6">
+          <ResortNavigation resort={resort} variant="light" />
+        </div>
+
+        <div className="mx-auto grid min-h-[86vh] max-w-6xl gap-10 pt-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+          <div className="pb-4">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-cyan-100">{resort.location}</p>
+            <h1 className="mt-5 text-5xl font-black leading-[0.96] sm:text-6xl lg:text-7xl">
+              {resort.hero_title}
+            </h1>
+            {resort.hero_subtitle ? (
+              <p className="mt-6 max-w-xl text-lg leading-8 text-cyan-50">{resort.hero_subtitle}</p>
+            ) : null}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#booking"
+                className="inline-flex min-h-13 items-center rounded-full bg-[#f6d365] px-6 text-sm font-bold text-[#0c2f35]"
+              >
+                Book Direct & Save
+              </a>
+              <a
+                href="#experiences"
+                className="inline-flex min-h-13 items-center rounded-full border border-white/35 px-6 text-sm font-bold text-white"
+              >
+                See experiences
+              </a>
+            </div>
+          </div>
+
+          <div className="relative min-h-[420px] overflow-hidden rounded-md bg-[#063e48] shadow-[0_30px_100px_rgba(4,43,50,0.35)]">
+            {featuredImage ? (
+              <Image src={featuredImage} alt={resort.name} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,#0b5f6f,#6ed4d8)]" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#063e48]/70 to-transparent" />
+            <div className="absolute bottom-5 left-5 right-5 grid grid-cols-3 gap-3">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-md bg-white/90 p-4 text-[#0c2f35] backdrop-blur">
+                  <p className="text-2xl font-black">{stat.value}</p>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em]">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" className="px-5 py-16 sm:px-6 lg:py-24">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">
+              {resort.type ?? "Surf camp stay"}
+            </p>
+            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">Wake up close to the breaks.</h2>
+          </div>
+          <p className="text-lg leading-9 text-[#31585f]">
+            {resort.description ??
+              `${resort.name} is built for guests who want easy beach access, simple comfort, and a direct line to the host before they arrive.`}
+          </p>
+        </div>
+      </section>
+
+      <section id="features" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Camp essentials</p>
+              <h2 className="mt-4 text-3xl font-black sm:text-4xl">Everything set up for active days.</h2>
+            </div>
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {resort.features.map((feature) => (
+              <div key={feature} className="rounded-md border border-cyan-100 bg-[#f5fbf8] p-5">
+                <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#0b7380]">Included</p>
+                <p className="mt-8 text-lg font-black">{feature}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {resort.gallery.length > 0 ? (
+        <section id="gallery" className="px-5 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Gallery</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {resort.gallery.slice(0, 6).map((imageUrl, index) => (
+                <div key={imageUrl} className={index === 0 ? "relative min-h-80 overflow-hidden rounded-md sm:col-span-2" : "relative min-h-64 overflow-hidden rounded-md"}>
+                  <Image src={imageUrl} alt={`${resort.name} surf gallery ${index + 1}`} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {resort.experiences.length > 0 ? (
+        <section id="experiences" className="bg-[#0c2f35] px-5 py-16 text-white sm:px-6 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#f6d365]">Nearby experiences</p>
+            <h2 className="mt-4 max-w-2xl text-3xl font-black leading-tight sm:text-4xl">Beach days, local rhythm, and the next session.</h2>
+            <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {resort.experiences.map((experience) => (
+                <div key={experience} className="rounded-md border border-white/15 bg-white/8 p-5 text-sm font-bold">
+                  {experience}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-md bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b7380]">Direct booking</p>
+            <h2 className="mt-4 text-4xl font-black text-[#0c2f35]">Book Direct & Save</h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[#31585f]">
+              Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
+            </p>
+          </div>
+          <a href={bookingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#0c2f35] px-8 text-base font-black text-white">
+            Book on WhatsApp
+          </a>
+        </div>
+      </section>
+
+      <FooterSection resort={resort} />
+    </main>
+  );
+}
