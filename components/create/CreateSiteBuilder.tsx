@@ -131,6 +131,10 @@ function draftList(value: string[] | undefined) {
   return value?.filter(Boolean).join("\n") ?? "";
 }
 
+function draftNumber(value: string | undefined) {
+  return value?.match(/\d+/)?.[0] ?? "";
+}
+
 function createPreviewResort(form: BuilderForm): Resort {
   const gallery = textareaList(form.gallery_images);
 
@@ -214,9 +218,9 @@ export function CreateSiteBuilder() {
         template_id: draft.template_id?.trim() || current.template_id,
         hero_title: draft.hero_title?.trim() || current.hero_title,
         hero_subtitle: draft.hero_subtitle?.trim() || current.hero_subtitle,
-        capacity: draft.capacity?.trim() || current.capacity,
-        bedrooms: draft.bedrooms?.trim() || current.bedrooms,
-        bathrooms: draft.bathrooms?.trim() || current.bathrooms,
+        capacity: draftNumber(draft.capacity) || current.capacity,
+        bedrooms: draftNumber(draft.bedrooms) || current.bedrooms,
+        bathrooms: draftNumber(draft.bathrooms) || current.bathrooms,
         description: draft.description?.trim() || current.description,
         features: draft.features?.length ? draftList(draft.features) : current.features,
         experiences: draft.experiences?.length ? draftList(draft.experiences) : current.experiences,

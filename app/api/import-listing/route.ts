@@ -16,6 +16,18 @@ type ListingDraft = {
   experiences?: string[];
 };
 
+type ListingSource = {
+  url: string;
+  host: string;
+  title: string;
+  metaDescription: string;
+  ogTitle: string;
+  ogDescription: string;
+  jsonLd: unknown[];
+  bodyText: string;
+  imageUrls: string[];
+};
+
 function normalizeUrl(value: unknown) {
   if (typeof value !== "string") {
     return null;
@@ -29,6 +41,21 @@ function normalizeUrl(value: unknown) {
   }
 }
 
+function decodeHtml(value: string) {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .trim();
+}
+
+function stripTags(value: string) {
+  return decodeHtml(value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " "));
+}
+
 function textFromHtml(html: string) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
@@ -37,6 +64,63 @@ function textFromHtml(html: string) {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 12000);
+}
+
+function matchFirst(html: string, pattern: RegExp) {
+  const match = html.match(pattern);
+  return match?.[1] ? decodeHtml(match[1]) : "";
+}
+
+function metaContent(html: string, key: string) {
+  const escapedKey = key.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const propertyFirst = new RegExp(
+    `<meta[^>]+(?:property|name)=["']${escapedKey}["'][^>]+content=["']([^"']+)["'][^>]*>`,
+    "i",
+  );
+  const contentFirst = new RegExp(
+    `<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${escapedKey}["'][^>]*>`,
+    "i",
+  );
+
+  return matchFirst(html, propertyFirst) || matchFirst(html, contentFirst);
+}
+
+function parseJsonLd(html: string) {
+  const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+
+  return scripts
+    .slice(0, 8)
+    .map((script) => stripTags(script[1] ?? ""))
+    .map((content) => {
+      try {
+        return JSON.parse(content) as unknown;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function extractImageUrls(html: string) {
+  return [
+    metaContent(html, "og:image"),
+    metaContent(html, "og:image:url"),
+    metaContent(html, "twitter:image"),
+  ].filter(Boolean);
+}
+
+function sourceFromHtml(url: URL, html: string): ListingSource {
+  return {
+    url: url.toString(),
+    host: url.hostname,
+    title: matchFirst(html, /<title[^>]*>([\s\S]*?)<\/title>/i),
+    metaDescription: metaContent(html, "description"),
+    ogTitle: metaContent(html, "og:title"),
+    ogDescription: metaContent(html, "og:description"),
+    jsonLd: parseJsonLd(html),
+    bodyText: textFromHtml(html),
+    imageUrls: extractImageUrls(html),
+  };
 }
 
 function titleFromUrl(url: URL) {
@@ -60,7 +144,7 @@ function fallbackDraft(url: URL): ListingDraft {
   };
 }
 
-async function fetchListingText(url: URL) {
+async function fetchListingSource(url: URL): Promise<ListingSource> {
   try {
     const response = await fetch(url, {
       headers: {
@@ -71,12 +155,12 @@ async function fetchListingText(url: URL) {
     });
 
     if (!response.ok) {
-      return "";
+      return sourceFromHtml(url, "");
     }
 
-    return textFromHtml(await response.text());
+    return sourceFromHtml(url, await response.text());
   } catch {
-    return "";
+    return sourceFromHtml(url, "");
   }
 }
 
@@ -93,7 +177,25 @@ function parseJsonObject(value: string) {
   }
 }
 
-async function createAiDraft(url: URL, listingText: string) {
+function summarizeSource(source: ListingSource) {
+  return JSON.stringify(
+    {
+      url: source.url,
+      host: source.host,
+      title: source.title,
+      metaDescription: source.metaDescription,
+      ogTitle: source.ogTitle,
+      ogDescription: source.ogDescription,
+      jsonLd: source.jsonLd,
+      imageUrls: source.imageUrls,
+      bodyText: source.bodyText,
+    },
+    null,
+    2,
+  ).slice(0, 18000);
+}
+
+async function createAiDraft(url: URL, source: ListingSource) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
@@ -108,14 +210,18 @@ name, slug, location, type, template_id, hero_title, hero_subtitle, description,
 
 Rules:
 - template_id must be one of: boutique-villa, surf-camp, minimal-stay.
-- features and experiences must be arrays of short strings.
-- capacity, bedrooms, bathrooms should be strings if known.
-- Do not invent precise room counts if they are not present.
+- description must be a polished short description of 2-4 sentences for the form's Short description field.
+- hero_title must be emotional and specific, not just "Direct booking for X".
+- hero_subtitle must summarize the strongest stay promise in one sentence.
+- features must contain 6-10 guest-facing amenities or stay strengths. Use exact amenities from the source when available; otherwise infer only broad, reasonable strengths from the property type and description.
+- experiences must contain 4-8 nearby activities, destination themes, or guest use cases.
+- capacity, bedrooms, bathrooms should be numeric strings only if known. Leave blank if not present.
+- Prefer structured data, meta description, OG description, and visible listing text over URL guesses.
+- Do not leave description, hero_title, hero_subtitle, features, or experiences empty if the source contains enough context to create a useful draft.
 - Use polished boutique hospitality copy, not generic SaaS copy.
 
-Listing URL: ${url.toString()}
-Listing text:
-${listingText || "The OTA page text could not be fetched. Use the URL only and leave uncertain fields blank."}`;
+Listing source:
+${summarizeSource(source)}`;
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -125,10 +231,12 @@ ${listingText || "The OTA page text could not be fetched. Use the URL only and l
     },
     body: JSON.stringify({
       model,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
-          content: "You turn OTA listing information into structured direct-booking website drafts.",
+          content:
+            "You turn OTA listing information into complete structured direct-booking website drafts. Always return valid JSON only.",
         },
         { role: "user", content: prompt },
       ],
@@ -153,15 +261,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Enter a valid OTA listing URL." }, { status: 400 });
   }
 
-  const listingText = await fetchListingText(url);
+  const listingSource = await fetchListingSource(url);
 
   try {
-    const aiDraft = await createAiDraft(url, listingText);
+    const aiDraft = await createAiDraft(url, listingSource);
 
     if (aiDraft) {
       return NextResponse.json({
         draft: { ...fallbackDraft(url), ...aiDraft },
-        sourceTextAvailable: Boolean(listingText),
+        sourceTextAvailable: Boolean(
+          listingSource.bodyText ||
+            listingSource.metaDescription ||
+            listingSource.ogDescription ||
+            listingSource.jsonLd.length,
+        ),
       });
     }
   } catch (error) {
@@ -174,7 +287,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       draft: fallbackDraft(url),
-      sourceTextAvailable: Boolean(listingText),
+      sourceTextAvailable: Boolean(listingSource.bodyText),
       warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic URL draft.",
     },
     { status: 200 },
