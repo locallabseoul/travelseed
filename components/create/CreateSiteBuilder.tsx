@@ -516,7 +516,7 @@ function StartChoice({
   onManualStart: () => void;
 }) {
   return (
-    <div className="mx-auto mb-10 grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+    <div className="mx-auto mb-10 max-w-3xl">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your site</p>
         <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
@@ -528,7 +528,7 @@ function StartChoice({
         </p>
       </div>
 
-      <div className="rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
+      <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
         <div className="grid gap-4">
           <div className="rounded-md border border-[#eadfce] bg-[#fbf8f1] p-4">
             <p className="text-sm font-semibold text-[#18352f]">Create with AI</p>
