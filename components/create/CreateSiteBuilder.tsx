@@ -29,6 +29,11 @@ type BuilderForm = {
   experiences: string;
 };
 
+type ImportDraft = Partial<Omit<BuilderForm, "features" | "experiences" | "gallery_images" | "hero_image_url">> & {
+  features?: string[];
+  experiences?: string[];
+};
+
 const steps = [
   {
     title: "Basic Info",
@@ -122,6 +127,10 @@ function dataUrlToFile(dataUrl: string, fileName: string) {
   return new File([bytes], fileName, { type: mimeType });
 }
 
+function draftList(value: string[] | undefined) {
+  return value?.filter(Boolean).join("\n") ?? "";
+}
+
 function createPreviewResort(form: BuilderForm): Resort {
   const gallery = textareaList(form.gallery_images);
 
@@ -156,10 +165,14 @@ Airport Pickup:`,
 export function CreateSiteBuilder() {
   const router = useRouter();
   const [form, setForm] = useState<BuilderForm>(starterForm);
+  const [builderStarted, setBuilderStarted] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [building, setBuilding] = useState(false);
   const [buildStatus, setBuildStatus] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [listingUrl, setListingUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState("");
   const previewResort = useMemo(() => createPreviewResort(form), [form]);
   const galleryImages = useMemo(() => textareaList(form.gallery_images), [form.gallery_images]);
 
@@ -185,6 +198,65 @@ export function CreateSiteBuilder() {
 
       return { ...current, [key]: value };
     });
+  }
+
+  function applyImportDraft(draft: ImportDraft) {
+    setForm((current) => {
+      const nextName = draft.name?.trim() || current.name;
+      const nextSlug = draft.slug?.trim() || (nextName ? slugify(nextName) : current.slug);
+
+      return {
+        ...current,
+        name: nextName,
+        slug: nextSlug,
+        location: draft.location?.trim() || current.location,
+        type: draft.type?.trim() || current.type,
+        template_id: draft.template_id?.trim() || current.template_id,
+        hero_title: draft.hero_title?.trim() || current.hero_title,
+        hero_subtitle: draft.hero_subtitle?.trim() || current.hero_subtitle,
+        capacity: draft.capacity?.trim() || current.capacity,
+        bedrooms: draft.bedrooms?.trim() || current.bedrooms,
+        bathrooms: draft.bathrooms?.trim() || current.bathrooms,
+        description: draft.description?.trim() || current.description,
+        features: draft.features?.length ? draftList(draft.features) : current.features,
+        experiences: draft.experiences?.length ? draftList(draft.experiences) : current.experiences,
+      };
+    });
+  }
+
+  async function handleImportListing() {
+    setImportStatus("");
+
+    if (!listingUrl.trim()) {
+      setImportStatus("Paste a public OTA listing URL first.");
+      return;
+    }
+
+    setImporting(true);
+    setImportStatus("Reading the listing and preparing a direct-booking draft...");
+
+    try {
+      const response = await fetch("/api/import-listing", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url: listingUrl }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setImportStatus(data?.error ?? "Could not import this listing. You can continue manually.");
+        return;
+      }
+
+      applyImportDraft(data.draft ?? {});
+      setBuilderStarted(true);
+      setActiveStep(0);
+      setImportStatus(data.warning ?? "Draft created. Review each field before publishing.");
+    } catch {
+      setImportStatus("Could not import this listing. You can continue manually.");
+    } finally {
+      setImporting(false);
+    }
   }
 
   async function handleHeroFile(event: ChangeEvent<HTMLInputElement>) {
@@ -316,8 +388,21 @@ export function CreateSiteBuilder() {
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
       <section className="px-5 py-10 sm:px-6 lg:py-14">
+        {!builderStarted ? (
+          <StartChoice
+            listingUrl={listingUrl}
+            onListingUrlChange={setListingUrl}
+            importing={importing}
+            importStatus={importStatus}
+            onImportListing={handleImportListing}
+            onManualStart={() => {
+              setBuilderStarted(true);
+              setImportStatus("");
+            }}
+          />
+        ) : null}
         <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[minmax(460px,0.9fr)_minmax(0,1.1fr)]">
-          <div>
+          <div className={builderStarted ? "" : "hidden"}>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your preview</p>
             <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
               Try your direct booking website before you subscribe.
@@ -328,6 +413,11 @@ export function CreateSiteBuilder() {
             </p>
 
             <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
+              {importStatus ? (
+                <p className="mb-5 rounded-md bg-[#f8f5ef] p-3 text-sm leading-6 text-[#51635b]">
+                  {importStatus}
+                </p>
+              ) : null}
               <StepProgress activeStep={activeStep} onSelect={setActiveStep} />
 
               <div className="mt-7 border-t border-[#eadfce] pt-7">
@@ -405,6 +495,79 @@ export function CreateSiteBuilder() {
         </div>
       </section>
     </main>
+  );
+}
+
+function StartChoice({
+  listingUrl,
+  onListingUrlChange,
+  importing,
+  importStatus,
+  onImportListing,
+  onManualStart,
+}: {
+  listingUrl: string;
+  onListingUrlChange: (value: string) => void;
+  importing: boolean;
+  importStatus: string;
+  onImportListing: () => Promise<void>;
+  onManualStart: () => void;
+}) {
+  return (
+    <div className="mx-auto mb-10 grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your site</p>
+        <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+          Start with AI from your OTA listing, or build manually.
+        </h1>
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-[#51635b]">
+          Paste a public Booking, Airbnb, Agoda, or resort listing URL to generate a direct-booking
+          draft. You can review and edit every field before launch.
+        </p>
+      </div>
+
+      <div className="rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
+        <div className="grid gap-4">
+          <div className="rounded-md border border-[#eadfce] bg-[#fbf8f1] p-4">
+            <p className="text-sm font-semibold text-[#18352f]">Create with AI</p>
+            <p className="mt-2 text-sm leading-6 text-[#51635b]">
+              Travelseed will read public listing text and turn it into a website draft with copy,
+              amenities, experiences, and a recommended template.
+            </p>
+            <label className="mt-4 grid gap-2 text-sm font-medium">
+              OTA listing URL
+              <input
+                type="url"
+                value={listingUrl}
+                onChange={(event) => onListingUrlChange(event.target.value)}
+                placeholder="https://www.booking.com/hotel/..."
+                className="min-h-12 rounded-md border border-[#d8cebb] bg-white px-3 outline-none focus:border-[#18352f]"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => void onImportListing()}
+              disabled={importing}
+              className="mt-4 min-h-[52px] w-full rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {importing ? "Generating Draft..." : "Generate with AI"}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={onManualStart}
+            className="min-h-[52px] rounded-full border border-[#d8cebb] bg-white px-6 text-sm font-semibold text-[#18352f]"
+          >
+            Enter Details Manually
+          </button>
+
+          {importStatus ? (
+            <p className="rounded-md bg-[#f8f5ef] p-3 text-sm leading-6 text-[#51635b]">{importStatus}</p>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
