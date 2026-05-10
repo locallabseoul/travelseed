@@ -100,7 +100,7 @@ async function createAiDraft(url: URL, listingText: string) {
     return null;
   }
 
-  const model = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+  const model = process.env.OPENAI_MODEL ?? "gpt-5-mini";
   const prompt = `Create a direct-booking resort website draft from this OTA listing.
 
 Return only compact JSON with these keys:
@@ -125,7 +125,6 @@ ${listingText || "The OTA page text could not be fetched. Use the URL only and l
     },
     body: JSON.stringify({
       model,
-      temperature: 0.3,
       messages: [
         {
           role: "system",

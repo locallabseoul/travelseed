@@ -9,8 +9,8 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 export function createSupabaseClient() {
   // Fallback values let `next build` run before local environment variables are configured.
   return createClient(
-    supabaseUrl ?? "https://example.supabase.co",
-    supabaseAnonKey ?? "missing-anon-key",
+    supabaseUrl || "https://example.supabase.co",
+    supabaseAnonKey || "missing-anon-key",
   );
 }
 
