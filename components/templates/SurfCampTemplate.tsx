@@ -27,15 +27,15 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
 
   return (
     <main className="bg-[#f5fbf8] text-[#0c2f35]">
-      <section className="relative overflow-hidden bg-[#0b5f6f] px-5 pb-14 pt-6 text-white sm:px-6 lg:pb-20">
+      <section className="relative overflow-hidden bg-[#0b5f6f] px-5 pb-12 pt-6 text-white sm:px-6 lg:pb-16">
         <div className="-mx-5 -mt-6 sm:-mx-6">
           <ResortNavigation resort={resort} variant="light" />
         </div>
 
-        <div className="mx-auto grid min-h-[86vh] max-w-6xl gap-10 pt-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
-          <div className="pb-4">
+        <div className="mx-auto grid max-w-6xl gap-8 pt-10 sm:pt-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:pt-14">
+          <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-cyan-100">{resort.location}</p>
-            <h1 className="mt-5 text-5xl font-black leading-[0.96] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-5 text-4xl font-black leading-[0.98] sm:text-5xl lg:text-6xl">
               {resort.hero_title}
             </h1>
             {resort.hero_subtitle ? (
@@ -57,7 +57,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
             </div>
           </div>
 
-          <div className="relative min-h-[420px] overflow-hidden rounded-md bg-[#063e48] shadow-[0_30px_100px_rgba(4,43,50,0.35)]">
+          <div className="relative min-h-[320px] overflow-hidden rounded-md bg-[#063e48] shadow-[0_30px_100px_rgba(4,43,50,0.35)] sm:min-h-[380px] lg:min-h-[440px]">
             {featuredImage ? (
               <Image src={featuredImage} alt={resort.name} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
             ) : (
