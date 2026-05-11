@@ -54,6 +54,14 @@ create policy "Anon can update resorts during MVP"
   using (true)
   with check (true);
 
+-- MVP-only delete policy for the unauthenticated admin page.
+-- Replace this with Supabase Auth role checks before production.
+drop policy if exists "Anon can delete resorts during MVP" on public.resorts;
+create policy "Anon can delete resorts during MVP"
+  on public.resorts
+  for delete
+  using (true);
+
 insert into storage.buckets (
   id,
   name,
@@ -89,6 +97,12 @@ create policy "Anon can update resort images during MVP"
   for update
   using (bucket_id = 'resort-images')
   with check (bucket_id = 'resort-images');
+
+drop policy if exists "Anon can delete resort images during MVP" on storage.objects;
+create policy "Anon can delete resort images during MVP"
+  on storage.objects
+  for delete
+  using (bucket_id = 'resort-images');
 
 insert into public.resorts (
   name,

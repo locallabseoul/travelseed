@@ -135,6 +135,28 @@ function previewHref(slug: string, templateId: string) {
   return `/sites/${slug}?template=${templateId}`;
 }
 
+function storagePathFromPublicUrl(imageUrl: string) {
+  try {
+    const url = new URL(imageUrl);
+    const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+    const markerIndex = url.pathname.indexOf(marker);
+
+    if (markerIndex === -1) {
+      return null;
+    }
+
+    return decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
+  } catch {
+    return null;
+  }
+}
+
+type StorageListItem = {
+  name: string;
+  id?: string | null;
+  metadata?: unknown;
+};
+
 // Temporary unauthenticated admin page. Add Supabase Auth or middleware guards before production use.
 export default function AdminPage() {
   const [resorts, setResorts] = useState<Resort[]>([]);
@@ -142,6 +164,7 @@ export default function AdminPage() {
   const [form, setForm] = useState<ResortFormState>(emptyForm);
   const [status, setStatus] = useState<string>("");
   const [uploadingField, setUploadingField] = useState<"hero" | "gallery" | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const selectedResort = useMemo(
     () => resorts.find((resort) => resort.id === selectedResortId) ?? null,
@@ -262,6 +285,96 @@ export default function AdminPage() {
     );
   }
 
+  async function listStoragePaths(prefix: string): Promise<string[]> {
+    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).list(prefix);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const items = (data ?? []) as StorageListItem[];
+    const paths = await Promise.all(
+      items.map(async (item) => {
+        const path = `${prefix}/${item.name}`;
+        const isFile = Boolean(item.id || item.metadata);
+
+        if (isFile) {
+          return [path];
+        }
+
+        return listStoragePaths(path);
+      }),
+    );
+
+    return paths.flat();
+  }
+
+  async function deleteResortStorageAssets(resort: Resort) {
+    const listedPaths = await Promise.all([
+      listStoragePaths(`${resort.slug}/hero`).catch(() => []),
+      listStoragePaths(`${resort.slug}/gallery`).catch(() => []),
+    ]);
+    const urlPaths = [resort.hero_image_url, ...resort.gallery]
+      .map((imageUrl) => (imageUrl ? storagePathFromPublicUrl(imageUrl) : null))
+      .filter(Boolean) as string[];
+    const paths = [...new Set([...listedPaths.flat(), ...urlPaths])];
+
+    if (paths.length === 0) {
+      return;
+    }
+
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(paths);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async function handleDeleteSelectedResort() {
+    if (!selectedResort) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete ${selectedResort.name}? This will remove the resort record and uploaded hero/gallery images from Storage. This cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    if (!isSupabaseConfigured) {
+      setResorts((current) => current.filter((resort) => resort.id !== selectedResort.id));
+      setSelectedResortId(null);
+      setForm(emptyForm);
+      setStatus("Resort removed from local preview data.");
+      return;
+    }
+
+    setDeleting(true);
+    setStatus(`Deleting ${selectedResort.name} and related images...`);
+
+    try {
+      await deleteResortStorageAssets(selectedResort);
+
+      const { error } = await supabase.from("resorts").delete().eq("id", selectedResort.id);
+
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+
+      setSelectedResortId(null);
+      setForm(emptyForm);
+      setStatus(`${selectedResort.name} deleted with related uploaded images.`);
+      await loadResorts();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not delete this resort.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -369,15 +482,27 @@ export default function AdminPage() {
                 Upload photos to Supabase Storage, then save the resort to publish changes.
               </p>
             </div>
-            <label className="inline-flex items-center gap-2 text-sm font-medium text-forest">
-              <input
-                type="checkbox"
-                checked={form.is_active}
-                onChange={(event) => updateField("is_active", event.target.checked)}
-                className="h-4 w-4 accent-forest"
-              />
-              Active
-            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {selectedResort ? (
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteSelectedResort()}
+                  disabled={deleting}
+                  className="min-h-10 rounded-md border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete resort"}
+                </button>
+              ) : null}
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-forest">
+                <input
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={(event) => updateField("is_active", event.target.checked)}
+                  className="h-4 w-4 accent-forest"
+                />
+                Active
+              </label>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 grid gap-5">
