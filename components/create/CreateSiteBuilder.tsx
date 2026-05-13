@@ -414,7 +414,32 @@ export function CreateSiteBuilder() {
         {!authReady ? (
           <p className="mx-auto max-w-3xl text-sm font-medium text-[#51635b]">Checking account session...</p>
         ) : null}
-        {!builderStarted ? (
+        {authReady && isSupabaseConfigured && !session ? (
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Create your site</p>
+              <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+                Sign in before building your direct booking site.
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-[#51635b]">
+                Create a verified account first, then import your listing or start manually.
+              </p>
+            </div>
+            <AccountPanel
+              session={session}
+              authMode={authMode}
+              authEmail={authEmail}
+              authPassword={authPassword}
+              authStatus={authStatus}
+              onAuthModeChange={setAuthMode}
+              onEmailChange={setAuthEmail}
+              onPasswordChange={setAuthPassword}
+              onSubmit={handleAuthSubmit}
+              onSignOut={handleSignOut}
+            />
+          </div>
+        ) : null}
+        {authReady && (!isSupabaseConfigured || session) && !builderStarted ? (
           <StartChoice
             listingUrl={listingUrl}
             onListingUrlChange={setListingUrl}
