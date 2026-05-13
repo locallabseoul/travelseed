@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { HomeAccountNav } from "@/components/auth/HomeAccountNav";
+import { AppHeader } from "@/components/auth/HomeAccountNav";
 
 const demoResorts = [
   {
@@ -94,12 +94,7 @@ export default function HomePage() {
 function HeroSection() {
   return (
     <section className="overflow-hidden px-5 pb-20 pt-6 sm:px-6 lg:pb-28">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">
-          TRAVELSEED
-        </Link>
-        <HomeAccountNav />
-      </nav>
+      <AppHeader />
 
       <div className="mx-auto grid max-w-7xl gap-12 pt-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pt-28">
         <div>

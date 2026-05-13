@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { renderResortTemplate } from "@/components/templates";
 import { loadPreviewResort } from "@/components/create/preview-storage";
 import type { Resort } from "@/types/resort";
@@ -22,14 +23,7 @@ export function PreviewSite() {
   if (!resort) {
     return (
       <main className="min-h-screen bg-[#f8f5ef] px-5 py-6 text-[#18352f] sm:px-6">
-        <header className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="text-sm font-semibold tracking-[0.22em]">
-            TRAVELSEED
-          </Link>
-          <Link href="/create" className="text-sm font-semibold text-[#51635b]">
-            Builder
-          </Link>
-        </header>
+        <AppHeader />
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="max-w-md rounded-md bg-white p-6 text-center shadow-[0_24px_80px_rgba(54,43,29,0.08)]">
             <h1 className="text-2xl font-semibold">No preview found</h1>

@@ -76,3 +76,14 @@ export function HomeAccountNav() {
     </details>
   );
 }
+
+export function AppHeader({ className = "" }: { className?: string }) {
+  return (
+    <header className={`mx-auto flex max-w-7xl items-center justify-between ${className}`}>
+      <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">
+        TRAVELSEED
+      </Link>
+      <HomeAccountNav />
+    </header>
+  );
+}

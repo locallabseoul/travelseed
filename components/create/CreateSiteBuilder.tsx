@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -493,16 +493,9 @@ export function CreateSiteBuilder() {
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
-      <header className="px-5 pt-6 sm:px-6">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="text-sm font-semibold tracking-[0.22em]">
-            TRAVELSEED
-          </Link>
-          <Link href="/login?next=/create" className="text-sm font-semibold text-[#51635b]">
-            Account
-          </Link>
-        </div>
-      </header>
+      <div className="px-5 pt-6 sm:px-6">
+        <AppHeader />
+      </div>
       <section className="px-5 py-10 sm:px-6 lg:py-14">
         {!authReady ? (
           <p className="mx-auto max-w-3xl text-sm font-medium text-[#51635b]">Checking account session...</p>

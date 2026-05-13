@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: string }) {
@@ -86,13 +86,11 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f5ef] px-5 py-10 text-[#18352f]">
-      <section className="grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-[0_24px_80px_rgba(54,43,29,0.08)]">
+    <main className="min-h-screen bg-[#f8f5ef] px-5 py-6 text-[#18352f] sm:px-6">
+      <AppHeader />
+      <section className="mx-auto mt-20 grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-[0_24px_80px_rgba(54,43,29,0.08)]">
         <div>
-          <Link href="/" className="text-sm font-semibold tracking-[0.22em]">
-            TRAVELSEED
-          </Link>
-          <h1 className="mt-4 text-3xl font-semibold">
+          <h1 className="text-3xl font-semibold">
             {authMode === "sign-in" ? "Sign in" : "Create account"}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#51635b]">

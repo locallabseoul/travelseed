@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { resortTemplateOptions } from "@/components/templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort, ResortUpsert } from "@/types/resort";
@@ -492,16 +493,7 @@ export function OperatorDashboard() {
 }
 
 function DashboardHeader() {
-  return (
-    <header className="mx-auto mb-8 flex max-w-7xl items-center justify-between">
-      <Link href="/" className="text-sm font-semibold tracking-[0.22em]">
-        TRAVELSEED
-      </Link>
-      <Link href="/create" className="text-sm font-semibold text-[#51635b]">
-        Build My Site
-      </Link>
-    </header>
-  );
+  return <AppHeader className="mb-8" />;
 }
 
 function CenteredMessage({ text, action }: { text: string; action?: ReactNode }) {
