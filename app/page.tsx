@@ -98,9 +98,6 @@ function HeroSection() {
           TRAVELSEED
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="hidden text-sm font-semibold text-[#51635b] sm:inline">
-            Dashboard
-          </Link>
           <Link href="/sites/villa-jeruk" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
             Demo Resort
           </Link>
@@ -123,9 +120,6 @@ function HeroSection() {
             </Link>
             <Link href="/sites/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#18352f] px-7 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(24,53,47,0.22)]">
               View Demo Resort
-            </Link>
-            <Link href="/admin" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[#cfc4b2] bg-white/70 px-7 text-sm font-semibold text-[#18352f]">
-              Open Dashboard
             </Link>
           </div>
         </div>
@@ -318,9 +312,6 @@ function FinalCtaSection() {
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-[#18352f]">
               Build My Site
             </Link>
-            <Link href="/admin" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#dbc895] px-7 text-sm font-semibold text-[#18352f]">
-              Open Dashboard
-            </Link>
             <Link href="/sites/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/25 px-7 text-sm font-semibold text-white">
               View Demo Resort
             </Link>
@@ -338,7 +329,7 @@ function Footer() {
         <p className="font-semibold tracking-[0.18em] text-[#18352f]">TRAVELSEED</p>
         <div className="flex flex-wrap gap-5">
           <Link href="/">About</Link>
-          <Link href="/admin">Dashboard</Link>
+          <Link href="/create">Build My Site</Link>
           <Link href="mailto:hello@travelseed.app">Contact</Link>
         </div>
       </div>

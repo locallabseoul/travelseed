@@ -9,6 +9,10 @@ export type AdminCheck =
   | { ok: true; email: string }
   | { ok: false; status: number; message: string };
 
+export type UserCheck =
+  | { ok: true; email: string }
+  | { ok: false; status: number; message: string };
+
 export function createServiceRoleClient() {
   if (!supabaseUrl || !supabaseServiceRoleKey) {
     throw new Error("Supabase service role environment variables are not configured.");
@@ -73,6 +77,37 @@ export async function verifyAdminRequest(request: Request): Promise<AdminCheck> 
 
   if (!allowedEmails.has(email)) {
     return { ok: false, status: 403, message: "This account is not allowed to manage Travelseed." };
+  }
+
+  return { ok: true, email };
+}
+
+export async function verifyAuthenticatedRequest(request: Request): Promise<UserCheck> {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return { ok: false, status: 500, message: "Supabase public environment variables are not configured." };
+  }
+
+  const token = bearerToken(request);
+  if (!token) {
+    return { ok: false, status: 401, message: "Sign in before creating a site." };
+  }
+
+  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    },
+  });
+  const { data, error } = await authClient.auth.getUser(token);
+  const email = data.user?.email?.toLowerCase();
+
+  if (error || !email) {
+    return { ok: false, status: 401, message: "Invalid session. Sign in again before creating a site." };
   }
 
   return { ok: true, email };

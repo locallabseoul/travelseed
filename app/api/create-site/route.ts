@@ -3,6 +3,7 @@ import {
   createServiceRoleClient,
   sanitizeResortPayload,
   validateResortPayload,
+  verifyAuthenticatedRequest,
 } from "@/lib/server/supabase-admin";
 import type { Resort } from "@/types/resort";
 
@@ -45,6 +46,11 @@ async function uploadDataUrlIfNeeded(imageUrl: string | null, slug: string, fold
 
 // Public site creation endpoint. Supabase writes happen server-side so anon RLS can stay locked down.
 export async function POST(request: Request) {
+  const user = await verifyAuthenticatedRequest(request);
+  if (!user.ok) {
+    return NextResponse.json({ error: user.message }, { status: user.status });
+  }
+
   const body = await request.json().catch(() => null);
   const payload = sanitizeResortPayload(body?.resort ?? {});
   const validationError = validateResortPayload(payload);

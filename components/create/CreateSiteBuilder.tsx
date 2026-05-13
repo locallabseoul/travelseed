@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort } from "@/types/resort";
 
 type BuilderForm = {
@@ -158,10 +159,36 @@ export function CreateSiteBuilder() {
   const [listingUrl, setListingUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState("");
+  const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
+  const [session, setSession] = useState<Session | null>(null);
+  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-up");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authStatus, setAuthStatus] = useState("");
   const previewResort = useMemo(() => createPreviewResort(form), [form]);
   const galleryImages = useMemo(() => textareaList(form.gallery_images), [form.gallery_images]);
 
   const isLastStep = activeStep === steps.length - 1;
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setAuthReady(true);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setAuthReady(true);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   function updateField<Key extends keyof BuilderForm>(key: Key, value: BuilderForm[Key]) {
     setForm((current) => {
@@ -284,9 +311,57 @@ export function CreateSiteBuilder() {
     window.open("/preview", "_blank", "noopener,noreferrer");
   }
 
+  async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthStatus(authMode === "sign-in" ? "Signing in..." : "Creating account...");
+
+    if (authMode === "sign-up") {
+      const { error } = await supabase.auth.signUp({
+        email: authEmail.trim(),
+        password: authPassword,
+        options: {
+          emailRedirectTo: `${window.location.origin}/create`,
+        },
+      });
+
+      if (error) {
+        setAuthStatus(error.message);
+        return;
+      }
+
+      setAuthPassword("");
+      setAuthMode("sign-in");
+      setAuthStatus("Check your email to verify the account, then sign in.");
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: authEmail.trim(),
+      password: authPassword,
+    });
+
+    if (error) {
+      setAuthStatus(error.message);
+      return;
+    }
+
+    setAuthPassword("");
+    setAuthStatus("");
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    setAuthStatus("");
+  }
+
   async function handleBuildSite() {
     if (!isSupabaseConfigured) {
       setBuildStatus("Supabase is not configured. Connect Supabase before creating a site.");
+      return;
+    }
+
+    if (!session?.access_token) {
+      setBuildStatus("Create an account or sign in before building your site.");
       return;
     }
 
@@ -305,7 +380,10 @@ export function CreateSiteBuilder() {
     try {
       const response = await fetch("/api/create-site", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          authorization: `Bearer ${session.access_token}`,
+          "content-type": "application/json",
+        },
         body: JSON.stringify({ resort }),
       });
       const data = await response.json();
@@ -333,6 +411,9 @@ export function CreateSiteBuilder() {
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
       <section className="px-5 py-10 sm:px-6 lg:py-14">
+        {!authReady ? (
+          <p className="mx-auto max-w-3xl text-sm font-medium text-[#51635b]">Checking account session...</p>
+        ) : null}
         {!builderStarted ? (
           <StartChoice
             listingUrl={listingUrl}
@@ -364,6 +445,18 @@ export function CreateSiteBuilder() {
                     {importStatus}
                   </p>
                 ) : null}
+                <AccountPanel
+                  session={session}
+                  authMode={authMode}
+                  authEmail={authEmail}
+                  authPassword={authPassword}
+                  authStatus={authStatus}
+                  onAuthModeChange={setAuthMode}
+                  onEmailChange={setAuthEmail}
+                  onPasswordChange={setAuthPassword}
+                  onSubmit={handleAuthSubmit}
+                  onSignOut={handleSignOut}
+                />
                 <StepProgress activeStep={activeStep} onSelect={setActiveStep} />
 
               <div className="mt-7 border-t border-[#eadfce] pt-7">
@@ -518,6 +611,78 @@ function StartChoice({
   );
 }
 
+function AccountPanel({
+  session,
+  authMode,
+  authEmail,
+  authPassword,
+  authStatus,
+  onAuthModeChange,
+  onEmailChange,
+  onPasswordChange,
+  onSubmit,
+  onSignOut,
+}: {
+  session: Session | null;
+  authMode: "sign-in" | "sign-up";
+  authEmail: string;
+  authPassword: string;
+  authStatus: string;
+  onAuthModeChange: (mode: "sign-in" | "sign-up") => void;
+  onEmailChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  onSignOut: () => Promise<void>;
+}) {
+  if (session) {
+    return (
+      <div className="mb-5 flex flex-col gap-3 rounded-md border border-[#d8cebb] bg-[#fbf8f1] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">Account ready</p>
+          <p className="mt-1 text-sm text-[#51635b]">{session.user.email}</p>
+        </div>
+        <button type="button" onClick={() => void onSignOut()} className="text-sm font-semibold text-[#0f5f6b]">
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={(event) => void onSubmit(event)} className="mb-5 grid gap-4 rounded-md border border-[#d8cebb] bg-[#fbf8f1] p-4">
+      <div>
+        <p className="text-sm font-semibold text-[#18352f]">
+          {authMode === "sign-up" ? "Create your Travelseed account" : "Sign in to build"}
+        </p>
+        <p className="mt-1 text-sm leading-6 text-[#51635b]">
+          {authMode === "sign-up"
+            ? "Verify your email before publishing your direct booking site."
+            : "Use your verified account to create and manage your site."}
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <TextField label="Email" value={authEmail} onChange={onEmailChange} type="email" />
+        <TextField label="Password" value={authPassword} onChange={onPasswordChange} type="password" />
+      </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button type="submit" className="min-h-[48px] rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white">
+          {authMode === "sign-up" ? "Create Account" : "Sign In"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onAuthModeChange(authMode === "sign-up" ? "sign-in" : "sign-up");
+          }}
+          className="text-sm font-semibold text-[#0f5f6b]"
+        >
+          {authMode === "sign-up" ? "Already have an account?" : "Create an account"}
+        </button>
+      </div>
+      {authStatus ? <p className="rounded-md bg-white p-3 text-sm text-[#51635b]">{authStatus}</p> : null}
+    </form>
+  );
+}
+
 function renderStep(
   activeStep: number,
   form: BuilderForm,
@@ -622,9 +787,8 @@ function renderStep(
     <div className="rounded-md bg-[#f8f5ef] p-5">
       <p className="text-sm font-semibold">Ready to turn this preview into a real site?</p>
       <p className="mt-2 text-sm leading-6 text-[#51635b]">
-        Review the live preview on the right. When you are ready, start the launch flow to create your
-        account, connect your domain, and unlock publishing, hosted image uploads, customer data, and
-        subscription billing.
+        Review the live preview on the right. Create or sign in to your verified account, then publish
+        the direct booking site with hosted images and a dedicated public URL.
       </p>
       <button
         type="button"
