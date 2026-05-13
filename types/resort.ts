@@ -77,11 +77,14 @@ export type ResortUpsert = ResortInsert & {
 
 export type ResortWithMetrics = Resort & {
   whatsapp_clicks_count?: number;
+  page_views_count?: number;
   inquiries_count?: number;
   storage_images_count?: number;
   analytics?: {
     whatsappClicks7d: number;
     whatsappClicks30d: number;
+    pageViews7d: number;
+    pageViews30d: number;
     recentEvents: Array<{
       eventType: string;
       source: string;
@@ -90,6 +93,7 @@ export type ResortWithMetrics = Resort & {
     dailyClicks: Array<{
       date: string;
       whatsappClicks: number;
+      pageViews: number;
     }>;
   };
 };

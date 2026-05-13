@@ -92,11 +92,14 @@ export type SiteAnalyticsEvent = {
 export type SiteAnalyticsDailyPoint = {
   date: string;
   whatsappClicks: number;
+  pageViews: number;
 };
 
 export type SiteAnalyticsSummary = {
   whatsappClicks7d: number;
   whatsappClicks30d: number;
+  pageViews7d: number;
+  pageViews30d: number;
   recentEvents: SiteAnalyticsEvent[];
   dailyClicks: SiteAnalyticsDailyPoint[];
 };

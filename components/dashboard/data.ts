@@ -8,6 +8,8 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
   const defaultAnalytics = {
     whatsappClicks7d: 0,
     whatsappClicks30d: resort.whatsapp_clicks_count ?? 0,
+    pageViews7d: 0,
+    pageViews30d: resort.page_views_count ?? 0,
     recentEvents: [],
     dailyClicks: [],
   };
@@ -23,7 +25,7 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     status: resort.is_active ? "Published" : "Paused",
     travelseedUrl: `${resort.slug}.travelseed.app`,
     customDomain: resort.domain ?? "",
-    monthlyVisitorsUsed: 0,
+    monthlyVisitorsUsed: resort.page_views_count ?? resort.analytics?.pageViews30d ?? 0,
     monthlyVisitorsLimit: planLimits.visitors,
     whatsappClicksUsed: resort.whatsapp_clicks_count ?? 0,
     whatsappClicksLimit: planLimits.whatsappClicks,

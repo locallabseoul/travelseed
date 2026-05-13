@@ -3,7 +3,7 @@ import type { ResortConsoleData } from "@/types/dashboard";
 
 export function AnalyticsView({ site }: { site: ResortConsoleData }) {
   const conversion = site.monthlyVisitorsUsed > 0 ? ((site.whatsappClicksUsed / site.monthlyVisitorsUsed) * 100).toFixed(1) : "0.0";
-  const maxDailyClicks = Math.max(...site.analytics.dailyClicks.map((point) => point.whatsappClicks), 1);
+  const maxDailyActivity = Math.max(...site.analytics.dailyClicks.map((point) => Math.max(point.whatsappClicks, point.pageViews)), 1);
   const sourceCounts = sourceCountsFor(site);
 
   return (
@@ -30,16 +30,16 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.72fr]">
         <Panel>
-          <h2 className="text-xl font-semibold text-[#18352f]">WhatsApp clicks by day</h2>
+          <h2 className="text-xl font-semibold text-[#18352f]">Traffic and clicks by day</h2>
           <div className="mt-6 grid gap-5">
             {site.analytics.dailyClicks.length > 0 ? (
               site.analytics.dailyClicks.map((point) => (
                 <div key={point.date}>
                   <div className="mb-2 flex justify-between text-sm">
                     <span className="font-medium text-[#18352f]">{formatShortDate(point.date)}</span>
-                    <span className="text-[#6f7b74]">{point.whatsappClicks}</span>
+                    <span className="text-[#6f7b74]">{point.pageViews} views · {point.whatsappClicks} clicks</span>
                   </div>
-                  <ProgressBar value={(point.whatsappClicks / maxDailyClicks) * 100} />
+                  <ProgressBar value={(Math.max(point.whatsappClicks, point.pageViews) / maxDailyActivity) * 100} />
                 </div>
               ))
             ) : (
@@ -54,7 +54,7 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
             {site.analytics.recentEvents.length > 0 ? (
               site.analytics.recentEvents.map((event) => (
                 <div key={`${event.createdAt}-${event.source}`} className="rounded-2xl bg-[#fbfaf7] p-4">
-                  <p className="text-sm font-semibold text-[#18352f]">WhatsApp clicked from {labelForSource(event.source)}</p>
+                  <p className="text-sm font-semibold text-[#18352f]">{labelForEvent(event.eventType)} from {labelForSource(event.source)}</p>
                   <p className="mt-1 text-xs text-[#6f7b74]">{formatDateTime(event.createdAt)}</p>
                 </div>
               ))
@@ -99,6 +99,10 @@ function labelForSource(source: string) {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function labelForEvent(eventType: string) {
+  return eventType === "page_view" ? "Page viewed" : "WhatsApp clicked";
 }
 
 function formatShortDate(date: string) {

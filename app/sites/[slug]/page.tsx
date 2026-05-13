@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { PageViewTracker } from "@/components/resort/PageViewTracker";
 import { renderResortTemplate } from "@/components/templates";
 import { getActiveResortBySlug } from "@/lib/tenants";
 import type { Resort } from "@/types/resort";
@@ -83,5 +84,10 @@ export default async function SitePage({ params, searchParams }: SitePageProps) 
     notFound();
   }
 
-  return renderResortTemplate(resort, template);
+  return (
+    <>
+      <PageViewTracker resortId={resort.id} path={`/sites/${resort.slug}`} />
+      {renderResortTemplate(resort, template)}
+    </>
+  );
 }

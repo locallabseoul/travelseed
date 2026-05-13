@@ -39,7 +39,8 @@ export async function GET(request: Request) {
 
   const resorts = (data ?? []) as Resort[];
   const resortIds = resorts.map((resort) => resort.id);
-  const eventCounts = new Map<string, number>();
+  const whatsappClickCounts = new Map<string, number>();
+  const pageViewCounts = new Map<string, number>();
   const inquiryCounts = new Map<string, number>();
   const eventsByResortId = new Map<string, SiteEventRow[]>();
   const now = Date.now();
@@ -50,7 +51,7 @@ export async function GET(request: Request) {
     const { data: events, error: eventsError } = await supabase
       .from("site_events")
       .select("resort_id,event_type,source,created_at")
-      .eq("event_type", "whatsapp_click")
+      .in("event_type", ["whatsapp_click", "page_view"])
       .in("resort_id", resortIds)
       .gte("created_at", thirtyDaysAgoIso)
       .order("created_at", { ascending: false });
@@ -60,7 +61,12 @@ export async function GET(request: Request) {
     }
 
     for (const event of (events ?? []) as SiteEventRow[]) {
-      eventCounts.set(event.resort_id, (eventCounts.get(event.resort_id) ?? 0) + 1);
+      if (event.event_type === "whatsapp_click") {
+        whatsappClickCounts.set(event.resort_id, (whatsappClickCounts.get(event.resort_id) ?? 0) + 1);
+      }
+      if (event.event_type === "page_view") {
+        pageViewCounts.set(event.resort_id, (pageViewCounts.get(event.resort_id) ?? 0) + 1);
+      }
       eventsByResortId.set(event.resort_id, [...(eventsByResortId.get(event.resort_id) ?? []), event]);
     }
 
@@ -95,7 +101,8 @@ export async function GET(request: Request) {
     const resortsWithMetrics: ResortWithMetrics[] = resorts.map((resort) => ({
       ...resort,
       services: servicesByResortId.get(resort.id) ?? [],
-      whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+      whatsapp_clicks_count: whatsappClickCounts.get(resort.id) ?? 0,
+      page_views_count: pageViewCounts.get(resort.id) ?? 0,
       inquiries_count: inquiryCounts.get(resort.id) ?? 0,
       storage_images_count: imageCountFor(resort, servicesByResortId.get(resort.id) ?? []),
       analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
@@ -107,7 +114,8 @@ export async function GET(request: Request) {
   const resortsWithMetrics: ResortWithMetrics[] = resorts.map((resort) => ({
     ...resort,
     services: [],
-    whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+    whatsapp_clicks_count: whatsappClickCounts.get(resort.id) ?? 0,
+    page_views_count: pageViewCounts.get(resort.id) ?? 0,
     inquiries_count: 0,
     storage_images_count: imageCountFor(resort, []),
     analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
@@ -121,22 +129,39 @@ function imageCountFor(resort: Resort, services: NonNullable<Resort["services"]>
 }
 
 function analyticsForEvents(events: SiteEventRow[], sevenDaysAgo: number) {
-  const dailyCounts = new Map<string, number>();
+  const dailyCounts = new Map<string, { whatsappClicks: number; pageViews: number }>();
   let whatsappClicks7d = 0;
+  let pageViews7d = 0;
 
   for (const event of events) {
     const timestamp = new Date(event.created_at).getTime();
     const dateKey = event.created_at.slice(0, 10);
-    dailyCounts.set(dateKey, (dailyCounts.get(dateKey) ?? 0) + 1);
+    const current = dailyCounts.get(dateKey) ?? { whatsappClicks: 0, pageViews: 0 };
 
-    if (timestamp >= sevenDaysAgo) {
+    if (event.event_type === "whatsapp_click") {
+      current.whatsappClicks += 1;
+    }
+    if (event.event_type === "page_view") {
+      current.pageViews += 1;
+    }
+    dailyCounts.set(dateKey, current);
+
+    if (timestamp >= sevenDaysAgo && event.event_type === "whatsapp_click") {
       whatsappClicks7d += 1;
+    }
+    if (timestamp >= sevenDaysAgo && event.event_type === "page_view") {
+      pageViews7d += 1;
     }
   }
 
+  const whatsappEvents = events.filter((event) => event.event_type === "whatsapp_click");
+  const pageViewEvents = events.filter((event) => event.event_type === "page_view");
+
   return {
     whatsappClicks7d,
-    whatsappClicks30d: events.length,
+    whatsappClicks30d: whatsappEvents.length,
+    pageViews7d,
+    pageViews30d: pageViewEvents.length,
     recentEvents: events.slice(0, 6).map((event) => ({
       eventType: event.event_type,
       source: event.source ?? "booking_cta",
@@ -144,7 +169,7 @@ function analyticsForEvents(events: SiteEventRow[], sevenDaysAgo: number) {
     })),
     dailyClicks: Array.from(dailyCounts.entries())
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([date, whatsappClicks]) => ({ date, whatsappClicks })),
+      .map(([date, counts]) => ({ date, whatsappClicks: counts.whatsappClicks, pageViews: counts.pageViews })),
   };
 }
 
