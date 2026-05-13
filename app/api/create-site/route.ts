@@ -7,6 +7,8 @@ import {
 } from "@/lib/server/supabase-admin";
 import type { Resort } from "@/types/resort";
 
+export const runtime = "nodejs";
+
 function isDataUrl(value: string | null) {
   return Boolean(value?.startsWith("data:"));
 }
@@ -52,6 +54,13 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
+  if (!body) {
+    return NextResponse.json(
+      { error: "Could not read the site data. Remove large photos or upload smaller images, then try again." },
+      { status: 400 },
+    );
+  }
+
   const payload = sanitizeResortPayload(body?.resort ?? {});
   const validationError = validateResortPayload(payload);
 
@@ -76,11 +85,13 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
+      console.error("create-site insert failed", { code: error.code, message: error.message, slug: payload.slug });
       return NextResponse.json({ error: error.message }, { status: error.code === "23505" ? 409 : 500 });
     }
 
     return NextResponse.json({ resort: data as Resort }, { status: 201 });
   } catch (error) {
+    console.error("create-site failed", { error, slug: payload.slug });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not create the site." },
       { status: 500 },

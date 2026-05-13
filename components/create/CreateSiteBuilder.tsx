@@ -101,13 +101,78 @@ function slugify(value: string) {
   );
 }
 
-function readFileAsDataUrl(file: File) {
+const maxImageDimension = 1800;
+const publishedSitePayloadLimit = 3_800_000;
+
+function readFileAsDataUrl(file: Blob) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+}
+
+async function imageFileToOptimizedDataUrl(file: File) {
+  if (file.type === "image/gif") {
+    return readFileAsDataUrl(file);
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const nextImage = new window.Image();
+      nextImage.onload = () => resolve(nextImage);
+      nextImage.onerror = () => reject(new Error("Could not read this image."));
+      nextImage.src = imageUrl;
+    });
+    const scale = Math.min(1, maxImageDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return readFileAsDataUrl(file);
+    }
+
+    context.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+
+    return readFileAsDataUrl(blob ?? file);
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+async function createSiteRequest(resort: Resort, accessToken: string) {
+  return fetch("/api/create-site", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ resort }),
+  });
+}
+
+async function readCreateSiteError(response: Response) {
+  const fallback = response.statusText || "Could not create the site.";
+  const text = await response.text().catch(() => "");
+
+  if (!text) {
+    return fallback;
+  }
+
+  try {
+    const data = JSON.parse(text) as { error?: string };
+    return data.error ?? fallback;
+  } catch {
+    return response.status === 413 ? "Uploaded images are too large. Remove a few photos or upload smaller images." : text;
+  }
 }
 
 function draftList(value: string[] | undefined) {
@@ -280,9 +345,9 @@ export function CreateSiteBuilder() {
     }
 
     setUploadStatus("Preparing hero preview...");
-    const dataUrl = await readFileAsDataUrl(file);
+    const dataUrl = await imageFileToOptimizedDataUrl(file);
     updateField("hero_image_url", dataUrl);
-    setUploadStatus("Hero image added to preview. Upload to Storage happens after subscription.");
+    setUploadStatus("Hero image added to preview. It will upload to Storage when the site is created.");
   }
 
   async function handleGalleryFiles(event: ChangeEvent<HTMLInputElement>) {
@@ -293,9 +358,9 @@ export function CreateSiteBuilder() {
     }
 
     setUploadStatus(`Preparing ${files.length} gallery image${files.length > 1 ? "s" : ""}...`);
-    const dataUrls = await Promise.all(files.map((file) => readFileAsDataUrl(file)));
+    const dataUrls = await Promise.all(files.map((file) => imageFileToOptimizedDataUrl(file)));
     updateField("gallery_images", [...textareaList(form.gallery_images), ...dataUrls].join("\n"));
-    setUploadStatus("Gallery images added to preview. Upload to Storage happens after subscription.");
+    setUploadStatus("Gallery images added to preview. They will upload to Storage when the site is created.");
   }
 
   function removeGalleryImage(imageUrl: string) {
@@ -380,19 +445,19 @@ export function CreateSiteBuilder() {
 
     const slug = slugify(form.slug || form.name);
     const resort = createPreviewResort({ ...form, slug });
+    const payloadSize = new Blob([JSON.stringify({ resort })]).size;
+
+    if (payloadSize > publishedSitePayloadLimit) {
+      setBuildStatus("Uploaded images are too large to publish at once. Remove a few photos or upload smaller images.");
+      setActiveStep(2);
+      return;
+    }
 
     setBuilding(true);
     setBuildStatus("Creating your direct booking site...");
 
     try {
-      let response = await fetch("/api/create-site", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${activeSession.access_token}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ resort }),
-      });
+      let response = await createSiteRequest(resort, activeSession.access_token);
 
       if (response.status === 401) {
         const { data: refreshedData } = await supabase.auth.refreshSession();
@@ -400,18 +465,9 @@ export function CreateSiteBuilder() {
 
         if (refreshedSession?.access_token) {
           setSession(refreshedSession);
-          response = await fetch("/api/create-site", {
-            method: "POST",
-            headers: {
-              authorization: `Bearer ${refreshedSession.access_token}`,
-              "content-type": "application/json",
-            },
-            body: JSON.stringify({ resort }),
-          });
+          response = await createSiteRequest(resort, refreshedSession.access_token);
         }
       }
-
-      const data = await response.json();
 
       if (!response.ok) {
         if (response.status === 409) {
@@ -420,7 +476,7 @@ export function CreateSiteBuilder() {
           return;
         }
 
-        setBuildStatus(data?.error ?? "Could not create the site.");
+        setBuildStatus(await readCreateSiteError(response));
         return;
       }
 
