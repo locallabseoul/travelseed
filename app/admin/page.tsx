@@ -147,6 +147,7 @@ export default function AdminPage() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [authStatus, setAuthStatus] = useState("");
+  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
 
   const selectedResort = useMemo(
     () => resorts.find((resort) => resort.id === selectedResortId) ?? null,
@@ -238,7 +239,27 @@ export default function AdminPage() {
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setAuthStatus("Signing in...");
+    setAuthStatus(authMode === "sign-in" ? "Signing in..." : "Creating account...");
+
+    if (authMode === "sign-up") {
+      const { error } = await supabase.auth.signUp({
+        email: loginEmail.trim(),
+        password: loginPassword,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin`,
+        },
+      });
+
+      if (error) {
+        setAuthStatus(error.message);
+        return;
+      }
+
+      setLoginPassword("");
+      setAuthStatus("Check your email to verify the account, then sign in.");
+      setAuthMode("sign-in");
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email: loginEmail.trim(),
@@ -436,12 +457,29 @@ export default function AdminPage() {
         <form onSubmit={handleLogin} className="grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-sm">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest/60">Admin</p>
-            <h1 className="mt-3 text-3xl font-semibold text-forest">Sign in</h1>
+            <h1 className="mt-3 text-3xl font-semibold text-forest">
+              {authMode === "sign-in" ? "Sign in" : "Create account"}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-forest/65">
+              {authMode === "sign-in"
+                ? "Use your approved admin email and password."
+                : "Create a Supabase Auth account, then verify your email before signing in."}
+            </p>
           </div>
           <TextField label="Email" value={loginEmail} onChange={setLoginEmail} type="email" required />
           <TextField label="Password" value={loginPassword} onChange={setLoginPassword} type="password" required />
           <button type="submit" className="min-h-12 rounded-md bg-forest px-5 text-sm font-semibold text-white">
-            Sign in
+            {authMode === "sign-in" ? "Sign in" : "Create account"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setAuthMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
+              setAuthStatus("");
+            }}
+            className="text-sm font-semibold text-ocean"
+          >
+            {authMode === "sign-in" ? "Create an admin account" : "Back to sign in"}
           </button>
           {authStatus ? <p className="text-sm text-forest/70">{authStatus}</p> : null}
         </form>
