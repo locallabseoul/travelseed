@@ -78,6 +78,8 @@ export async function POST(request: Request) {
       .from("resorts")
       .insert({
         ...payload,
+        owner_user_id: user.userId,
+        owner_email: user.email,
         hero_image_url: heroImageUrl,
         gallery: gallery.filter(Boolean),
       })

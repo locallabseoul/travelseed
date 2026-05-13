@@ -2,6 +2,8 @@ create extension if not exists "pgcrypto";
 
 create table if not exists public.resorts (
   id uuid primary key default gen_random_uuid(),
+  owner_user_id uuid references auth.users(id) on delete set null,
+  owner_email text,
   slug text not null unique,
   name text not null,
   domain text unique,
@@ -28,6 +30,8 @@ create table if not exists public.resorts (
 create index if not exists resorts_slug_idx on public.resorts (slug);
 create index if not exists resorts_domain_idx on public.resorts (domain);
 create index if not exists resorts_is_active_idx on public.resorts (is_active);
+create index if not exists resorts_owner_user_id_idx on public.resorts (owner_user_id);
+create index if not exists resorts_owner_email_idx on public.resorts (owner_email);
 
 alter table public.resorts enable row level security;
 

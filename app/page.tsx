@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HomeAccountNav } from "@/components/auth/HomeAccountNav";
 
 const demoResorts = [
   {
@@ -97,11 +98,7 @@ function HeroSection() {
         <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">
           TRAVELSEED
         </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/sites/villa-jeruk" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
-            Demo Resort
-          </Link>
-        </div>
+        <HomeAccountNav />
       </nav>
 
       <div className="mx-auto grid max-w-7xl gap-12 pt-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pt-28">

@@ -4,6 +4,8 @@ import type { Resort } from "@/types/resort";
 export const sampleResorts: Resort[] = [
   {
     id: "local-villa-jeruk",
+    owner_user_id: null,
+    owner_email: null,
     slug: "villa-jeruk",
     name: "Villa Jeruk",
     domain: null,

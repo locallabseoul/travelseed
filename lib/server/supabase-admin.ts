@@ -9,7 +9,7 @@ export type AdminCheck =
   | { ok: false; status: number; message: string };
 
 export type UserCheck =
-  | { ok: true; email: string }
+  | { ok: true; userId: string; email: string }
   | { ok: false; status: number; message: string };
 
 export function createServiceRoleClient() {
@@ -84,14 +84,15 @@ export async function verifyAuthenticatedRequest(request: Request): Promise<User
 
   const authClient = createServiceRoleClient();
   const { data, error } = await authClient.auth.getUser(token);
+  const userId = data.user?.id;
   const email = data.user?.email?.toLowerCase();
 
-  if (error || !email) {
+  if (error || !userId || !email) {
     console.error("Customer session validation failed", { message: error?.message });
     return { ok: false, status: 401, message: "Invalid session. Sign in again before creating a site." };
   }
 
-  return { ok: true, email };
+  return { ok: true, userId, email };
 }
 
 export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUpsert {

@@ -413,6 +413,8 @@ export default function AdminPage() {
       const previewPayload = payloadFromForm(form);
       const previewResort: Resort = {
         id: selectedResortId ?? `local-${previewPayload.slug}`,
+        owner_user_id: null,
+        owner_email: null,
         ...previewPayload,
       };
 

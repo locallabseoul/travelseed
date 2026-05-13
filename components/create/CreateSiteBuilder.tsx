@@ -188,6 +188,8 @@ function createPreviewResort(form: BuilderForm): Resort {
 
   return {
     id: "preview-resort",
+    owner_user_id: null,
+    owner_email: null,
     slug: slugify(form.slug || form.name),
     name: form.name.trim() || "Your Resort",
     domain: null,

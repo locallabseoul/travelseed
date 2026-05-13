@@ -2,6 +2,8 @@ export type ResortTemplateId = "boutique-villa" | "surf-camp" | "minimal-stay";
 
 export type Resort = {
   id: string;
+  owner_user_id: string | null;
+  owner_email: string | null;
   slug: string;
   name: string;
   domain: string | null;
@@ -23,8 +25,11 @@ export type Resort = {
   is_active: boolean;
 };
 
-export type ResortInsert = Omit<Resort, "id">;
+export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> & {
+  owner_user_id?: string | null;
+  owner_email?: string | null;
+};
 
-export type ResortUpsert = Omit<Resort, "id"> & {
+export type ResortUpsert = ResortInsert & {
   updated_at?: string;
 };
