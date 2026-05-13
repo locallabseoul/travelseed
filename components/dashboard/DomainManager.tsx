@@ -1,4 +1,5 @@
-import { Badge, Field, Panel, ProgressBar, SecondaryButton } from "@/components/dashboard/ui";
+import { useEffect, useState } from "react";
+import { Badge, Panel, ProgressBar, SecondaryButton } from "@/components/dashboard/ui";
 import type { ResortConsoleData } from "@/types/dashboard";
 
 const dnsRows = [
@@ -7,8 +8,34 @@ const dnsRows = [
   { type: "TXT Verification", name: "_travelseed", value: "ts-villa-jeruk-verify", status: "Active" },
 ];
 
-export function DomainManager({ site }: { site: ResortConsoleData }) {
+export function DomainManager({
+  site,
+  onSiteUpdate,
+}: {
+  site: ResortConsoleData;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+}) {
   const hasCustomDomain = Boolean(site.customDomain);
+  const [slug, setSlug] = useState(site.slug);
+  const [customDomain, setCustomDomain] = useState(site.customDomain);
+
+  useEffect(() => {
+    setSlug(site.slug);
+    setCustomDomain(site.customDomain);
+  }, [site.customDomain, site.id, site.slug]);
+
+  async function saveDomainSettings() {
+    const normalizedSlug = slug.trim().toLowerCase();
+    const normalizedDomain = customDomain.trim().toLowerCase();
+
+    await onSiteUpdate({
+      ...site,
+      slug: normalizedSlug,
+      travelseedUrl: `${normalizedSlug}.travelseed.app`,
+      domain: normalizedDomain || null,
+      customDomain: normalizedDomain,
+    });
+  }
 
   return (
     <div className="grid gap-6">
@@ -25,9 +52,12 @@ export function DomainManager({ site }: { site: ResortConsoleData }) {
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <Field label="Current Travelseed URL" value={site.travelseedUrl} />
-          <Field label="Custom Domain" value={site.customDomain || "Not connected"} />
+          <EditableField label="Travelseed Slug" value={slug} onChange={setSlug} prefix="https://" suffix=".travelseed.app" />
+          <EditableField label="Custom Domain" value={customDomain} onChange={setCustomDomain} placeholder="villajeruk.com" />
         </div>
+        <button type="button" onClick={() => void saveDomainSettings()} className="mt-6 min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+          Save domain settings
+        </button>
       </Panel>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.58fr]">
@@ -67,5 +97,37 @@ export function DomainManager({ site }: { site: ResortConsoleData }) {
         </Panel>
       </div>
     </div>
+  );
+}
+
+function EditableField({
+  label,
+  value,
+  onChange,
+  prefix,
+  suffix,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  prefix?: string;
+  suffix?: string;
+  placeholder?: string;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+      {label}
+      <div className="flex min-h-11 overflow-hidden rounded-xl border border-[#d8cebb] bg-white focus-within:border-[#18352f]">
+        {prefix ? <span className="flex items-center bg-[#fbfaf7] px-3 text-sm text-[#6f7b74]">{prefix}</span> : null}
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className="min-w-0 flex-1 px-3 text-sm outline-none"
+        />
+        {suffix ? <span className="flex items-center bg-[#fbfaf7] px-3 text-sm text-[#6f7b74]">{suffix}</span> : null}
+      </div>
+    </label>
   );
 }

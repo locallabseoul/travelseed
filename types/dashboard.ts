@@ -30,10 +30,13 @@ export type ResortConsoleData = {
   whatsappNumber: string;
   heroTitle: string;
   heroSubtitle: string;
+  heroImageUrl: string;
   heroCta: string;
   about: string;
   features: string[];
+  gallery: string[];
   experiences: string[];
+  bookingMessageTemplate: string;
   language: string;
   timezone: string;
   contactEmail: string;

@@ -31,7 +31,7 @@ function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onS
     case "whatsapp":
       return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "domain":
-      return <DomainManager site={selectedSite} />;
+      return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "analytics":
       return <AnalyticsView site={selectedSite} />;
     case "plan":
@@ -129,11 +129,12 @@ export function DashboardShell({ siteId }: { siteId: string }) {
   async function updateSelectedSite(nextSite: ResortConsoleData) {
     setStatus("Saving site to database...");
     try {
-      await operatorFetch(`/api/operator/resorts/${nextSite.id}`, {
+      const data = await operatorFetch(`/api/operator/resorts/${nextSite.id}`, {
         method: "PUT",
         body: JSON.stringify({ resort: resortPayloadFromSite(nextSite) }),
       });
-      setSites((currentSites) => currentSites.map((site) => (site.id === nextSite.id ? nextSite : site)));
+      const savedSite = siteFromResort(data.resort as Resort);
+      setSites((currentSites) => currentSites.map((site) => (site.id === savedSite.id ? savedSite : site)));
       setStatus("Site saved to database.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save site.");
