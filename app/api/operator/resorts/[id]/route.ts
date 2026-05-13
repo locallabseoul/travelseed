@@ -20,6 +20,14 @@ function userError(check: Awaited<ReturnType<typeof verifyAuthenticatedRequest>>
   });
 }
 
+function canManageResort(resort: Resort, user: Extract<Awaited<ReturnType<typeof verifyAuthenticatedRequest>>, { ok: true }>) {
+  if (resort.owner_user_id) {
+    return resort.owner_user_id === user.userId;
+  }
+
+  return Boolean(resort.owner_email && resort.owner_email === user.email);
+}
+
 export async function PUT(request: Request, { params }: RouteContext) {
   const user = await verifyAuthenticatedRequest(request);
   if (!user.ok) {
@@ -36,6 +44,16 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 
   const supabase = createServiceRoleClient();
+  const { data: existingResort, error: loadError } = await supabase.from("resorts").select("*").eq("id", id).single();
+
+  if (loadError || !existingResort) {
+    return NextResponse.json({ error: loadError?.message ?? "Site not found." }, { status: 404 });
+  }
+
+  if (!canManageResort(existingResort as Resort, user)) {
+    return NextResponse.json({ error: "You can only manage sites connected to your account." }, { status: 403 });
+  }
+
   const { data, error } = await supabase
     .from("resorts")
     .update({
@@ -44,7 +62,6 @@ export async function PUT(request: Request, { params }: RouteContext) {
       owner_email: user.email,
     })
     .eq("id", id)
-    .eq("owner_user_id", user.userId)
     .select("*")
     .single();
 
@@ -67,16 +84,19 @@ export async function DELETE(request: Request, { params }: RouteContext) {
     .from("resorts")
     .select("*")
     .eq("id", id)
-    .eq("owner_user_id", user.userId)
     .single();
 
   if (loadError || !resort) {
     return NextResponse.json({ error: loadError?.message ?? "Site not found." }, { status: 404 });
   }
 
+  if (!canManageResort(resort as Resort, user)) {
+    return NextResponse.json({ error: "You can only manage sites connected to your account." }, { status: 403 });
+  }
+
   await deleteResortStorageAssets(resort as Resort);
 
-  const { error } = await supabase.from("resorts").delete().eq("id", id).eq("owner_user_id", user.userId);
+  const { error } = await supabase.from("resorts").delete().eq("id", id);
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -20,11 +20,9 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceRoleClient();
-  const { data, error } = await supabase
-    .from("resorts")
-    .select("*")
-    .eq("owner_user_id", user.userId)
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("resorts").select("*").or(
+    `owner_user_id.eq.${user.userId},owner_email.eq.${user.email}`,
+  ).order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
