@@ -1,7 +1,8 @@
-import { colorThemes, mockResort, templateOptions } from "@/components/dashboard/mockData";
+import { colorThemes, templateOptions } from "@/components/dashboard/mockData";
 import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
+import type { ResortConsoleData } from "@/types/dashboard";
 
-export function DesignManager() {
+export function DesignManager({ site }: { site: ResortConsoleData }) {
   return (
     <div className="grid gap-6">
       <Panel>
@@ -12,11 +13,11 @@ export function DesignManager() {
 
       <div className="grid gap-4 xl:grid-cols-4">
         {templateOptions.map((template) => (
-          <Panel key={template.name} className={template.selected ? "ring-2 ring-[#2d6b50]" : ""}>
+          <Panel key={template.name} className={template.name === site.template ? "ring-2 ring-[#2d6b50]" : ""}>
             <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-[#eadfce] via-[#f8f5ef] to-[#2d6b50]/45" />
             <div className="mt-4 flex items-center justify-between gap-3">
               <h2 className="font-semibold text-[#18352f]">{template.name}</h2>
-              {template.selected ? <Badge>Current</Badge> : null}
+              {template.name === site.template ? <Badge>Current</Badge> : null}
             </div>
             <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{template.description}</p>
           </Panel>
@@ -49,14 +50,14 @@ export function DesignManager() {
           <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.48fr]">
             <div className="overflow-hidden rounded-2xl border border-[#eadfce] bg-[#18352f] p-5 text-white">
               <div className="h-44 rounded-xl bg-gradient-to-br from-[#9eb39f] to-[#eadfce]" />
-              <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">{mockResort.type}</p>
-              <h3 className="mt-2 text-2xl font-semibold">{mockResort.name}</h3>
-              <p className="mt-2 text-sm text-white/70">{mockResort.location}</p>
+              <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">{site.type}</p>
+              <h3 className="mt-2 text-2xl font-semibold">{site.name}</h3>
+              <p className="mt-2 text-sm text-white/70">{site.location}</p>
             </div>
             <div className="mx-auto w-44 overflow-hidden rounded-[2rem] border-8 border-[#18352f] bg-white p-3 shadow-sm">
               <div className="h-28 rounded-2xl bg-gradient-to-br from-[#9eb39f] to-[#eadfce]" />
-              <p className="mt-4 text-xs font-semibold text-[#72815e]">Villa</p>
-              <h3 className="mt-1 text-lg font-semibold text-[#18352f]">Book direct</h3>
+              <p className="mt-4 text-xs font-semibold text-[#72815e]">{site.template}</p>
+              <h3 className="mt-1 text-lg font-semibold text-[#18352f]">{site.heroCta}</h3>
               <div className="mt-4 h-9 rounded-full bg-[#18352f]" />
             </div>
           </div>

@@ -10,6 +10,7 @@ export type DashboardTab =
   | "settings";
 
 export type ResortConsoleData = {
+  id: string;
   name: string;
   type: string;
   location: string;
@@ -25,6 +26,15 @@ export type ResortConsoleData = {
   storageLimitGb: number;
   template: string;
   whatsappNumber: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroCta: string;
+  about: string;
+  features: string[];
+  experiences: string[];
+  language: string;
+  timezone: string;
+  contactEmail: string;
 };
 
 export type DashboardMetric = {

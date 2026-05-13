@@ -1,7 +1,62 @@
+import { useEffect, useState } from "react";
 import { contentSections } from "@/components/dashboard/mockData";
 import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
+import type { ContentSection, ResortConsoleData } from "@/types/dashboard";
 
-export function ContentManager() {
+type EditableSection = "Hero" | "About" | "Features" | "Experiences";
+
+function isEditableSection(title: ContentSection["title"]): title is EditableSection {
+  return ["Hero", "About", "Features", "Experiences"].includes(title);
+}
+
+export function ContentManager({
+  site,
+  onSiteUpdate,
+}: {
+  site: ResortConsoleData;
+  onSiteUpdate: (site: ResortConsoleData) => void;
+}) {
+  const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
+  const [heroTitle, setHeroTitle] = useState(site.heroTitle);
+  const [heroSubtitle, setHeroSubtitle] = useState(site.heroSubtitle);
+  const [heroCta, setHeroCta] = useState(site.heroCta);
+  const [about, setAbout] = useState(site.about);
+  const [features, setFeatures] = useState(site.features.join("\n"));
+  const [experiences, setExperiences] = useState(site.experiences.join("\n"));
+
+  useEffect(() => {
+    setEditingSection(null);
+    setHeroTitle(site.heroTitle);
+    setHeroSubtitle(site.heroSubtitle);
+    setHeroCta(site.heroCta);
+    setAbout(site.about);
+    setFeatures(site.features.join("\n"));
+    setExperiences(site.experiences.join("\n"));
+  }, [site.about, site.experiences, site.features, site.heroCta, site.heroSubtitle, site.heroTitle, site.id]);
+
+  function startEditing(section: EditableSection) {
+    setEditingSection(section);
+    setHeroTitle(site.heroTitle);
+    setHeroSubtitle(site.heroSubtitle);
+    setHeroCta(site.heroCta);
+    setAbout(site.about);
+    setFeatures(site.features.join("\n"));
+    setExperiences(site.experiences.join("\n"));
+  }
+
+  function saveSection() {
+    onSiteUpdate({
+      ...site,
+      heroTitle,
+      heroSubtitle,
+      heroCta,
+      about,
+      features: features.split("\n").map((item) => item.trim()).filter(Boolean),
+      experiences: experiences.split("\n").map((item) => item.trim()).filter(Boolean),
+    });
+    setEditingSection(null);
+  }
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -20,14 +75,43 @@ export function ContentManager() {
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{section.description}</p>
               </div>
-              <SecondaryButton>Edit</SecondaryButton>
+              {isEditableSection(section.title) ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditableSection(section.title)) {
+                      startEditing(section.title);
+                    }
+                  }}
+                  className="min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]"
+                >
+                  Edit
+                </button>
+              ) : (
+                <SecondaryButton>Edit</SecondaryButton>
+              )}
             </div>
             {section.title === "Hero" ? (
               <div className="mt-5 rounded-2xl bg-[#18352f] p-5 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Hero preview</p>
-                <h3 className="mt-3 text-2xl font-semibold">Private Tropical Escape in Selong Belanak</h3>
-                <p className="mt-2 text-sm leading-6 text-white/70">3-bedroom villa with private pool near Lombok&apos;s most beautiful beaches.</p>
-                <span className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">Book Direct on WhatsApp</span>
+                <h3 className="mt-3 text-2xl font-semibold">{site.heroTitle}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/70">{site.heroSubtitle}</p>
+                <span className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">{site.heroCta}</span>
+              </div>
+            ) : null}
+            {section.title === "About" ? <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{site.about}</p> : null}
+            {section.title === "Features" ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {site.features.map((feature) => (
+                  <span key={feature} className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#18352f]">{feature}</span>
+                ))}
+              </div>
+            ) : null}
+            {section.title === "Experiences" ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {site.experiences.map((experience) => (
+                  <span key={experience} className="rounded-full bg-[#e6f0e7] px-3 py-1 text-xs font-semibold text-[#1f5a45]">{experience}</span>
+                ))}
               </div>
             ) : null}
             {section.title === "Gallery" ? (
@@ -40,6 +124,61 @@ export function ContentManager() {
           </Panel>
         ))}
       </div>
+
+      {editingSection ? (
+        <Panel className="border-[#2d6b50]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Editing</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[#18352f]">{editingSection}</h2>
+            </div>
+            <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-[#6f7b74]">
+              Cancel
+            </button>
+          </div>
+          <div className="mt-5 grid gap-4">
+            {editingSection === "Hero" ? (
+              <>
+                <EditableField label="Hero title" value={heroTitle} onChange={setHeroTitle} />
+                <EditableField label="Hero subtitle" value={heroSubtitle} onChange={setHeroSubtitle} textarea />
+                <EditableField label="CTA label" value={heroCta} onChange={setHeroCta} />
+              </>
+            ) : null}
+            {editingSection === "About" ? <EditableField label="About copy" value={about} onChange={setAbout} textarea /> : null}
+            {editingSection === "Features" ? <EditableField label="Features, one per line" value={features} onChange={setFeatures} textarea /> : null}
+            {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button type="button" onClick={saveSection} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+                Apply mock changes
+              </button>
+            </div>
+            <p className="text-xs leading-5 text-[#6f7b74]">TODO: Replace this local mock update with a Supabase mutation when persistence is added.</p>
+          </div>
+        </Panel>
+      ) : null}
     </div>
+  );
+}
+
+function EditableField({
+  label,
+  value,
+  onChange,
+  textarea,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  textarea?: boolean;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+      {label}
+      {textarea ? (
+        <textarea value={value} rows={4} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+      ) : (
+        <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+      )}
+    </label>
   );
 }

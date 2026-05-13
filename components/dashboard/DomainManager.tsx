@@ -1,5 +1,5 @@
-import { mockResort } from "@/components/dashboard/mockData";
 import { Badge, Field, Panel, ProgressBar, SecondaryButton } from "@/components/dashboard/ui";
+import type { ResortConsoleData } from "@/types/dashboard";
 
 const dnsRows = [
   { type: "CNAME", name: "www", value: "sites.travelseed.app", status: "Verified" },
@@ -7,7 +7,9 @@ const dnsRows = [
   { type: "TXT Verification", name: "_travelseed", value: "ts-villa-jeruk-verify", status: "Active" },
 ];
 
-export function DomainManager() {
+export function DomainManager({ site }: { site: ResortConsoleData }) {
+  const hasCustomDomain = Boolean(site.customDomain);
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -18,13 +20,13 @@ export function DomainManager() {
             <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Keep Travelseed operations behind a branded guest-facing address.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge>Active</Badge>
-            <Badge tone="sand">SSL Active</Badge>
+            <Badge tone={hasCustomDomain ? "green" : "sand"}>{hasCustomDomain ? "Active" : "Pending"}</Badge>
+            <Badge tone={hasCustomDomain ? "sand" : "gray"}>SSL {hasCustomDomain ? "Active" : "Pending"}</Badge>
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <Field label="Current Travelseed URL" value={mockResort.travelseedUrl} />
-          <Field label="Custom Domain" value={mockResort.customDomain} />
+          <Field label="Current Travelseed URL" value={site.travelseedUrl} />
+          <Field label="Custom Domain" value={site.customDomain || "Not connected"} />
         </div>
       </Panel>
 

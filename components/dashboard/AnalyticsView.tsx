@@ -1,4 +1,5 @@
 import { Panel, ProgressBar } from "@/components/dashboard/ui";
+import type { ResortConsoleData } from "@/types/dashboard";
 
 const topSections = [
   { label: "Hero", value: 92 },
@@ -15,7 +16,9 @@ const events = [
   "Booking CTA clicked from Footer",
 ];
 
-export function AnalyticsView() {
+export function AnalyticsView({ site }: { site: ResortConsoleData }) {
+  const conversion = ((site.whatsappClicksUsed / site.monthlyVisitorsUsed) * 100).toFixed(1);
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -26,9 +29,9 @@ export function AnalyticsView() {
 
       <div className="grid gap-4 md:grid-cols-4">
         {[
-          ["Page Views", "1,240"],
-          ["WhatsApp Clicks", "32"],
-          ["CTA Conversion", "2.6%"],
+          ["Page Views", site.monthlyVisitorsUsed.toLocaleString()],
+          ["WhatsApp Clicks", site.whatsappClicksUsed.toLocaleString()],
+          ["CTA Conversion", `${conversion}%`],
           ["Avg. Time", "1m 42s"],
         ].map(([label, value]) => (
           <Panel key={label}>

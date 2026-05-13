@@ -1,35 +1,123 @@
 import type { ContentSection, DashboardMetric, PlanOption, ResortConsoleData, SetupStep, TemplateOption, UsageMetric } from "@/types/dashboard";
 
-export const mockResort: ResortConsoleData = {
-  name: "Villa Jeruk",
-  type: "Private Tropical Villa",
-  location: "Selong Belanak, Lombok, Indonesia",
-  plan: "Tree",
-  status: "Published",
-  travelseedUrl: "villa-jeruk.travelseed.app",
-  customDomain: "villajeruk.com",
-  monthlyVisitorsUsed: 1240,
-  monthlyVisitorsLimit: 20000,
-  whatsappClicksUsed: 32,
-  whatsappClicksLimit: 300,
-  storageUsedGb: 2.4,
-  storageLimitGb: 20,
-  template: "Boutique Villa",
-  whatsappNumber: "+62 821-4790-1202",
-};
-
-export const dashboardMetrics: DashboardMetric[] = [
-  { label: "Monthly Visitors", value: "1,240 / 20,000", helper: "6.2% of monthly allowance" },
-  { label: "WhatsApp Clicks", value: "32 / 300", helper: "Direct booking intent" },
-  { label: "Storage", value: "2.4GB / 20GB", helper: "Hero and gallery media" },
-  { label: "Conversion Signal", value: "2.6%", helper: "WhatsApp clicks from visits" },
+export const mockSites: ResortConsoleData[] = [
+  {
+    id: "villa-jeruk",
+    name: "Villa Jeruk",
+    type: "Private Tropical Villa",
+    location: "Selong Belanak, Lombok, Indonesia",
+    plan: "Tree",
+    status: "Published",
+    travelseedUrl: "villa-jeruk.travelseed.app",
+    customDomain: "villajeruk.com",
+    monthlyVisitorsUsed: 1240,
+    monthlyVisitorsLimit: 20000,
+    whatsappClicksUsed: 32,
+    whatsappClicksLimit: 300,
+    storageUsedGb: 2.4,
+    storageLimitGb: 20,
+    template: "Boutique Villa",
+    whatsappNumber: "+62 821-4790-1202",
+    heroTitle: "Private Tropical Escape in Selong Belanak",
+    heroSubtitle: "3-bedroom villa with private pool near Lombok's most beautiful beaches.",
+    heroCta: "Book Direct on WhatsApp",
+    about: "A calm private villa for families, surfers, and remote workers looking for a South Lombok base.",
+    features: ["Private Pool", "Fast WiFi", "Fully Equipped Kitchen", "Tropical Garden"],
+    experiences: ["Selong Belanak Beach", "Surf Lessons", "Sunset Coast", "Local Cafes"],
+    language: "English",
+    timezone: "Asia/Makassar",
+    contactEmail: "hello@villajeruk.com",
+  },
+  {
+    id: "rplay-lombok",
+    name: "RPLAY Lombok",
+    type: "Surf Camp",
+    location: "Kuta Mandalika, Lombok, Indonesia",
+    plan: "Seed",
+    status: "Draft",
+    travelseedUrl: "rplay-lombok.travelseed.app",
+    customDomain: "",
+    monthlyVisitorsUsed: 420,
+    monthlyVisitorsLimit: 5000,
+    whatsappClicksUsed: 18,
+    whatsappClicksLimit: 80,
+    storageUsedGb: 1.1,
+    storageLimitGb: 5,
+    template: "Surf Camp",
+    whatsappNumber: "+62 813-9000-4412",
+    heroTitle: "Surf, Stay, and Explore South Lombok",
+    heroSubtitle: "Guided surf camp packages with local instructors and flexible stays.",
+    heroCta: "Ask About Surf Packages",
+    about: "A surf-first stay experience for travelers who want lessons, community, and easy access to breaks.",
+    features: ["Surf Lessons", "Board Rental", "Airport Pickup", "Community Dinner"],
+    experiences: ["Tanjung Aan", "Gerupuk Bay", "Beginner Surf Lessons", "Beach BBQ"],
+    language: "English",
+    timezone: "Asia/Makassar",
+    contactEmail: "booking@rplaylombok.com",
+  },
+  {
+    id: "warung-senja",
+    name: "Warung Senja",
+    type: "Local Business",
+    location: "Canggu, Bali, Indonesia",
+    plan: "Seed Trial",
+    status: "Paused",
+    travelseedUrl: "warung-senja.travelseed.app",
+    customDomain: "",
+    monthlyVisitorsUsed: 96,
+    monthlyVisitorsLimit: 500,
+    whatsappClicksUsed: 7,
+    whatsappClicksLimit: 20,
+    storageUsedGb: 0.4,
+    storageLimitGb: 1,
+    template: "Local Business",
+    whatsappNumber: "+62 878-1220-3344",
+    heroTitle: "Balinese Home Cooking for Groups and Events",
+    heroSubtitle: "Simple catering packages and local dishes prepared for private gatherings.",
+    heroCta: "Request Menu on WhatsApp",
+    about: "A small family-run kitchen serving practical catering for villas, retreats, and local events.",
+    features: ["Group Catering", "Vegetarian Options", "Local Ingredients", "Delivery Available"],
+    experiences: ["Private Villa Dinner", "Retreat Meals", "Balinese Menu", "Snack Boxes"],
+    language: "English",
+    timezone: "Asia/Makassar",
+    contactEmail: "hello@warungsenja.id",
+  },
 ];
 
-export const usageMetrics: UsageMetric[] = [
-  { label: "Visitors", used: 1240, limit: 20000, unit: "" },
-  { label: "WhatsApp clicks", used: 32, limit: 300, unit: "" },
-  { label: "Storage", used: 2.4, limit: 20, unit: "GB" },
-];
+export const mockResort: ResortConsoleData = mockSites[0];
+
+export function dashboardMetricsFor(site: ResortConsoleData): DashboardMetric[] {
+  return [
+    {
+      label: "Monthly Visitors",
+      value: `${site.monthlyVisitorsUsed.toLocaleString()} / ${site.monthlyVisitorsLimit.toLocaleString()}`,
+      helper: `${Math.round((site.monthlyVisitorsUsed / site.monthlyVisitorsLimit) * 100)}% of monthly allowance`,
+    },
+    {
+      label: "WhatsApp Clicks",
+      value: `${site.whatsappClicksUsed.toLocaleString()} / ${site.whatsappClicksLimit.toLocaleString()}`,
+      helper: "Direct booking intent",
+    },
+    {
+      label: "Storage",
+      value: `${site.storageUsedGb}GB / ${site.storageLimitGb}GB`,
+      helper: "Hero and gallery media",
+    },
+    {
+      label: "Conversion Signal",
+      value: `${((site.whatsappClicksUsed / site.monthlyVisitorsUsed) * 100).toFixed(1)}%`,
+      helper: "WhatsApp clicks from visits",
+    },
+  ];
+}
+
+export function usageMetricsFor(site: ResortConsoleData): UsageMetric[] {
+  return [
+    { label: "Visitors", used: site.monthlyVisitorsUsed, limit: site.monthlyVisitorsLimit, unit: "" },
+    { label: "WhatsApp clicks", used: site.whatsappClicksUsed, limit: site.whatsappClicksLimit, unit: "" },
+    { label: "Storage", used: site.storageUsedGb, limit: site.storageLimitGb, unit: "GB" },
+  ];
+}
 
 export const quickActions = [
   "Edit Hero Section",

@@ -1,7 +1,34 @@
-import { mockResort } from "@/components/dashboard/mockData";
-import { Field, Panel, PrimaryButton } from "@/components/dashboard/ui";
+import { useEffect, useState } from "react";
+import { Panel } from "@/components/dashboard/ui";
+import type { ResortConsoleData } from "@/types/dashboard";
 
-export function SettingsView() {
+export function SettingsView({
+  site,
+  onSiteUpdate,
+}: {
+  site: ResortConsoleData;
+  onSiteUpdate: (site: ResortConsoleData) => void;
+}) {
+  const [name, setName] = useState(site.name);
+  const [location, setLocation] = useState(site.location);
+  const [contactEmail, setContactEmail] = useState(site.contactEmail);
+  const [language, setLanguage] = useState(site.language);
+  const [timezone, setTimezone] = useState(site.timezone);
+  const [type, setType] = useState(site.type);
+
+  useEffect(() => {
+    setName(site.name);
+    setLocation(site.location);
+    setContactEmail(site.contactEmail);
+    setLanguage(site.language);
+    setTimezone(site.timezone);
+    setType(site.type);
+  }, [site.contactEmail, site.id, site.language, site.location, site.name, site.timezone, site.type]);
+
+  function saveSettings() {
+    onSiteUpdate({ ...site, name, location, contactEmail, language, timezone, type });
+  }
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -13,15 +40,18 @@ export function SettingsView() {
       <div className="grid gap-6 xl:grid-cols-[1fr_0.58fr]">
         <Panel>
           <div className="grid gap-5 md:grid-cols-2">
-            <Field label="Business Name" value={mockResort.name} />
-            <Field label="Location" value={mockResort.location} />
-            <Field label="Contact Email" value="hello@villajeruk.com" />
-            <Field label="Language" value="English" />
-            <Field label="Timezone" value="Asia/Makassar" />
-            <Field label="Business Type" value={mockResort.type} />
+            <EditableField label="Business Name" value={name} onChange={setName} />
+            <EditableField label="Location" value={location} onChange={setLocation} />
+            <EditableField label="Contact Email" value={contactEmail} onChange={setContactEmail} />
+            <EditableField label="Language" value={language} onChange={setLanguage} />
+            <EditableField label="Timezone" value={timezone} onChange={setTimezone} />
+            <EditableField label="Business Type" value={type} onChange={setType} />
           </div>
           <div className="mt-6">
-            <PrimaryButton>Save settings</PrimaryButton>
+            <button type="button" onClick={saveSettings} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+              Apply mock changes
+            </button>
+            <p className="mt-3 text-xs leading-5 text-[#6f7b74]">TODO: Persist business settings to Supabase when DB integration starts.</p>
           </div>
         </Panel>
 
@@ -34,5 +64,22 @@ export function SettingsView() {
         </Panel>
       </div>
     </div>
+  );
+}
+
+function EditableField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+      {label}
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+    </label>
   );
 }
