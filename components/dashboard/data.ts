@@ -1,7 +1,7 @@
 import type { ResortConsoleData } from "@/types/dashboard";
-import type { Resort, ResortUpsert } from "@/types/resort";
+import type { ResortWithMetrics, ResortUpsert } from "@/types/resort";
 
-export function siteFromResort(resort: Resort): ResortConsoleData {
+export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
   return {
     id: resort.id,
     slug: resort.slug,
@@ -15,7 +15,7 @@ export function siteFromResort(resort: Resort): ResortConsoleData {
     customDomain: resort.domain ?? "",
     monthlyVisitorsUsed: 0,
     monthlyVisitorsLimit: 20000,
-    whatsappClicksUsed: 0,
+    whatsappClicksUsed: resort.whatsapp_clicks_count ?? 0,
     whatsappClicksLimit: 300,
     storageUsedGb: 0,
     storageLimitGb: 20,

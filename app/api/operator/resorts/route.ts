@@ -5,7 +5,7 @@ import {
   validateResortPayload,
   verifyAuthenticatedRequest,
 } from "@/lib/server/supabase-admin";
-import type { Resort } from "@/types/resort";
+import type { Resort, ResortWithMetrics } from "@/types/resort";
 
 function userError(check: Awaited<ReturnType<typeof verifyAuthenticatedRequest>>) {
   return NextResponse.json({ error: check.ok ? "Unexpected session check state." : check.message }, {
@@ -30,7 +30,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ resorts: (data ?? []) as Resort[] });
+  const resorts = (data ?? []) as Resort[];
+  const resortIds = resorts.map((resort) => resort.id);
+  const eventCounts = new Map<string, number>();
+
+  if (resortIds.length > 0) {
+    const { data: events, error: eventsError } = await supabase
+      .from("site_events")
+      .select("resort_id")
+      .eq("event_type", "whatsapp_click")
+      .in("resort_id", resortIds);
+
+    if (eventsError) {
+      return NextResponse.json({ error: eventsError.message }, { status: 500 });
+    }
+
+    for (const event of (events ?? []) as Array<{ resort_id: string }>) {
+      eventCounts.set(event.resort_id, (eventCounts.get(event.resort_id) ?? 0) + 1);
+    }
+  }
+
+  const resortsWithMetrics: ResortWithMetrics[] = resorts.map((resort) => ({
+    ...resort,
+    whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+  }));
+
+  return NextResponse.json({ resorts: resortsWithMetrics });
 }
 
 export async function POST(request: Request) {

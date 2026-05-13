@@ -18,7 +18,7 @@ import { WhatsAppManager } from "@/components/dashboard/WhatsAppManager";
 import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
-import type { Resort } from "@/types/resort";
+import type { ResortWithMetrics } from "@/types/resort";
 
 function renderTab(
   activeTab: DashboardTab,
@@ -115,7 +115,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
         throw new Error(data?.error ?? "Could not load sites.");
       }
 
-      const loadedSites = ((data.resorts ?? []) as Resort[]).map(siteFromResort);
+      const loadedSites = ((data.resorts ?? []) as ResortWithMetrics[]).map(siteFromResort);
       setSites(loadedSites);
       setStatus(loadedSites.length > 0 ? "" : "Site not found in the database.");
     } catch (error) {
@@ -139,7 +139,10 @@ export function DashboardShell({ siteId }: { siteId: string }) {
         method: "PUT",
         body: JSON.stringify({ resort: resortPayloadFromSite(nextSite) }),
       });
-      const savedSite = siteFromResort(data.resort as Resort);
+      const savedSite = siteFromResort({
+        ...(data.resort as ResortWithMetrics),
+        whatsapp_clicks_count: nextSite.whatsappClicksUsed,
+      });
       setSites((currentSites) => currentSites.map((site) => (site.id === savedSite.id ? savedSite : site)));
       setStatus("Site saved to database.");
     } catch (error) {

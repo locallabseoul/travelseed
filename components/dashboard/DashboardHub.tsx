@@ -7,7 +7,7 @@ import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/da
 import { Badge } from "@/components/dashboard/ui";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { ResortConsoleData } from "@/types/dashboard";
-import type { Resort } from "@/types/resort";
+import type { ResortWithMetrics } from "@/types/resort";
 
 export function DashboardHub() {
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
@@ -54,7 +54,7 @@ export function DashboardHub() {
         throw new Error(data?.error ?? "Could not load sites.");
       }
 
-      const loadedSites = ((data.resorts ?? []) as Resort[]).map(siteFromResort);
+      const loadedSites = ((data.resorts ?? []) as ResortWithMetrics[]).map(siteFromResort);
       setSites(loadedSites);
       setStatus(loadedSites.length > 0 ? "" : "No sites found in the database.");
     } catch (error) {
@@ -91,7 +91,10 @@ export function DashboardHub() {
         throw new Error(data?.error ?? "Could not update site status.");
       }
 
-      const updatedSite = siteFromResort(data.resort as Resort);
+      const updatedSite = siteFromResort({
+        ...(data.resort as ResortWithMetrics),
+        whatsapp_clicks_count: site.whatsappClicksUsed,
+      });
       setSites((currentSites) => currentSites.map((currentSite) => (currentSite.id === site.id ? updatedSite : currentSite)));
       setStatus(`${updatedSite.name} is now ${updatedSite.status.toLowerCase()}.`);
     } catch (error) {

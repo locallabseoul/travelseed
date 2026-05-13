@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
@@ -126,9 +127,9 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               Send a clear WhatsApp inquiry and reserve directly with the host.
             </p>
           </div>
-          <a href={bookingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-md bg-[#202724] px-8 text-base font-semibold text-white">
+          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-md bg-[#202724] px-8 text-base font-semibold text-white">
             Book on WhatsApp
-          </a>
+          </TrackedWhatsAppLink>
         </div>
       </section>
 

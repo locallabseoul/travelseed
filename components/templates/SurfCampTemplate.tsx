@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
@@ -150,9 +151,9 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
               Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
             </p>
           </div>
-          <a href={bookingUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#0c2f35] px-8 text-base font-black text-white">
+          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#0c2f35] px-8 text-base font-black text-white">
             Book on WhatsApp
-          </a>
+          </TrackedWhatsAppLink>
         </div>
       </section>
 

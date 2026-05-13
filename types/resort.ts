@@ -35,3 +35,7 @@ export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> 
 export type ResortUpsert = ResortInsert & {
   updated_at?: string;
 };
+
+export type ResortWithMetrics = Resort & {
+  whatsapp_clicks_count?: number;
+};

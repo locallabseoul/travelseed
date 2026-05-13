@@ -1,5 +1,6 @@
 import type { Resort } from "@/types/resort";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
+import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 
 type BookingSectionProps = {
   resort: Resort;
@@ -25,14 +26,16 @@ export function BookingSection({ resort, buttonClassName = "bg-forest text-white
         </div>
         <div className="rounded-md border border-white/12 bg-white/8 p-5 backdrop-blur">
           <p className="text-sm leading-6 text-white/70">Ready to check dates for {resort.name}?</p>
-          <a
+          <TrackedWhatsAppLink
             href={bookingUrl}
+            resortId={resort.id}
+            source="booking_cta"
             target="_blank"
             rel="noreferrer"
             className={`mt-5 inline-flex min-h-14 w-full items-center justify-center rounded-full px-7 text-base font-semibold ${buttonClassName}`}
           >
             Book on WhatsApp
-          </a>
+          </TrackedWhatsAppLink>
         </div>
       </div>
     </section>
