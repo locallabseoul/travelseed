@@ -62,10 +62,35 @@ export async function GET(request: Request) {
       eventCounts.set(event.resort_id, (eventCounts.get(event.resort_id) ?? 0) + 1);
       eventsByResortId.set(event.resort_id, [...(eventsByResortId.get(event.resort_id) ?? []), event]);
     }
+
+    const { data: services, error: servicesError } = await supabase
+      .from("resort_services")
+      .select("*")
+      .in("resort_id", resortIds)
+      .order("sort_order", { ascending: true });
+
+    if (servicesError) {
+      return NextResponse.json({ error: servicesError.message }, { status: 500 });
+    }
+
+    const servicesByResortId = new Map<string, Resort["services"]>();
+    for (const service of (services ?? []) as NonNullable<Resort["services"]>) {
+      servicesByResortId.set(service.resort_id, [...(servicesByResortId.get(service.resort_id) ?? []), service]);
+    }
+
+    const resortsWithMetrics: ResortWithMetrics[] = resorts.map((resort) => ({
+      ...resort,
+      services: servicesByResortId.get(resort.id) ?? [],
+      whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+      analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
+    }));
+
+    return NextResponse.json({ resorts: resortsWithMetrics });
   }
 
   const resortsWithMetrics: ResortWithMetrics[] = resorts.map((resort) => ({
     ...resort,
+    services: [],
     whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
     analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
   }));

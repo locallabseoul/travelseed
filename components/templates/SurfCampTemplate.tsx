@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
@@ -141,6 +142,8 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
           </div>
         </section>
       ) : null}
+
+      <ServiceSection resort={resort} />
 
       <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-md bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between">

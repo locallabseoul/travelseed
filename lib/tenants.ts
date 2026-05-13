@@ -10,7 +10,7 @@ export async function getActiveResortBySlug(slug: string): Promise<Resort | null
 
   const { data, error } = await supabase
     .from("resorts")
-    .select("*")
+    .select("*, services:resort_services(*)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -36,7 +36,7 @@ export async function getActiveResortByHost(host: string): Promise<Resort | null
   const domain = normalizeHost(host);
   const { data, error } = await supabase
     .from("resorts")
-    .select("*")
+    .select("*, services:resort_services(*)")
     .eq("domain", domain)
     .eq("is_active", true)
     .single();

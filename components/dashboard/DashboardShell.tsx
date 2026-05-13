@@ -144,7 +144,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
         ...(data.resort as ResortWithMetrics),
         whatsapp_clicks_count: nextSite.whatsappClicksUsed,
       });
-      setSites((currentSites) => currentSites.map((site) => (site.id === savedSite.id ? savedSite : site)));
+      setSites((currentSites) => currentSites.map((site) => (site.id === savedSite.id ? { ...savedSite, services: nextSite.services } : site)));
       setStatus("Site saved to database.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save site.");

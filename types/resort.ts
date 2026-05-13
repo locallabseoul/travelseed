@@ -1,6 +1,7 @@
 export type ResortTemplateId = "boutique-villa" | "surf-camp" | "minimal-stay";
 export type DomainStatus = "not_connected" | "pending" | "verified" | "active" | "error";
 export type SslStatus = "pending" | "active" | "error";
+export type ResortServiceKind = "room" | "service" | "package";
 
 export type Resort = {
   id: string;
@@ -28,8 +29,36 @@ export type Resort = {
   domain_status?: DomainStatus;
   ssl_status?: SslStatus;
   domain_verified_at?: string | null;
+  services?: ResortService[];
   created_at?: string | null;
   updated_at?: string | null;
+};
+
+export type ResortService = {
+  id: string;
+  resort_id: string;
+  kind: ResortServiceKind;
+  title: string;
+  description: string | null;
+  price_label: string | null;
+  capacity: number | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type ResortServiceInput = {
+  id?: string;
+  kind: ResortServiceKind;
+  title: string;
+  description?: string | null;
+  price_label?: string | null;
+  capacity?: number | null;
+  image_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
 };
 
 export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> & {

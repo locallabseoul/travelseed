@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { contentSections } from "@/components/dashboard/mockData";
 import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
-import type { ContentSection, ResortConsoleData } from "@/types/dashboard";
+import type { ContentSection, ResortConsoleData, ResortServiceData } from "@/types/dashboard";
+import type { ResortService } from "@/types/resort";
 
 type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Rooms / Services" | "Experiences" | "Booking CTA";
 
@@ -24,6 +25,7 @@ export function ContentManager({
   const [heroCta, setHeroCta] = useState(site.heroCta);
   const [about, setAbout] = useState(site.about);
   const [features, setFeatures] = useState(site.features.join("\n"));
+  const [services, setServices] = useState<ResortServiceData[]>(site.services);
   const [gallery, setGallery] = useState(site.gallery.join("\n"));
   const [experiences, setExperiences] = useState(site.experiences.join("\n"));
   const [bookingMessageTemplate, setBookingMessageTemplate] = useState(site.bookingMessageTemplate);
@@ -37,10 +39,11 @@ export function ContentManager({
     setHeroCta(site.heroCta);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
+    setServices(site.services);
     setGallery(site.gallery.join("\n"));
     setExperiences(site.experiences.join("\n"));
     setBookingMessageTemplate(site.bookingMessageTemplate);
-  }, [site.about, site.bookingMessageTemplate, site.experiences, site.features, site.gallery, site.heroCta, site.heroSubtitle, site.heroTitle, site.id]);
+  }, [site.about, site.bookingMessageTemplate, site.experiences, site.features, site.gallery, site.heroCta, site.heroSubtitle, site.heroTitle, site.id, site.services]);
 
   function startEditing(section: EditableSection) {
     setEditingSection(section);
@@ -49,6 +52,7 @@ export function ContentManager({
     setHeroCta(site.heroCta);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
+    setServices(site.services);
     setGallery(site.gallery.join("\n"));
     setExperiences(site.experiences.join("\n"));
     setBookingMessageTemplate(site.bookingMessageTemplate);
@@ -125,6 +129,13 @@ export function ContentManager({
   async function saveSection() {
     const nextFeatures = features.split("\n").map((item) => item.trim()).filter(Boolean);
 
+    if (editingSection === "Rooms / Services") {
+      const savedServices = await saveServices();
+      await onSiteUpdate({ ...site, services: savedServices });
+      setEditingSection(null);
+      return;
+    }
+
     await onSiteUpdate({
       ...site,
       heroTitle,
@@ -137,6 +148,64 @@ export function ContentManager({
       bookingMessageTemplate,
     });
     setEditingSection(null);
+  }
+
+  async function saveServices() {
+    if (!accessToken) {
+      throw new Error("Sign in before saving rooms or services.");
+    }
+
+    const response = await fetch(`/api/operator/resorts/${site.id}/services`, {
+      method: "PUT",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        services: services.map((service, index) => ({
+          kind: service.kind,
+          title: service.title,
+          description: service.description,
+          price_label: service.priceLabel,
+          capacity: service.capacity ? Number(service.capacity) : null,
+          image_url: service.imageUrl,
+          sort_order: index,
+          is_active: service.isActive,
+        })),
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.error ?? "Could not save rooms or services.");
+    }
+
+    return ((data.services ?? []) as ResortService[]).map(serviceFromApi);
+  }
+
+  function updateService(index: number, patch: Partial<ResortServiceData>) {
+    setServices((currentServices) => currentServices.map((service, serviceIndex) => (serviceIndex === index ? { ...service, ...patch } : service)));
+  }
+
+  function addService() {
+    setServices((currentServices) => [
+      ...currentServices,
+      {
+        id: `draft-${Date.now()}`,
+        kind: "room",
+        title: "",
+        description: "",
+        priceLabel: "",
+        capacity: "",
+        imageUrl: "",
+        sortOrder: currentServices.length,
+        isActive: true,
+      },
+    ]);
+  }
+
+  function removeService(index: number) {
+    setServices((currentServices) => currentServices.filter((_, serviceIndex) => serviceIndex !== index));
   }
 
   return (
@@ -214,9 +283,16 @@ export function ContentManager({
             ) : null}
             {section.title === "Rooms / Services" ? (
               <div className="mt-5 grid gap-2">
-                {site.features.slice(0, 4).map((feature) => (
-                  <div key={feature} className="rounded-2xl bg-[#fbfaf7] p-3 text-sm font-semibold text-[#18352f]">{feature}</div>
-                ))}
+                {site.services.length > 0
+                  ? site.services.slice(0, 4).map((service) => (
+                      <div key={service.id} className="rounded-2xl bg-[#fbfaf7] p-3">
+                        <p className="text-sm font-semibold text-[#18352f]">{service.title}</p>
+                        <p className="mt-1 text-xs text-[#6f7b74]">{service.priceLabel || service.kind}</p>
+                      </div>
+                    ))
+                  : site.features.slice(0, 4).map((feature) => (
+                      <div key={feature} className="rounded-2xl bg-[#fbfaf7] p-3 text-sm font-semibold text-[#18352f]">{feature}</div>
+                    ))}
               </div>
             ) : null}
             {section.title === "Booking CTA" ? (
@@ -265,10 +341,23 @@ export function ContentManager({
             ) : null}
             {editingSection === "Rooms / Services" ? (
               <>
-                <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">
-                  Rooms and services currently use the same saved highlights as Features. A dedicated room database can be added later when reservation management is built.
-                </p>
-                <EditableField label="Rooms / services highlights, one per line" value={features} onChange={setFeatures} textarea rows={8} />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm leading-6 text-[#52615a]">Add rooms, stay packages, activities, or MSME services as structured cards.</p>
+                  <button type="button" onClick={addService} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                    Add item
+                  </button>
+                </div>
+                <div className="grid gap-4">
+                  {services.map((service, index) => (
+                    <ServiceEditor
+                      key={service.id}
+                      service={service}
+                      onChange={(patch) => updateService(index, patch)}
+                      onRemove={() => removeService(index)}
+                    />
+                  ))}
+                  {services.length === 0 ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">No rooms or services yet.</p> : null}
+                </div>
               </>
             ) : null}
             {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
@@ -282,6 +371,60 @@ export function ContentManager({
           </div>
         </Panel>
       ) : null}
+    </div>
+  );
+}
+
+function serviceFromApi(service: ResortService): ResortServiceData {
+  return {
+    id: service.id,
+    kind: service.kind,
+    title: service.title,
+    description: service.description ?? "",
+    priceLabel: service.price_label ?? "",
+    capacity: service.capacity?.toString() ?? "",
+    imageUrl: service.image_url ?? "",
+    sortOrder: service.sort_order,
+    isActive: service.is_active,
+  };
+}
+
+function ServiceEditor({
+  service,
+  onChange,
+  onRemove,
+}: {
+  service: ResortServiceData;
+  onChange: (patch: Partial<ResortServiceData>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="grid gap-4 rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <select
+          value={service.kind}
+          onChange={(event) => onChange({ kind: event.target.value as ResortServiceData["kind"] })}
+          className="min-h-10 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]"
+        >
+          <option value="room">Room</option>
+          <option value="service">Service</option>
+          <option value="package">Package</option>
+        </select>
+        <button type="button" onClick={onRemove} className="text-sm font-semibold text-[#9d3323]">
+          Remove
+        </button>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <EditableField label="Title" value={service.title} onChange={(value) => onChange({ title: value })} />
+        <EditableField label="Price label" value={service.priceLabel} onChange={(value) => onChange({ priceLabel: value })} />
+        <EditableField label="Capacity" value={service.capacity} onChange={(value) => onChange({ capacity: value })} />
+        <EditableField label="Image URL" value={service.imageUrl} onChange={(value) => onChange({ imageUrl: value })} />
+      </div>
+      <EditableField label="Description" value={service.description} onChange={(value) => onChange({ description: value })} textarea />
+      <label className="flex items-center gap-2 text-sm font-semibold text-[#18352f]">
+        <input type="checkbox" checked={service.isActive} onChange={(event) => onChange({ isActive: event.target.checked })} />
+        Active
+      </label>
     </div>
   );
 }

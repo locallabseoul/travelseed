@@ -34,6 +34,17 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     heroCta: "Book Direct on WhatsApp",
     about: resort.description ?? "",
     features: resort.features,
+    services: (resort.services ?? []).map((service) => ({
+      id: service.id,
+      kind: service.kind,
+      title: service.title,
+      description: service.description ?? "",
+      priceLabel: service.price_label ?? "",
+      capacity: service.capacity?.toString() ?? "",
+      imageUrl: service.image_url ?? "",
+      sortOrder: service.sort_order,
+      isActive: service.is_active,
+    })),
     gallery: resort.gallery,
     experiences: resort.experiences,
     bookingMessageTemplate:

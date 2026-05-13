@@ -34,6 +34,7 @@ export type ResortConsoleData = {
   heroCta: string;
   about: string;
   features: string[];
+  services: ResortServiceData[];
   gallery: string[];
   experiences: string[];
   bookingMessageTemplate: string;
@@ -47,6 +48,18 @@ export type ResortConsoleData = {
   createdAt: string | null;
   updatedAt: string | null;
   analytics: SiteAnalyticsSummary;
+};
+
+export type ResortServiceData = {
+  id: string;
+  kind: "room" | "service" | "package";
+  title: string;
+  description: string;
+  priceLabel: string;
+  capacity: string;
+  imageUrl: string;
+  sortOrder: number;
+  isActive: boolean;
 };
 
 export type SiteAnalyticsEvent = {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
@@ -101,6 +102,8 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
           </div>
         </section>
       ) : null}
+
+      <ServiceSection resort={resort} />
 
       {resort.experiences.length > 0 ? (
         <section id="experiences" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
