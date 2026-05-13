@@ -2,6 +2,9 @@ import type { ResortConsoleData } from "@/types/dashboard";
 import type { ResortWithMetrics, ResortUpsert } from "@/types/resort";
 
 export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
+  const plan = resort.plan ?? "Tree";
+  const planLimits = limitsForPlan(plan);
+
   const defaultAnalytics = {
     whatsappClicks7d: 0,
     whatsappClicks30d: resort.whatsapp_clicks_count ?? 0,
@@ -16,16 +19,19 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     name: resort.name,
     type: resort.type ?? "Direct Booking Site",
     location: resort.location,
-    plan: "Tree",
+    plan,
     status: resort.is_active ? "Published" : "Paused",
     travelseedUrl: `${resort.slug}.travelseed.app`,
     customDomain: resort.domain ?? "",
     monthlyVisitorsUsed: 0,
-    monthlyVisitorsLimit: 20000,
+    monthlyVisitorsLimit: planLimits.visitors,
     whatsappClicksUsed: resort.whatsapp_clicks_count ?? 0,
-    whatsappClicksLimit: 300,
-    storageUsedGb: 0,
-    storageLimitGb: 20,
+    whatsappClicksLimit: planLimits.whatsappClicks,
+    inquiriesUsed: resort.inquiries_count ?? 0,
+    inquiriesLimit: planLimits.inquiries,
+    storageUsedGb: estimatedStorageGb(resort.storage_images_count ?? imageCountFor(resort)),
+    storageLimitGb: planLimits.storageGb,
+    storageImagesUsed: resort.storage_images_count ?? imageCountFor(resort),
     template: resort.template_id,
     whatsappNumber: resort.whatsapp_number,
     heroTitle: resort.hero_title,
@@ -91,6 +97,26 @@ export function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
     domain_status: site.domainStatus,
     ssl_status: site.sslStatus,
     domain_verified_at: site.domainVerifiedAt,
+    plan: site.plan,
     updated_at: new Date().toISOString(),
   };
+}
+
+function limitsForPlan(plan: ResortConsoleData["plan"]) {
+  const limits = {
+    "Seed Trial": { visitors: 500, whatsappClicks: 0, storageGb: 1, inquiries: 0 },
+    Seed: { visitors: 5000, whatsappClicks: 100, storageGb: 5, inquiries: 100 },
+    Tree: { visitors: 20000, whatsappClicks: 300, storageGb: 20, inquiries: 500 },
+    Forest: { visitors: 100000, whatsappClicks: 100000, storageGb: 100, inquiries: null },
+  } satisfies Record<ResortConsoleData["plan"], { visitors: number; whatsappClicks: number; storageGb: number; inquiries: number | null }>;
+
+  return limits[plan];
+}
+
+function imageCountFor(resort: ResortWithMetrics) {
+  return resort.gallery.length + (resort.hero_image_url ? 1 : 0) + (resort.services ?? []).filter((service) => service.image_url).length;
+}
+
+function estimatedStorageGb(imageCount: number) {
+  return Number((imageCount * 0.004).toFixed(2));
 }

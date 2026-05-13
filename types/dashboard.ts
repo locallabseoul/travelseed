@@ -25,8 +25,11 @@ export type ResortConsoleData = {
   monthlyVisitorsLimit: number;
   whatsappClicksUsed: number;
   whatsappClicksLimit: number;
+  inquiriesUsed: number;
+  inquiriesLimit: number | null;
   storageUsedGb: number;
   storageLimitGb: number;
+  storageImagesUsed: number;
   template: string;
   whatsappNumber: string;
   heroTitle: string;

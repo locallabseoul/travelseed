@@ -45,7 +45,7 @@ function renderTab(
     case "analytics":
       return <AnalyticsView site={selectedSite} />;
     case "plan":
-      return <PlanBillingView site={selectedSite} />;
+      return <PlanBillingView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "settings":
       return <SettingsView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "dashboard":

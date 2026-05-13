@@ -1,4 +1,5 @@
 export type ResortTemplateId = "boutique-villa" | "surf-camp" | "minimal-stay";
+export type ResortPlan = "Seed Trial" | "Seed" | "Tree" | "Forest";
 export type DomainStatus = "not_connected" | "pending" | "verified" | "active" | "error";
 export type SslStatus = "pending" | "active" | "error";
 export type ResortServiceKind = "room" | "service" | "package";
@@ -11,6 +12,7 @@ export type Resort = {
   name: string;
   domain: string | null;
   template_id: string;
+  plan?: ResortPlan;
   location: string;
   type: string | null;
   description: string | null;
@@ -75,6 +77,8 @@ export type ResortUpsert = ResortInsert & {
 
 export type ResortWithMetrics = Resort & {
   whatsapp_clicks_count?: number;
+  inquiries_count?: number;
+  storage_images_count?: number;
   analytics?: {
     whatsappClicks7d: number;
     whatsappClicks30d: number;

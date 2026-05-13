@@ -40,6 +40,7 @@ export async function GET(request: Request) {
   const resorts = (data ?? []) as Resort[];
   const resortIds = resorts.map((resort) => resort.id);
   const eventCounts = new Map<string, number>();
+  const inquiryCounts = new Map<string, number>();
   const eventsByResortId = new Map<string, SiteEventRow[]>();
   const now = Date.now();
   const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -63,6 +64,19 @@ export async function GET(request: Request) {
       eventsByResortId.set(event.resort_id, [...(eventsByResortId.get(event.resort_id) ?? []), event]);
     }
 
+    const { data: inquiries, error: inquiriesError } = await supabase
+      .from("booking_inquiries")
+      .select("resort_id")
+      .in("resort_id", resortIds);
+
+    if (inquiriesError) {
+      return NextResponse.json({ error: inquiriesError.message }, { status: 500 });
+    }
+
+    for (const inquiry of (inquiries ?? []) as Array<{ resort_id: string }>) {
+      inquiryCounts.set(inquiry.resort_id, (inquiryCounts.get(inquiry.resort_id) ?? 0) + 1);
+    }
+
     const { data: services, error: servicesError } = await supabase
       .from("resort_services")
       .select("*")
@@ -82,6 +96,8 @@ export async function GET(request: Request) {
       ...resort,
       services: servicesByResortId.get(resort.id) ?? [],
       whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+      inquiries_count: inquiryCounts.get(resort.id) ?? 0,
+      storage_images_count: imageCountFor(resort, servicesByResortId.get(resort.id) ?? []),
       analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
     }));
 
@@ -92,10 +108,16 @@ export async function GET(request: Request) {
     ...resort,
     services: [],
     whatsapp_clicks_count: eventCounts.get(resort.id) ?? 0,
+    inquiries_count: 0,
+    storage_images_count: imageCountFor(resort, []),
     analytics: analyticsForEvents(eventsByResortId.get(resort.id) ?? [], sevenDaysAgo),
   }));
 
   return NextResponse.json({ resorts: resortsWithMetrics });
+}
+
+function imageCountFor(resort: Resort, services: NonNullable<Resort["services"]>) {
+  return resort.gallery.length + (resort.hero_image_url ? 1 : 0) + services.filter((service) => service.image_url).length;
 }
 
 function analyticsForEvents(events: SiteEventRow[], sevenDaysAgo: number) {
