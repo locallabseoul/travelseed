@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import type { Resort, ResortUpsert } from "@/types/resort";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export type AdminCheck =
@@ -43,8 +42,8 @@ function bearerToken(request: Request) {
 }
 
 export async function verifyAdminRequest(request: Request): Promise<AdminCheck> {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return { ok: false, status: 500, message: "Supabase public environment variables are not configured." };
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    return { ok: false, status: 500, message: "Supabase server environment variables are not configured." };
   }
 
   const allowedEmails = adminEmailSet();
@@ -57,21 +56,12 @@ export async function verifyAdminRequest(request: Request): Promise<AdminCheck> 
     return { ok: false, status: 401, message: "Missing admin session." };
   }
 
-  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-    global: {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    },
-  });
+  const authClient = createServiceRoleClient();
   const { data, error } = await authClient.auth.getUser(token);
   const email = data.user?.email?.toLowerCase();
 
   if (error || !email) {
+    console.error("Admin session validation failed", { message: error?.message });
     return { ok: false, status: 401, message: "Invalid admin session." };
   }
 
@@ -83,8 +73,8 @@ export async function verifyAdminRequest(request: Request): Promise<AdminCheck> 
 }
 
 export async function verifyAuthenticatedRequest(request: Request): Promise<UserCheck> {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return { ok: false, status: 500, message: "Supabase public environment variables are not configured." };
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    return { ok: false, status: 500, message: "Supabase server environment variables are not configured." };
   }
 
   const token = bearerToken(request);
@@ -92,21 +82,12 @@ export async function verifyAuthenticatedRequest(request: Request): Promise<User
     return { ok: false, status: 401, message: "Sign in before creating a site." };
   }
 
-  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-    global: {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    },
-  });
+  const authClient = createServiceRoleClient();
   const { data, error } = await authClient.auth.getUser(token);
   const email = data.user?.email?.toLowerCase();
 
   if (error || !email) {
+    console.error("Customer session validation failed", { message: error?.message });
     return { ok: false, status: 401, message: "Invalid session. Sign in again before creating a site." };
   }
 
