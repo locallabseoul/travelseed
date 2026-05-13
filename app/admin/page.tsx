@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { resortTemplateOptions } from "@/components/templates";
@@ -445,50 +446,57 @@ export default function AdminPage() {
 
   if (isSupabaseConfigured && !authReady) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-sand px-5 text-forest">
-        <p className="text-sm font-medium text-forest/70">Checking admin session...</p>
+      <main className="min-h-screen bg-sand px-5 py-6 text-forest sm:px-6">
+        <HeaderNav />
+        <div className="flex min-h-[70vh] items-center justify-center">
+          <p className="text-sm font-medium text-forest/70">Checking admin session...</p>
+        </div>
       </main>
     );
   }
 
   if (isSupabaseConfigured && !session) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-sand px-5 text-forest">
-        <form onSubmit={handleLogin} className="grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-sm">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest/60">Admin</p>
-            <h1 className="mt-3 text-3xl font-semibold text-forest">
+      <main className="min-h-screen bg-sand px-5 py-6 text-forest sm:px-6">
+        <HeaderNav />
+        <div className="flex min-h-[70vh] items-center justify-center">
+          <form onSubmit={handleLogin} className="grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-sm">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest/60">Admin</p>
+              <h1 className="mt-3 text-3xl font-semibold text-forest">
+                {authMode === "sign-in" ? "Sign in" : "Create account"}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-forest/65">
+                {authMode === "sign-in"
+                  ? "Use your approved admin email and password."
+                  : "Create a Supabase Auth account, then verify your email before signing in."}
+              </p>
+            </div>
+            <TextField label="Email" value={loginEmail} onChange={setLoginEmail} type="email" required />
+            <TextField label="Password" value={loginPassword} onChange={setLoginPassword} type="password" required />
+            <button type="submit" className="min-h-12 rounded-md bg-forest px-5 text-sm font-semibold text-white">
               {authMode === "sign-in" ? "Sign in" : "Create account"}
-            </h1>
-            <p className="mt-2 text-sm leading-6 text-forest/65">
-              {authMode === "sign-in"
-                ? "Use your approved admin email and password."
-                : "Create a Supabase Auth account, then verify your email before signing in."}
-            </p>
-          </div>
-          <TextField label="Email" value={loginEmail} onChange={setLoginEmail} type="email" required />
-          <TextField label="Password" value={loginPassword} onChange={setLoginPassword} type="password" required />
-          <button type="submit" className="min-h-12 rounded-md bg-forest px-5 text-sm font-semibold text-white">
-            {authMode === "sign-in" ? "Sign in" : "Create account"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
-              setAuthStatus("");
-            }}
-            className="text-sm font-semibold text-ocean"
-          >
-            {authMode === "sign-in" ? "Create an admin account" : "Back to sign in"}
-          </button>
-          {authStatus ? <p className="text-sm text-forest/70">{authStatus}</p> : null}
-        </form>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
+                setAuthStatus("");
+              }}
+              className="text-sm font-semibold text-ocean"
+            >
+              {authMode === "sign-in" ? "Create an admin account" : "Back to sign in"}
+            </button>
+            {authStatus ? <p className="text-sm text-forest/70">{authStatus}</p> : null}
+          </form>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-sand px-5 py-8 sm:px-6">
+      <HeaderNav />
       <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.86fr_1.14fr]">
         <section>
           <div className="flex items-end justify-between gap-4">
@@ -712,6 +720,19 @@ export default function AdminPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function HeaderNav() {
+  return (
+    <header className="mx-auto mb-8 flex max-w-7xl items-center justify-between">
+      <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-forest">
+        TRAVELSEED
+      </Link>
+      <Link href="/create" className="text-sm font-semibold text-forest/65">
+        Build My Site
+      </Link>
+    </header>
   );
 }
 
