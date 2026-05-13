@@ -23,6 +23,8 @@ export type Resort = {
   experiences: string[];
   booking_message_template: string | null;
   is_active: boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> & {

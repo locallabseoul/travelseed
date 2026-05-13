@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { siteFromResort } from "@/components/dashboard/data";
+import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
 import { Badge } from "@/components/dashboard/ui";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { ResortConsoleData } from "@/types/dashboard";
@@ -14,6 +14,7 @@ export function DashboardHub() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [sites, setSites] = useState<ResortConsoleData[]>([]);
   const [status, setStatus] = useState("Loading sites from database...");
+  const [workingSiteId, setWorkingSiteId] = useState<string | null>(null);
 
   const publishedCount = useMemo(() => sites.filter((site) => site.status === "Published").length, [sites]);
   const pausedCount = useMemo(() => sites.filter((site) => site.status === "Paused").length, [sites]);
@@ -61,6 +62,80 @@ export function DashboardHub() {
     }
   }
 
+  async function updateSiteStatus(site: ResortConsoleData, nextActiveState: boolean) {
+    if (!accessToken) {
+      setStatus("Sign in to manage your sites.");
+      return;
+    }
+
+    const nextSite: ResortConsoleData = {
+      ...site,
+      isActive: nextActiveState,
+      status: nextActiveState ? "Published" : "Paused",
+    };
+
+    setWorkingSiteId(site.id);
+    setStatus(nextActiveState ? "Publishing site..." : "Pausing site...");
+    try {
+      const response = await fetch(`/api/operator/resorts/${site.id}`, {
+        method: "PUT",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ resort: resortPayloadFromSite(nextSite) }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Could not update site status.");
+      }
+
+      const updatedSite = siteFromResort(data.resort as Resort);
+      setSites((currentSites) => currentSites.map((currentSite) => (currentSite.id === site.id ? updatedSite : currentSite)));
+      setStatus(`${updatedSite.name} is now ${updatedSite.status.toLowerCase()}.`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not update site status.");
+    } finally {
+      setWorkingSiteId(null);
+    }
+  }
+
+  async function deleteSite(site: ResortConsoleData) {
+    if (!accessToken) {
+      setStatus("Sign in to manage your sites.");
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete ${site.name}? This removes the site and its uploaded images.`);
+    if (!confirmed) {
+      return;
+    }
+
+    setWorkingSiteId(site.id);
+    setStatus("Deleting site...");
+    try {
+      const response = await fetch(`/api/operator/resorts/${site.id}`, {
+        method: "DELETE",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Could not delete site.");
+      }
+
+      setSites((currentSites) => currentSites.filter((currentSite) => currentSite.id !== site.id));
+      setStatus(`${site.name} was deleted.`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not delete site.");
+    } finally {
+      setWorkingSiteId(null);
+    }
+  }
+
   useEffect(() => {
     if (accessToken) {
       void loadSites(accessToken);
@@ -99,11 +174,18 @@ export function DashboardHub() {
                 <SummaryCard label="Published" value={publishedCount.toString()} />
                 <SummaryCard label="Paused" value={pausedCount.toString()} />
               </div>
+              {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
 
               {sites.length > 0 ? (
                 <div className="grid gap-4 xl:grid-cols-2">
                   {sites.map((site) => (
-                    <SiteCard key={site.id} site={site} />
+                    <SiteCard
+                      key={site.id}
+                      site={site}
+                      isWorking={workingSiteId === site.id}
+                      onDelete={deleteSite}
+                      onStatusChange={updateSiteStatus}
+                    />
                   ))}
                 </div>
               ) : (
@@ -126,7 +208,20 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SiteCard({ site }: { site: ResortConsoleData }) {
+function SiteCard({
+  site,
+  isWorking,
+  onDelete,
+  onStatusChange,
+}: {
+  site: ResortConsoleData;
+  isWorking: boolean;
+  onDelete: (site: ResortConsoleData) => void;
+  onStatusChange: (site: ResortConsoleData, nextActiveState: boolean) => void;
+}) {
+  const lastUpdated = formatDate(site.updatedAt);
+  const created = formatDate(site.createdAt);
+
   return (
     <article className="rounded-2xl border border-[#e8dfd0] bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -141,7 +236,7 @@ function SiteCard({ site }: { site: ResortConsoleData }) {
         <span className="rounded-full bg-[#f8f5ef] px-3 py-1 text-xs font-semibold text-[#52615a]">{site.template}</span>
       </div>
 
-      <div className="mt-5 grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#52615a]">
+      <div className="mt-5 grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#52615a] sm:grid-cols-2">
         <div className="flex items-center justify-between gap-4">
           <span>Travelseed URL</span>
           <span className="break-all text-right font-semibold text-[#18352f]">{site.travelseedUrl}</span>
@@ -154,21 +249,54 @@ function SiteCard({ site }: { site: ResortConsoleData }) {
           <span>WhatsApp</span>
           <span className="text-right font-semibold text-[#18352f]">{site.whatsappNumber}</span>
         </div>
+        <div className="flex items-center justify-between gap-4">
+          <span>Created</span>
+          <span className="text-right font-semibold text-[#18352f]">{created}</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span>Last updated</span>
+          <span className="text-right font-semibold text-[#18352f]">{lastUpdated}</span>
+        </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:flex-wrap">
         <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
           Manage
         </Link>
         <Link href={`/sites/${site.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
           View site
         </Link>
-        <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
-          Edit content
-        </Link>
+        <button
+          type="button"
+          disabled={isWorking}
+          onClick={() => onStatusChange(site, !site.isActive)}
+          className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {site.isActive ? "Pause" : "Publish"}
+        </button>
+        <button
+          type="button"
+          disabled={isWorking}
+          onClick={() => onDelete(site)}
+          className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#fff7f5] px-5 text-sm font-semibold text-[#9d3323] ring-1 ring-[#efc8bd] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Delete
+        </button>
       </div>
     </article>
   );
+}
+
+function formatDate(value: string | null) {
+  if (!value) {
+    return "Not available";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
 }
 
 function HubMessage({ text, actionHref, actionLabel }: { text: string; actionHref?: string; actionLabel?: string }) {

@@ -31,6 +31,8 @@ export function siteFromResort(resort: Resort): ResortConsoleData {
     timezone: "Asia/Makassar",
     contactEmail: resort.owner_email ?? "",
     isActive: resort.is_active,
+    createdAt: resort.created_at ?? null,
+    updatedAt: resort.updated_at ?? null,
   };
 }
 

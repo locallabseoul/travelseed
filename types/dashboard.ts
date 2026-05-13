@@ -38,6 +38,8 @@ export type ResortConsoleData = {
   timezone: string;
   contactEmail: string;
   isActive: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
 export type DashboardMetric = {

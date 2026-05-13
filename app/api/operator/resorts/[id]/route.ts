@@ -29,7 +29,7 @@ function canManageResort(resort: Resort, user: Extract<Awaited<ReturnType<typeof
     return resort.owner_email === user.email;
   }
 
-  return true;
+  return false;
 }
 
 export async function PUT(request: Request, { params }: RouteContext) {
