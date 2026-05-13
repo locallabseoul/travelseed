@@ -43,6 +43,25 @@ export type ResortConsoleData = {
   isActive: boolean;
   createdAt: string | null;
   updatedAt: string | null;
+  analytics: SiteAnalyticsSummary;
+};
+
+export type SiteAnalyticsEvent = {
+  eventType: string;
+  source: string;
+  createdAt: string;
+};
+
+export type SiteAnalyticsDailyPoint = {
+  date: string;
+  whatsappClicks: number;
+};
+
+export type SiteAnalyticsSummary = {
+  whatsappClicks7d: number;
+  whatsappClicks30d: number;
+  recentEvents: SiteAnalyticsEvent[];
+  dailyClicks: SiteAnalyticsDailyPoint[];
 };
 
 export type DashboardMetric = {

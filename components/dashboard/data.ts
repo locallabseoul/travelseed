@@ -2,6 +2,13 @@ import type { ResortConsoleData } from "@/types/dashboard";
 import type { ResortWithMetrics, ResortUpsert } from "@/types/resort";
 
 export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
+  const defaultAnalytics = {
+    whatsappClicks7d: 0,
+    whatsappClicks30d: resort.whatsapp_clicks_count ?? 0,
+    recentEvents: [],
+    dailyClicks: [],
+  };
+
   return {
     id: resort.id,
     slug: resort.slug,
@@ -42,6 +49,7 @@ Airport Pickup:`,
     isActive: resort.is_active,
     createdAt: resort.created_at ?? null,
     updatedAt: resort.updated_at ?? null,
+    analytics: resort.analytics ?? defaultAnalytics,
   };
 }
 

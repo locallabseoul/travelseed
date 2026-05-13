@@ -38,4 +38,17 @@ export type ResortUpsert = ResortInsert & {
 
 export type ResortWithMetrics = Resort & {
   whatsapp_clicks_count?: number;
+  analytics?: {
+    whatsappClicks7d: number;
+    whatsappClicks30d: number;
+    recentEvents: Array<{
+      eventType: string;
+      source: string;
+      createdAt: string;
+    }>;
+    dailyClicks: Array<{
+      date: string;
+      whatsappClicks: number;
+    }>;
+  };
 };
