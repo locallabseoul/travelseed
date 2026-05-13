@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { contentSections } from "@/components/dashboard/mockData";
-import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
+import { Badge, Panel } from "@/components/dashboard/ui";
 import type { ContentSection, ResortConsoleData, ResortServiceData } from "@/types/dashboard";
 import type { ResortService } from "@/types/resort";
 
-type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Rooms / Services" | "Experiences" | "Booking CTA";
+type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Rooms / Services" | "Experiences" | "Booking CTA" | "Footer";
 
 function isEditableSection(title: ContentSection["title"]): title is EditableSection {
-  return ["Hero", "About", "Features", "Gallery", "Rooms / Services", "Experiences", "Booking CTA"].includes(title);
+  return ["Hero", "About", "Features", "Gallery", "Rooms / Services", "Experiences", "Booking CTA", "Footer"].includes(title);
 }
 
 export function ContentManager({
@@ -23,6 +23,8 @@ export function ContentManager({
   const [heroTitle, setHeroTitle] = useState(site.heroTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(site.heroSubtitle);
   const [heroCta, setHeroCta] = useState(site.heroCta);
+  const [footerName, setFooterName] = useState(site.name);
+  const [footerLocation, setFooterLocation] = useState(site.location);
   const [about, setAbout] = useState(site.about);
   const [features, setFeatures] = useState(site.features.join("\n"));
   const [services, setServices] = useState<ResortServiceData[]>(site.services);
@@ -37,19 +39,23 @@ export function ContentManager({
     setHeroTitle(site.heroTitle);
     setHeroSubtitle(site.heroSubtitle);
     setHeroCta(site.heroCta);
+    setFooterName(site.name);
+    setFooterLocation(site.location);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
     setServices(site.services);
     setGallery(site.gallery.join("\n"));
     setExperiences(site.experiences.join("\n"));
     setBookingMessageTemplate(site.bookingMessageTemplate);
-  }, [site.about, site.bookingMessageTemplate, site.experiences, site.features, site.gallery, site.heroCta, site.heroSubtitle, site.heroTitle, site.id, site.services]);
+  }, [site.about, site.bookingMessageTemplate, site.experiences, site.features, site.gallery, site.heroCta, site.heroSubtitle, site.heroTitle, site.id, site.location, site.name, site.services]);
 
   function startEditing(section: EditableSection) {
     setEditingSection(section);
     setHeroTitle(site.heroTitle);
     setHeroSubtitle(site.heroSubtitle);
     setHeroCta(site.heroCta);
+    setFooterName(site.name);
+    setFooterLocation(site.location);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
     setServices(site.services);
@@ -136,6 +142,12 @@ export function ContentManager({
       return;
     }
 
+    if (editingSection === "Footer") {
+      await onSiteUpdate({ ...site, name: footerName, location: footerLocation });
+      setEditingSection(null);
+      return;
+    }
+
     await onSiteUpdate({
       ...site,
       heroTitle,
@@ -215,6 +227,80 @@ export function ContentManager({
         <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Site sections</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Manage fixed hospitality sections with simple forms. No drag-and-drop page builder required.</p>
       </Panel>
+
+      {editingSection ? (
+        <Panel className="border-[#2d6b50]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Editing</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[#18352f]">{editingSection}</h2>
+            </div>
+            <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-[#6f7b74]">
+              Cancel
+            </button>
+          </div>
+          <div className="mt-5 grid gap-4">
+            {editingSection === "Hero" ? (
+              <>
+                <HeroImagePanel imageUrl={site.heroImageUrl} uploading={uploading === "hero"} onUpload={uploadHeroImage} />
+                <EditableField label="Hero title" value={heroTitle} onChange={setHeroTitle} />
+                <EditableField label="Hero subtitle" value={heroSubtitle} onChange={setHeroSubtitle} textarea />
+                <EditableField label="CTA label" value={heroCta} onChange={setHeroCta} />
+              </>
+            ) : null}
+            {editingSection === "About" ? <EditableField label="About copy" value={about} onChange={setAbout} textarea /> : null}
+            {editingSection === "Features" ? <EditableField label="Features, one per line" value={features} onChange={setFeatures} textarea /> : null}
+            {editingSection === "Gallery" ? (
+              <>
+                <GalleryUploadPanel
+                  gallery={gallery.split("\n").map((item) => item.trim()).filter(Boolean)}
+                  uploading={uploading === "gallery"}
+                  onUpload={uploadGalleryImages}
+                  onRemove={removeGalleryImage}
+                  onUseAsHero={useGalleryImageAsHero}
+                />
+                <EditableField label="Gallery image URLs, one per line" value={gallery} onChange={setGallery} textarea rows={8} />
+              </>
+            ) : null}
+            {editingSection === "Rooms / Services" ? (
+              <>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm leading-6 text-[#52615a]">Add rooms, stay packages, activities, or MSME services as structured cards.</p>
+                  <button type="button" onClick={addService} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                    Add item
+                  </button>
+                </div>
+                <div className="grid gap-4">
+                  {services.map((service, index) => (
+                    <ServiceEditor
+                      key={service.id}
+                      service={service}
+                      onChange={(patch) => updateService(index, patch)}
+                      onRemove={() => removeService(index)}
+                    />
+                  ))}
+                  {services.length === 0 ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">No rooms or services yet.</p> : null}
+                </div>
+              </>
+            ) : null}
+            {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
+            {editingSection === "Booking CTA" ? <EditableField label="WhatsApp booking message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
+            {editingSection === "Footer" ? (
+              <>
+                <EditableField label="Business name" value={footerName} onChange={setFooterName} />
+                <EditableField label="Footer location" value={footerLocation} onChange={setFooterLocation} />
+              </>
+            ) : null}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+                Save changes
+              </button>
+            </div>
+            {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
+          </div>
+        </Panel>
+      ) : null}
+
       <div className="grid gap-4 xl:grid-cols-2">
         {contentSections.map((section) => (
           <Panel key={section.title}>
@@ -226,21 +312,21 @@ export function ContentManager({
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{section.description}</p>
               </div>
-              {isEditableSection(section.title) ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isEditableSection(section.title)) {
-                      startEditing(section.title);
-                    }
-                  }}
-                  className="min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]"
-                >
-                  Edit
-                </button>
-              ) : (
-                <SecondaryButton>Edit</SecondaryButton>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (isEditableSection(section.title)) {
+                    startEditing(section.title);
+                  }
+                }}
+                className={`min-h-11 rounded-full px-5 text-sm font-semibold ring-1 ${
+                  editingSection === section.title
+                    ? "bg-[#18352f] text-white ring-[#18352f]"
+                    : "bg-white text-[#18352f] ring-[#d8cebb]"
+                }`}
+              >
+                {editingSection === section.title ? "Editing" : "Edit"}
+              </button>
             </div>
             {section.title === "Hero" ? (
               <div className="mt-5 rounded-2xl bg-[#18352f] p-5 text-white">
@@ -301,76 +387,15 @@ export function ContentManager({
                 <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/78">{site.bookingMessageTemplate}</p>
               </div>
             ) : null}
+            {section.title === "Footer" ? (
+              <div className="mt-5 rounded-2xl bg-[#11241f] p-5 text-white">
+                <p className="text-sm font-semibold">{site.name}</p>
+                <p className="mt-1 text-sm text-white/70">{site.location}</p>
+              </div>
+            ) : null}
           </Panel>
         ))}
       </div>
-
-      {editingSection ? (
-        <Panel className="border-[#2d6b50]">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Editing</p>
-              <h2 className="mt-2 text-2xl font-semibold text-[#18352f]">{editingSection}</h2>
-            </div>
-            <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-[#6f7b74]">
-              Cancel
-            </button>
-          </div>
-          <div className="mt-5 grid gap-4">
-            {editingSection === "Hero" ? (
-              <>
-                <HeroImagePanel imageUrl={site.heroImageUrl} uploading={uploading === "hero"} onUpload={uploadHeroImage} />
-                <EditableField label="Hero title" value={heroTitle} onChange={setHeroTitle} />
-                <EditableField label="Hero subtitle" value={heroSubtitle} onChange={setHeroSubtitle} textarea />
-                <EditableField label="CTA label" value={heroCta} onChange={setHeroCta} />
-              </>
-            ) : null}
-            {editingSection === "About" ? <EditableField label="About copy" value={about} onChange={setAbout} textarea /> : null}
-            {editingSection === "Features" ? <EditableField label="Features, one per line" value={features} onChange={setFeatures} textarea /> : null}
-            {editingSection === "Gallery" ? (
-              <>
-                <GalleryUploadPanel
-                  gallery={gallery.split("\n").map((item) => item.trim()).filter(Boolean)}
-                  uploading={uploading === "gallery"}
-                  onUpload={uploadGalleryImages}
-                  onRemove={removeGalleryImage}
-                  onUseAsHero={useGalleryImageAsHero}
-                />
-                <EditableField label="Gallery image URLs, one per line" value={gallery} onChange={setGallery} textarea rows={8} />
-              </>
-            ) : null}
-            {editingSection === "Rooms / Services" ? (
-              <>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm leading-6 text-[#52615a]">Add rooms, stay packages, activities, or MSME services as structured cards.</p>
-                  <button type="button" onClick={addService} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
-                    Add item
-                  </button>
-                </div>
-                <div className="grid gap-4">
-                  {services.map((service, index) => (
-                    <ServiceEditor
-                      key={service.id}
-                      service={service}
-                      onChange={(patch) => updateService(index, patch)}
-                      onRemove={() => removeService(index)}
-                    />
-                  ))}
-                  {services.length === 0 ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">No rooms or services yet.</p> : null}
-                </div>
-              </>
-            ) : null}
-            {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
-            {editingSection === "Booking CTA" ? <EditableField label="WhatsApp booking message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-                Save changes
-              </button>
-            </div>
-            {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
-          </div>
-        </Panel>
-      ) : null}
     </div>
   );
 }
