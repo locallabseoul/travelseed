@@ -162,7 +162,7 @@ export function CreateSiteBuilder() {
   const [importStatus, setImportStatus] = useState("");
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const [session, setSession] = useState<Session | null>(null);
-  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-up");
+  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authStatus, setAuthStatus] = useState("");
@@ -332,7 +332,7 @@ export function CreateSiteBuilder() {
 
       setAuthPassword("");
       setAuthMode("sign-in");
-      setAuthStatus("Check your email to verify the account, then sign in.");
+      setAuthStatus("Check your email to verify the account. If you already have an account, switch back to sign in.");
       return;
     }
 
