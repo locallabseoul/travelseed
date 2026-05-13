@@ -3,9 +3,9 @@ import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { UsageCard } from "@/components/dashboard/UsageCard";
 import { Badge, Panel, PrimaryButton, SecondaryButton } from "@/components/dashboard/ui";
-import type { ResortConsoleData } from "@/types/dashboard";
+import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
-export function DashboardOverview({ site }: { site: ResortConsoleData }) {
+export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
   const dashboardMetrics = dashboardMetricsFor(site);
   const usageMetrics = usageMetricsFor(site);
 
@@ -48,7 +48,7 @@ export function DashboardOverview({ site }: { site: ResortConsoleData }) {
 
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <UsageCard metrics={usageMetrics} />
-        <QuickActionCard actions={quickActions} />
+        <QuickActionCard actions={quickActions} onTabChange={onTabChange} />
       </div>
 
       <Panel>

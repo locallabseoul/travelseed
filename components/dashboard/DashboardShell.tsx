@@ -20,7 +20,12 @@ import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 import type { Resort } from "@/types/resort";
 
-function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onSiteUpdate: (site: ResortConsoleData) => Promise<void>) {
+function renderTab(
+  activeTab: DashboardTab,
+  selectedSite: ResortConsoleData,
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>,
+  onTabChange: (tab: DashboardTab) => void,
+) {
   switch (activeTab) {
     case "setup":
       return <SetupWizard />;
@@ -40,7 +45,7 @@ function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onS
       return <SettingsView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "dashboard":
     default:
-      return <DashboardOverview site={selectedSite} />;
+      return <DashboardOverview site={selectedSite} onTabChange={onTabChange} />;
   }
 }
 
@@ -154,7 +159,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
             <>
               <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={(nextSiteId) => router.push(`/dashboard/${nextSiteId}`)} />
               {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
-              {renderTab(activeTab, selectedSite, updateSelectedSite)}
+              {renderTab(activeTab, selectedSite, updateSelectedSite, setActiveTab)}
             </>
           ) : null}
         </section>

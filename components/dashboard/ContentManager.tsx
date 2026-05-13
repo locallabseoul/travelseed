@@ -3,10 +3,10 @@ import { contentSections } from "@/components/dashboard/mockData";
 import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
 import type { ContentSection, ResortConsoleData } from "@/types/dashboard";
 
-type EditableSection = "Hero" | "About" | "Features" | "Experiences";
+type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Rooms / Services" | "Experiences" | "Booking CTA";
 
 function isEditableSection(title: ContentSection["title"]): title is EditableSection {
-  return ["Hero", "About", "Features", "Experiences"].includes(title);
+  return ["Hero", "About", "Features", "Gallery", "Rooms / Services", "Experiences", "Booking CTA"].includes(title);
 }
 
 export function ContentManager({
@@ -22,7 +22,9 @@ export function ContentManager({
   const [heroCta, setHeroCta] = useState(site.heroCta);
   const [about, setAbout] = useState(site.about);
   const [features, setFeatures] = useState(site.features.join("\n"));
+  const [gallery, setGallery] = useState(site.gallery.join("\n"));
   const [experiences, setExperiences] = useState(site.experiences.join("\n"));
+  const [bookingMessageTemplate, setBookingMessageTemplate] = useState(site.bookingMessageTemplate);
 
   useEffect(() => {
     setEditingSection(null);
@@ -31,8 +33,10 @@ export function ContentManager({
     setHeroCta(site.heroCta);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
+    setGallery(site.gallery.join("\n"));
     setExperiences(site.experiences.join("\n"));
-  }, [site.about, site.experiences, site.features, site.heroCta, site.heroSubtitle, site.heroTitle, site.id]);
+    setBookingMessageTemplate(site.bookingMessageTemplate);
+  }, [site.about, site.bookingMessageTemplate, site.experiences, site.features, site.gallery, site.heroCta, site.heroSubtitle, site.heroTitle, site.id]);
 
   function startEditing(section: EditableSection) {
     setEditingSection(section);
@@ -41,18 +45,24 @@ export function ContentManager({
     setHeroCta(site.heroCta);
     setAbout(site.about);
     setFeatures(site.features.join("\n"));
+    setGallery(site.gallery.join("\n"));
     setExperiences(site.experiences.join("\n"));
+    setBookingMessageTemplate(site.bookingMessageTemplate);
   }
 
   async function saveSection() {
+    const nextFeatures = features.split("\n").map((item) => item.trim()).filter(Boolean);
+
     await onSiteUpdate({
       ...site,
       heroTitle,
       heroSubtitle,
       heroCta,
       about,
-      features: features.split("\n").map((item) => item.trim()).filter(Boolean),
+      features: nextFeatures,
+      gallery: gallery.split("\n").map((item) => item.trim()).filter(Boolean),
       experiences: experiences.split("\n").map((item) => item.trim()).filter(Boolean),
+      bookingMessageTemplate,
     });
     setEditingSection(null);
   }
@@ -116,9 +126,31 @@ export function ContentManager({
             ) : null}
             {section.title === "Gallery" ? (
               <div className="mt-5 grid grid-cols-4 gap-2">
-                {Array.from({ length: 8 }, (_, index) => (
-                  <div key={index} className="aspect-square rounded-xl bg-gradient-to-br from-[#eadfce] to-[#9eb39f]" />
+                {site.gallery.length > 0
+                  ? site.gallery.slice(0, 8).map((imageUrl, index) => (
+                      <div
+                        key={imageUrl}
+                        className="aspect-square rounded-xl bg-cover bg-center shadow-sm"
+                        style={{ backgroundImage: `url(${imageUrl})` }}
+                        aria-label={`${site.name} gallery image ${index + 1}`}
+                      />
+                    ))
+                  : Array.from({ length: 8 }, (_, index) => (
+                      <div key={index} className="aspect-square rounded-xl bg-gradient-to-br from-[#eadfce] to-[#9eb39f]" />
+                    ))}
+              </div>
+            ) : null}
+            {section.title === "Rooms / Services" ? (
+              <div className="mt-5 grid gap-2">
+                {site.features.slice(0, 4).map((feature) => (
+                  <div key={feature} className="rounded-2xl bg-[#fbfaf7] p-3 text-sm font-semibold text-[#18352f]">{feature}</div>
                 ))}
+              </div>
+            ) : null}
+            {section.title === "Booking CTA" ? (
+              <div className="mt-5 rounded-2xl bg-[#18352f] p-5 text-white">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">WhatsApp message</p>
+                <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/78">{site.bookingMessageTemplate}</p>
               </div>
             ) : null}
           </Panel>
@@ -146,7 +178,17 @@ export function ContentManager({
             ) : null}
             {editingSection === "About" ? <EditableField label="About copy" value={about} onChange={setAbout} textarea /> : null}
             {editingSection === "Features" ? <EditableField label="Features, one per line" value={features} onChange={setFeatures} textarea /> : null}
+            {editingSection === "Gallery" ? <EditableField label="Gallery image URLs, one per line" value={gallery} onChange={setGallery} textarea rows={8} /> : null}
+            {editingSection === "Rooms / Services" ? (
+              <>
+                <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">
+                  Rooms and services currently use the same saved highlights as Features. A dedicated room database can be added later when reservation management is built.
+                </p>
+                <EditableField label="Rooms / services highlights, one per line" value={features} onChange={setFeatures} textarea rows={8} />
+              </>
+            ) : null}
             {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
+            {editingSection === "Booking CTA" ? <EditableField label="WhatsApp booking message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
             <div className="flex flex-col gap-3 sm:flex-row">
               <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
                 Save changes
@@ -164,17 +206,19 @@ function EditableField({
   value,
   onChange,
   textarea,
+  rows = 4,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   textarea?: boolean;
+  rows?: number;
 }) {
   return (
     <label className="grid gap-2 text-sm font-medium text-[#18352f]">
       {label}
       {textarea ? (
-        <textarea value={value} rows={4} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+        <textarea value={value} rows={rows} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
       ) : (
         <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
       )}
