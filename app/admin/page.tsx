@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { resortTemplateOptions } from "@/components/templates";
 import { sampleResorts } from "@/lib/sample-resorts";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort, ResortUpsert } from "@/types/resort";
-
-const STORAGE_BUCKET = "resort-images";
 
 type ResortFormState = {
   name: string;
@@ -135,29 +134,7 @@ function previewHref(slug: string, templateId: string) {
   return `/sites/${slug}?template=${templateId}`;
 }
 
-function storagePathFromPublicUrl(imageUrl: string) {
-  try {
-    const url = new URL(imageUrl);
-    const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
-    const markerIndex = url.pathname.indexOf(marker);
-
-    if (markerIndex === -1) {
-      return null;
-    }
-
-    return decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
-  } catch {
-    return null;
-  }
-}
-
-type StorageListItem = {
-  name: string;
-  id?: string | null;
-  metadata?: unknown;
-};
-
-// Temporary unauthenticated admin page. Add Supabase Auth or middleware guards before production use.
+// Authenticated admin page for managing resort content and uploaded images.
 export default function AdminPage() {
   const [resorts, setResorts] = useState<Resort[]>([]);
   const [selectedResortId, setSelectedResortId] = useState<string | null>(null);
@@ -165,11 +142,38 @@ export default function AdminPage() {
   const [status, setStatus] = useState<string>("");
   const [uploadingField, setUploadingField] = useState<"hero" | "gallery" | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [authStatus, setAuthStatus] = useState("");
 
   const selectedResort = useMemo(
     () => resorts.find((resort) => resort.id === selectedResortId) ?? null,
     [resorts, selectedResortId],
   );
+
+  async function adminFetch(path: string, init: RequestInit = {}) {
+    if (!session?.access_token) {
+      throw new Error("Sign in before managing resorts.");
+    }
+
+    const headers = new Headers(init.headers);
+    headers.set("authorization", `Bearer ${session.access_token}`);
+
+    if (init.body && !(init.body instanceof FormData)) {
+      headers.set("content-type", "application/json");
+    }
+
+    const response = await fetch(path, { ...init, headers });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.error ?? "Admin request failed.");
+    }
+
+    return data;
+  }
 
   async function loadResorts() {
     if (!isSupabaseConfigured) {
@@ -180,26 +184,81 @@ export default function AdminPage() {
       return;
     }
 
-    const { data, error } = await supabase.from("resorts").select("*").order("name");
-    if (error) {
-      setStatus(error.message);
+    if (!session?.access_token) {
       return;
     }
 
-    const loadedResorts = (data ?? []) as Resort[];
-    setResorts(loadedResorts);
+    try {
+      const data = await adminFetch("/api/admin/resorts");
+      const loadedResorts = (data.resorts ?? []) as Resort[];
+      setResorts(loadedResorts);
 
-    if (!selectedResortId && loadedResorts[0]) {
-      setSelectedResortId(loadedResorts[0].id);
-      setForm(formFromResort(loadedResorts[0]));
+      if (!selectedResortId && loadedResorts[0]) {
+        setSelectedResortId(loadedResorts[0].id);
+        setForm(formFromResort(loadedResorts[0]));
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not load resorts.");
+      return;
     }
   }
 
   useEffect(() => {
-    void loadResorts();
-    // The selected id is intentionally excluded so initial loading does not re-run after selection changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!isSupabaseConfigured) {
+      setAuthReady(true);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setAuthReady(true);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      if (!nextSession) {
+        setResorts([]);
+        setSelectedResortId(null);
+        setForm(emptyForm);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || session?.access_token) {
+      void loadResorts();
+    }
+    // selectedResortId is intentionally excluded so loading does not re-run after every selection change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.access_token]);
+
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthStatus("Signing in...");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail.trim(),
+      password: loginPassword,
+    });
+
+    if (error) {
+      setAuthStatus(error.message);
+      return;
+    }
+
+    setLoginPassword("");
+    setAuthStatus("");
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    setStatus("");
+    setAuthStatus("");
+  }
 
   function selectResort(resort: Resort) {
     setSelectedResortId(resort.id);
@@ -224,19 +283,22 @@ export default function AdminPage() {
     }
 
     const resortSlug = form.slug.trim() || selectedResort?.slug || "draft-resort";
-    const filePath = `${resortSlug}/${folder}/${Date.now()}-${sanitizeFileName(file.name)}`;
-    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
+    const formData = new FormData();
+    formData.set("file", file, sanitizeFileName(file.name));
+    formData.set("folder", folder);
+    formData.set("slug", resortSlug);
 
-    if (error) {
-      setStatus(error.message);
+    try {
+      const data = await adminFetch("/api/admin/images", {
+        method: "POST",
+        body: formData,
+      });
+
+      return String(data.publicUrl);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Image upload failed.");
       return null;
     }
-
-    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-    return data.publicUrl;
   }
 
   async function handleHeroUpload(file: File) {
@@ -285,51 +347,6 @@ export default function AdminPage() {
     );
   }
 
-  async function listStoragePaths(prefix: string): Promise<string[]> {
-    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).list(prefix);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const items = (data ?? []) as StorageListItem[];
-    const paths = await Promise.all(
-      items.map(async (item) => {
-        const path = `${prefix}/${item.name}`;
-        const isFile = Boolean(item.id || item.metadata);
-
-        if (isFile) {
-          return [path];
-        }
-
-        return listStoragePaths(path);
-      }),
-    );
-
-    return paths.flat();
-  }
-
-  async function deleteResortStorageAssets(resort: Resort) {
-    const listedPaths = await Promise.all([
-      listStoragePaths(`${resort.slug}/hero`).catch(() => []),
-      listStoragePaths(`${resort.slug}/gallery`).catch(() => []),
-    ]);
-    const urlPaths = [resort.hero_image_url, ...resort.gallery]
-      .map((imageUrl) => (imageUrl ? storagePathFromPublicUrl(imageUrl) : null))
-      .filter(Boolean) as string[];
-    const paths = [...new Set([...listedPaths.flat(), ...urlPaths])];
-
-    if (paths.length === 0) {
-      return;
-    }
-
-    const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(paths);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  }
-
   async function handleDeleteSelectedResort() {
     if (!selectedResort) {
       return;
@@ -355,15 +372,7 @@ export default function AdminPage() {
     setStatus(`Deleting ${selectedResort.name} and related images...`);
 
     try {
-      await deleteResortStorageAssets(selectedResort);
-
-      const { error } = await supabase.from("resorts").delete().eq("id", selectedResort.id);
-
-      if (error) {
-        setStatus(error.message);
-        return;
-      }
-
+      await adminFetch(`/api/admin/resorts/${selectedResort.id}`, { method: "DELETE" });
       setSelectedResortId(null);
       setForm(emptyForm);
       setStatus(`${selectedResort.name} deleted with related uploaded images.`);
@@ -399,17 +408,45 @@ export default function AdminPage() {
     const payload = payloadFromForm(form);
     setStatus(selectedResort ? "Updating resort..." : "Creating resort...");
 
-    const result = selectedResort
-      ? await supabase.from("resorts").update(payload).eq("id", selectedResort.id)
-      : await supabase.from("resorts").insert(payload);
-
-    if (result.error) {
-      setStatus(result.error.message);
+    try {
+      await adminFetch(selectedResort ? `/api/admin/resorts/${selectedResort.id}` : "/api/admin/resorts", {
+        method: selectedResort ? "PUT" : "POST",
+        body: JSON.stringify({ resort: payload }),
+      });
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not save resort.");
       return;
     }
 
     setStatus(selectedResort ? "Resort updated." : "Resort created.");
     await loadResorts();
+  }
+
+  if (isSupabaseConfigured && !authReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-sand px-5 text-forest">
+        <p className="text-sm font-medium text-forest/70">Checking admin session...</p>
+      </main>
+    );
+  }
+
+  if (isSupabaseConfigured && !session) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-sand px-5 text-forest">
+        <form onSubmit={handleLogin} className="grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-sm">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-forest/60">Admin</p>
+            <h1 className="mt-3 text-3xl font-semibold text-forest">Sign in</h1>
+          </div>
+          <TextField label="Email" value={loginEmail} onChange={setLoginEmail} type="email" required />
+          <TextField label="Password" value={loginPassword} onChange={setLoginPassword} type="password" required />
+          <button type="submit" className="min-h-12 rounded-md bg-forest px-5 text-sm font-semibold text-white">
+            Sign in
+          </button>
+          {authStatus ? <p className="text-sm text-forest/70">{authStatus}</p> : null}
+        </form>
+      </main>
+    );
   }
 
   return (
@@ -429,6 +466,14 @@ export default function AdminPage() {
               New resort
             </button>
           </div>
+          {isSupabaseConfigured ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-forest/65">
+              <span>{session?.user.email}</span>
+              <button type="button" onClick={() => void handleSignOut()} className="font-semibold text-ocean">
+                Sign out
+              </button>
+            </div>
+          ) : null}
 
           <div className="mt-8 space-y-3">
             {resorts.map((resort) => (

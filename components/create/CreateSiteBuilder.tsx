@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useMemo, useState } from "react";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
-import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { isSupabaseConfigured } from "@/lib/supabase";
 import type { Resort } from "@/types/resort";
-
-const STORAGE_BUCKET = "resort-images";
 
 type BuilderForm = {
   name: string;
@@ -108,23 +106,6 @@ function readFileAsDataUrl(file: File) {
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
-}
-
-function isDataUrl(value: string | null) {
-  return Boolean(value?.startsWith("data:"));
-}
-
-function dataUrlToFile(dataUrl: string, fileName: string) {
-  const [header, base64Data] = dataUrl.split(",");
-  const mimeType = header.match(/data:(.*);base64/)?.[1] ?? "image/jpeg";
-  const binary = window.atob(base64Data);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-
-  return new File([bytes], fileName, { type: mimeType });
 }
 
 function draftList(value: string[] | undefined) {
@@ -303,26 +284,6 @@ export function CreateSiteBuilder() {
     window.open("/preview", "_blank", "noopener,noreferrer");
   }
 
-  async function uploadDataUrlIfNeeded(imageUrl: string | null, slug: string, folder: "hero" | "gallery", index = 0) {
-    if (!imageUrl || !isDataUrl(imageUrl)) {
-      return imageUrl;
-    }
-
-    const file = dataUrlToFile(imageUrl, `${folder}-${index}.jpg`);
-    const filePath = `${slug}/${folder}/${file.name}`;
-    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: true,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-    return data.publicUrl;
-  }
-
   async function handleBuildSite() {
     if (!isSupabaseConfigured) {
       setBuildStatus("Supabase is not configured. Connect Supabase before creating a site.");
@@ -342,41 +303,21 @@ export function CreateSiteBuilder() {
     setBuildStatus("Creating your direct booking site...");
 
     try {
-      const heroImageUrl = await uploadDataUrlIfNeeded(resort.hero_image_url, slug, "hero");
-      const gallery = await Promise.all(
-        resort.gallery.map((imageUrl, index) => uploadDataUrlIfNeeded(imageUrl, slug, "gallery", index)),
-      );
-
-      const { error } = await supabase.from("resorts").insert({
-        slug,
-        name: resort.name,
-        domain: null,
-        template_id: resort.template_id,
-        location: resort.location,
-        type: resort.type,
-        description: resort.description,
-        hero_title: resort.hero_title,
-        hero_subtitle: resort.hero_subtitle,
-        hero_image_url: heroImageUrl,
-        whatsapp_number: resort.whatsapp_number,
-        capacity: resort.capacity,
-        bedrooms: resort.bedrooms,
-        bathrooms: resort.bathrooms,
-        features: resort.features,
-        gallery: gallery.filter(Boolean),
-        experiences: resort.experiences,
-        booking_message_template: resort.booking_message_template,
-        is_active: true,
+      const response = await fetch("/api/create-site", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ resort }),
       });
+      const data = await response.json();
 
-      if (error) {
-        if (error.code === "23505") {
+      if (!response.ok) {
+        if (response.status === 409) {
           setBuildStatus(`The URL slug "${slug}" is already taken. Change the site URL slug and try again.`);
           setActiveStep(0);
           return;
         }
 
-        setBuildStatus(error.message);
+        setBuildStatus(data?.error ?? "Could not create the site.");
         return;
       }
 

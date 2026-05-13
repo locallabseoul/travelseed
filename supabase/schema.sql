@@ -34,33 +34,14 @@ alter table public.resorts enable row level security;
 drop policy if exists "Public can read active resorts" on public.resorts;
 drop policy if exists "Anon can read resorts during MVP" on public.resorts;
 
-create policy "Anon can read resorts during MVP"
+create policy "Public can read active resorts"
   on public.resorts
   for select
-  using (true);
+  using (is_active = true);
 
--- MVP-only write policy for the unauthenticated admin page.
--- Replace this with Supabase Auth role checks before production.
-create policy "Anon can insert resorts during MVP"
-  on public.resorts
-  for insert
-  with check (true);
-
--- MVP-only update policy for the unauthenticated admin page.
--- Replace this with Supabase Auth role checks before production.
-create policy "Anon can update resorts during MVP"
-  on public.resorts
-  for update
-  using (true)
-  with check (true);
-
--- MVP-only delete policy for the unauthenticated admin page.
--- Replace this with Supabase Auth role checks before production.
 drop policy if exists "Anon can delete resorts during MVP" on public.resorts;
-create policy "Anon can delete resorts during MVP"
-  on public.resorts
-  for delete
-  using (true);
+drop policy if exists "Anon can insert resorts during MVP" on public.resorts;
+drop policy if exists "Anon can update resorts during MVP" on public.resorts;
 
 insert into storage.buckets (
   id,
@@ -86,23 +67,8 @@ create policy "Public can read resort images"
   using (bucket_id = 'resort-images');
 
 drop policy if exists "Anon can upload resort images during MVP" on storage.objects;
-create policy "Anon can upload resort images during MVP"
-  on storage.objects
-  for insert
-  with check (bucket_id = 'resort-images');
-
 drop policy if exists "Anon can update resort images during MVP" on storage.objects;
-create policy "Anon can update resort images during MVP"
-  on storage.objects
-  for update
-  using (bucket_id = 'resort-images')
-  with check (bucket_id = 'resort-images');
-
 drop policy if exists "Anon can delete resort images during MVP" on storage.objects;
-create policy "Anon can delete resort images during MVP"
-  on storage.objects
-  for delete
-  using (bucket_id = 'resort-images');
 
 insert into public.resorts (
   name,
