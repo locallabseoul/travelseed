@@ -11,6 +11,8 @@ export type DashboardTab =
 
 export type ResortConsoleData = {
   id: string;
+  slug: string;
+  domain: string | null;
   name: string;
   type: string;
   location: string;
@@ -35,6 +37,7 @@ export type ResortConsoleData = {
   language: string;
   timezone: string;
   contactEmail: string;
+  isActive: boolean;
 };
 
 export type DashboardMetric = {

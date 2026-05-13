@@ -14,7 +14,7 @@ export function ContentManager({
   onSiteUpdate,
 }: {
   site: ResortConsoleData;
-  onSiteUpdate: (site: ResortConsoleData) => void;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
 }) {
   const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
   const [heroTitle, setHeroTitle] = useState(site.heroTitle);
@@ -44,8 +44,8 @@ export function ContentManager({
     setExperiences(site.experiences.join("\n"));
   }
 
-  function saveSection() {
-    onSiteUpdate({
+  async function saveSection() {
+    await onSiteUpdate({
       ...site,
       heroTitle,
       heroSubtitle,
@@ -148,11 +148,10 @@ export function ContentManager({
             {editingSection === "Features" ? <EditableField label="Features, one per line" value={features} onChange={setFeatures} textarea /> : null}
             {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" onClick={saveSection} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-                Apply mock changes
+              <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+                Save changes
               </button>
             </div>
-            <p className="text-xs leading-5 text-[#6f7b74]">TODO: Replace this local mock update with a Supabase mutation when persistence is added.</p>
           </div>
         </Panel>
       ) : null}

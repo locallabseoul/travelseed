@@ -7,7 +7,7 @@ export function SettingsView({
   onSiteUpdate,
 }: {
   site: ResortConsoleData;
-  onSiteUpdate: (site: ResortConsoleData) => void;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
 }) {
   const [name, setName] = useState(site.name);
   const [location, setLocation] = useState(site.location);
@@ -25,8 +25,8 @@ export function SettingsView({
     setType(site.type);
   }, [site.contactEmail, site.id, site.language, site.location, site.name, site.timezone, site.type]);
 
-  function saveSettings() {
-    onSiteUpdate({ ...site, name, location, contactEmail, language, timezone, type });
+  async function saveSettings() {
+    await onSiteUpdate({ ...site, name, location, contactEmail, language, timezone, type });
   }
 
   return (
@@ -48,10 +48,9 @@ export function SettingsView({
             <EditableField label="Business Type" value={type} onChange={setType} />
           </div>
           <div className="mt-6">
-            <button type="button" onClick={saveSettings} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-              Apply mock changes
+            <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+              Save settings
             </button>
-            <p className="mt-3 text-xs leading-5 text-[#6f7b74]">TODO: Persist business settings to Supabase when DB integration starts.</p>
           </div>
         </Panel>
 

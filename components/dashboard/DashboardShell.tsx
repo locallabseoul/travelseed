@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { AnalyticsView } from "@/components/dashboard/AnalyticsView";
 import { ContentManager } from "@/components/dashboard/ContentManager";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -13,10 +14,73 @@ import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { WhatsAppManager } from "@/components/dashboard/WhatsAppManager";
-import { mockSites } from "@/components/dashboard/mockData";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
+import type { Resort, ResortUpsert } from "@/types/resort";
 
-function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onSiteUpdate: (site: ResortConsoleData) => void) {
+function siteFromResort(resort: Resort): ResortConsoleData {
+  return {
+    id: resort.id,
+    slug: resort.slug,
+    domain: resort.domain,
+    name: resort.name,
+    type: resort.type ?? "Direct Booking Site",
+    location: resort.location,
+    plan: "Tree",
+    status: resort.is_active ? "Published" : "Paused",
+    travelseedUrl: `${resort.slug}.travelseed.app`,
+    customDomain: resort.domain ?? "",
+    monthlyVisitorsUsed: 0,
+    monthlyVisitorsLimit: 20000,
+    whatsappClicksUsed: 0,
+    whatsappClicksLimit: 300,
+    storageUsedGb: 0,
+    storageLimitGb: 20,
+    template: resort.template_id,
+    whatsappNumber: resort.whatsapp_number,
+    heroTitle: resort.hero_title,
+    heroSubtitle: resort.hero_subtitle ?? "",
+    heroCta: "Book Direct on WhatsApp",
+    about: resort.description ?? "",
+    features: resort.features,
+    experiences: resort.experiences,
+    language: "English",
+    timezone: "Asia/Makassar",
+    contactEmail: resort.owner_email ?? "",
+    isActive: resort.is_active,
+  };
+}
+
+function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
+  return {
+    name: site.name,
+    slug: site.slug,
+    domain: site.domain,
+    template_id: site.template,
+    location: site.location,
+    type: site.type,
+    description: site.about || null,
+    hero_title: site.heroTitle,
+    hero_subtitle: site.heroSubtitle || null,
+    hero_image_url: null,
+    whatsapp_number: site.whatsappNumber,
+    capacity: null,
+    bedrooms: null,
+    bathrooms: null,
+    features: site.features,
+    gallery: [],
+    experiences: site.experiences,
+    booking_message_template: `Hello, I would like to make a reservation at ${site.name}.
+Check-in:
+Check-out:
+Guests:
+Airport Pickup:`,
+    is_active: site.isActive,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onSiteUpdate: (site: ResortConsoleData) => Promise<void>) {
   switch (activeTab) {
     case "setup":
       return <SetupWizard />;
@@ -42,25 +106,140 @@ function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onS
 
 export function DashboardShell() {
   const [activeTab, setActiveTab] = useState<DashboardTab>("dashboard");
-  const [sites, setSites] = useState<ResortConsoleData[]>(mockSites);
-  const [selectedSiteId, setSelectedSiteId] = useState(mockSites[0].id);
-  const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? sites[0];
+  const [sites, setSites] = useState<ResortConsoleData[]>([]);
+  const [selectedSiteId, setSelectedSiteId] = useState("");
+  const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [status, setStatus] = useState("Loading sites from database...");
+  const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? sites[0] ?? null;
 
-  function updateSelectedSite(nextSite: ResortConsoleData) {
-    setSites((currentSites) => currentSites.map((site) => (site.id === nextSite.id ? nextSite : site)));
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setAuthReady(true);
+      setStatus("Supabase is not configured.");
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setAccessToken(data.session?.access_token ?? null);
+      setAuthReady(true);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setAccessToken(nextSession?.access_token ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function operatorFetch(path: string, init: RequestInit = {}) {
+    if (!accessToken) {
+      throw new Error("Sign in before managing sites.");
+    }
+
+    const headers = new Headers(init.headers);
+    headers.set("authorization", `Bearer ${accessToken}`);
+    if (init.body && !(init.body instanceof FormData)) {
+      headers.set("content-type", "application/json");
+    }
+
+    const response = await fetch(path, { ...init, headers });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.error ?? "Request failed.");
+    }
+
+    return data;
   }
 
-  // TODO: Replace mock data and local tab state with Supabase-backed site state once customer ownership is finalized.
+  async function loadSites(token: string) {
+    setStatus("Loading sites from database...");
+    try {
+      const response = await fetch("/api/operator/resorts", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Could not load sites.");
+      }
+
+      const loadedSites = ((data.resorts ?? []) as Resort[]).map(siteFromResort);
+      setSites(loadedSites);
+      setSelectedSiteId((currentId) => {
+        if (loadedSites.some((site) => site.id === currentId)) {
+          return currentId;
+        }
+
+        return loadedSites[0]?.id ?? "";
+      });
+      setStatus(loadedSites.length > 0 ? "" : "No sites found in the database.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not load sites.");
+    }
+  }
+
+  useEffect(() => {
+    if (accessToken) {
+      void loadSites(accessToken);
+    } else if (authReady) {
+      setSites([]);
+      setStatus("Sign in to view your sites.");
+    }
+  }, [accessToken, authReady]);
+
+  async function updateSelectedSite(nextSite: ResortConsoleData) {
+    setStatus("Saving site to database...");
+    try {
+      await operatorFetch(`/api/operator/resorts/${nextSite.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ resort: resortPayloadFromSite(nextSite) }),
+      });
+      setSites((currentSites) => currentSites.map((site) => (site.id === nextSite.id ? nextSite : site)));
+      setStatus("Site saved to database.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not save site.");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
       <DashboardHeader />
       <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-8">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
         <section className="grid min-w-0 gap-5 pb-10">
-          <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={setSelectedSiteId} />
-          {renderTab(activeTab, selectedSite, updateSelectedSite)}
+          {!authReady ? <DashboardMessage text="Checking account session..." /> : null}
+          {authReady && !accessToken ? <DashboardMessage text={status} actionHref="/login?next=/dashboard" actionLabel="Sign in" /> : null}
+          {authReady && accessToken && !selectedSite ? <DashboardMessage text={status} actionHref="/create" actionLabel="Create site" /> : null}
+          {authReady && accessToken && selectedSite ? (
+            <>
+              <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={setSelectedSiteId} />
+              {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
+              {renderTab(activeTab, selectedSite, updateSelectedSite)}
+            </>
+          ) : null}
         </section>
       </div>
     </main>
+  );
+}
+
+function DashboardMessage({ text, actionHref, actionLabel }: { text: string; actionHref?: string; actionLabel?: string }) {
+  return (
+    <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-[#e8dfd0] bg-white p-6 text-center shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+      <div>
+        <p className="text-lg font-semibold text-[#18352f]">{text}</p>
+        {actionHref && actionLabel ? (
+          <Link href={actionHref} className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+            {actionLabel}
+          </Link>
+        ) : null}
+      </div>
+    </section>
   );
 }

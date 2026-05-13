@@ -15,7 +15,7 @@ export function WhatsAppManager({
   onSiteUpdate,
 }: {
   site: ResortConsoleData;
-  onSiteUpdate: (site: ResortConsoleData) => void;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
 }) {
   const [whatsappNumber, setWhatsappNumber] = useState(site.whatsappNumber);
   const [language, setLanguage] = useState(site.language);
@@ -25,8 +25,8 @@ export function WhatsAppManager({
     setLanguage(site.language);
   }, [site.id, site.language, site.whatsappNumber]);
 
-  function saveSettings() {
-    onSiteUpdate({ ...site, whatsappNumber, language });
+  async function saveSettings() {
+    await onSiteUpdate({ ...site, whatsappNumber, language });
   }
 
   return (
@@ -43,10 +43,9 @@ export function WhatsAppManager({
             <EditableField label="Language" value={language} onChange={setLanguage} />
             <EditableField label="Airport Pickup Option" value="Enabled" onChange={() => undefined} />
           </div>
-          <button type="button" onClick={saveSettings} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-            Apply mock changes
+          <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+            Save WhatsApp settings
           </button>
-          <p className="text-xs leading-5 text-[#6f7b74]">TODO: Persist WhatsApp settings through a Supabase update mutation.</p>
         </div>
       </Panel>
 
