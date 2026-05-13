@@ -26,6 +26,7 @@ function renderTab(
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>,
   onTabChange: (tab: DashboardTab) => void,
   accessToken: string | null,
+  operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>,
 ) {
   switch (activeTab) {
     case "setup":
@@ -37,7 +38,7 @@ function renderTab(
     case "whatsapp":
       return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "domain":
-      return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+      return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} />;
     case "analytics":
       return <AnalyticsView site={selectedSite} />;
     case "plan":
@@ -163,7 +164,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
             <>
               <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={(nextSiteId) => router.push(`/dashboard/${nextSiteId}`)} />
               {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
-              {renderTab(activeTab, selectedSite, updateSelectedSite, setActiveTab, accessToken)}
+              {renderTab(activeTab, selectedSite, updateSelectedSite, setActiveTab, accessToken, operatorFetch)}
             </>
           ) : null}
         </section>

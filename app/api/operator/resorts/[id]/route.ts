@@ -58,10 +58,17 @@ export async function PUT(request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "You can only manage sites connected to your account." }, { status: 403 });
   }
 
+  const existingDomain = (existingResort as Resort).domain ?? null;
+  const nextDomain = payload.domain ?? null;
+  const domainChanged = existingDomain !== nextDomain;
+
   const { data, error } = await supabase
     .from("resorts")
     .update({
       ...payload,
+      domain_status: domainChanged ? (nextDomain ? "pending" : "not_connected") : payload.domain_status,
+      ssl_status: domainChanged ? "pending" : payload.ssl_status,
+      domain_verified_at: domainChanged ? null : payload.domain_verified_at,
       owner_user_id: user.userId,
       owner_email: user.email,
     })

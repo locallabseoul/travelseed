@@ -118,6 +118,9 @@ export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUps
       ? String(payload.booking_message_template)
       : null,
     is_active: Boolean(payload.is_active),
+    domain_status: payload.domain_status ?? (payload.domain ? "pending" : "not_connected"),
+    ssl_status: payload.ssl_status ?? "pending",
+    domain_verified_at: payload.domain_verified_at ?? null,
     updated_at: payload.updated_at ?? new Date().toISOString(),
   };
 }

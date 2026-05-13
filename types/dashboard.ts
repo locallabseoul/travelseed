@@ -41,6 +41,9 @@ export type ResortConsoleData = {
   timezone: string;
   contactEmail: string;
   isActive: boolean;
+  domainStatus: "not_connected" | "pending" | "verified" | "active" | "error";
+  sslStatus: "pending" | "active" | "error";
+  domainVerifiedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   analytics: SiteAnalyticsSummary;

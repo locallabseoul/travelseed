@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Badge, Panel, ProgressBar, SecondaryButton } from "@/components/dashboard/ui";
+import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import type { ResortConsoleData } from "@/types/dashboard";
+import type { Resort } from "@/types/resort";
 
 const dnsRows = [
   { type: "CNAME", name: "www", value: "sites.travelseed.app", status: "Verified" },
@@ -11,17 +12,21 @@ const dnsRows = [
 export function DomainManager({
   site,
   onSiteUpdate,
+  operatorFetch,
 }: {
   site: ResortConsoleData;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+  operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
 }) {
   const hasCustomDomain = Boolean(site.customDomain);
   const [slug, setSlug] = useState(site.slug);
   const [customDomain, setCustomDomain] = useState(site.customDomain);
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
     setSlug(site.slug);
     setCustomDomain(site.customDomain);
+    setStatus("");
   }, [site.customDomain, site.id, site.slug]);
 
   async function saveDomainSettings() {
@@ -34,8 +39,36 @@ export function DomainManager({
       travelseedUrl: `${normalizedSlug}.travelseed.app`,
       domain: normalizedDomain || null,
       customDomain: normalizedDomain,
+      domainStatus: normalizedDomain === site.customDomain ? site.domainStatus : normalizedDomain ? "pending" : "not_connected",
+      sslStatus: normalizedDomain === site.customDomain ? site.sslStatus : "pending",
+      domainVerifiedAt: normalizedDomain === site.customDomain ? site.domainVerifiedAt : null,
     });
   }
+
+  async function recheckDns() {
+    setStatus("Rechecking DNS...");
+    try {
+      const data = await operatorFetch(`/api/operator/resorts/${site.id}/domain/recheck`, { method: "POST" }) as { resort?: Resort };
+      const resort = data.resort;
+
+      if (!resort) {
+        throw new Error("Could not read domain status.");
+      }
+
+      await onSiteUpdate({
+        ...site,
+        domainStatus: resort.domain_status ?? site.domainStatus,
+        sslStatus: resort.ssl_status ?? site.sslStatus,
+        domainVerifiedAt: resort.domain_verified_at ?? null,
+      });
+      setStatus("DNS status updated.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not recheck DNS.");
+    }
+  }
+
+  const dnsProgress = site.domainStatus === "active" || site.domainStatus === "verified" ? 100 : hasCustomDomain ? 55 : 0;
+  const sslProgress = site.sslStatus === "active" ? 100 : hasCustomDomain ? 50 : 0;
 
   return (
     <div className="grid gap-6">
@@ -47,8 +80,8 @@ export function DomainManager({
             <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Keep Travelseed operations behind a branded guest-facing address.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge tone={hasCustomDomain ? "green" : "sand"}>{hasCustomDomain ? "Active" : "Pending"}</Badge>
-            <Badge tone={hasCustomDomain ? "sand" : "gray"}>SSL {hasCustomDomain ? "Active" : "Pending"}</Badge>
+            <Badge tone={site.domainStatus === "active" || site.domainStatus === "verified" ? "green" : hasCustomDomain ? "sand" : "gray"}>{labelForStatus(site.domainStatus)}</Badge>
+            <Badge tone={site.sslStatus === "active" ? "green" : hasCustomDomain ? "sand" : "gray"}>SSL {labelForStatus(site.sslStatus)}</Badge>
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -58,6 +91,7 @@ export function DomainManager({
         <button type="button" onClick={() => void saveDomainSettings()} className="mt-6 min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
           Save domain settings
         </button>
+        {status ? <p className="mt-4 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{status}</p> : null}
       </Panel>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.58fr]">
@@ -69,7 +103,7 @@ export function DomainManager({
                 <p className="text-sm font-semibold text-[#18352f]">{row.type}</p>
                 <p className="text-sm text-[#6f7b74]">{row.name}</p>
                 <p className="break-all text-sm text-[#6f7b74]">{row.value}</p>
-                <Badge tone={row.status === "Active" || row.status === "Verified" ? "green" : "sand"}>{row.status}</Badge>
+                <Badge tone={statusTone(row.status)}>{row.status}</Badge>
               </div>
             ))}
           </div>
@@ -81,23 +115,46 @@ export function DomainManager({
             <div>
               <div className="mb-2 flex justify-between text-sm">
                 <span>DNS</span>
-                <span>70%</span>
+                <span>{dnsProgress}%</span>
               </div>
-              <ProgressBar value={70} />
+              <ProgressBar value={dnsProgress} />
             </div>
             <div>
               <div className="mb-2 flex justify-between text-sm">
                 <span>SSL</span>
-                <span>100%</span>
+                <span>{sslProgress}%</span>
               </div>
-              <ProgressBar value={100} />
+              <ProgressBar value={sslProgress} />
             </div>
-            <SecondaryButton>Recheck DNS</SecondaryButton>
+            <button type="button" onClick={() => void recheckDns()} className="min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+              Recheck DNS
+            </button>
+            {site.domainVerifiedAt ? <p className="text-xs text-[#6f7b74]">Last verified {formatDateTime(site.domainVerifiedAt)}</p> : null}
           </div>
         </Panel>
       </div>
     </div>
   );
+}
+
+function labelForStatus(status: string) {
+  return status
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function statusTone(status: string) {
+  return status === "Active" || status === "Verified" ? "green" : status === "Pending" ? "sand" : "gray";
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
 function EditableField({
