@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnalyticsView } from "@/components/dashboard/AnalyticsView";
 import { ContentManager } from "@/components/dashboard/ContentManager";
@@ -14,71 +15,10 @@ import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { WhatsAppManager } from "@/components/dashboard/WhatsAppManager";
+import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
-import type { Resort, ResortUpsert } from "@/types/resort";
-
-function siteFromResort(resort: Resort): ResortConsoleData {
-  return {
-    id: resort.id,
-    slug: resort.slug,
-    domain: resort.domain,
-    name: resort.name,
-    type: resort.type ?? "Direct Booking Site",
-    location: resort.location,
-    plan: "Tree",
-    status: resort.is_active ? "Published" : "Paused",
-    travelseedUrl: `${resort.slug}.travelseed.app`,
-    customDomain: resort.domain ?? "",
-    monthlyVisitorsUsed: 0,
-    monthlyVisitorsLimit: 20000,
-    whatsappClicksUsed: 0,
-    whatsappClicksLimit: 300,
-    storageUsedGb: 0,
-    storageLimitGb: 20,
-    template: resort.template_id,
-    whatsappNumber: resort.whatsapp_number,
-    heroTitle: resort.hero_title,
-    heroSubtitle: resort.hero_subtitle ?? "",
-    heroCta: "Book Direct on WhatsApp",
-    about: resort.description ?? "",
-    features: resort.features,
-    experiences: resort.experiences,
-    language: "English",
-    timezone: "Asia/Makassar",
-    contactEmail: resort.owner_email ?? "",
-    isActive: resort.is_active,
-  };
-}
-
-function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
-  return {
-    name: site.name,
-    slug: site.slug,
-    domain: site.domain,
-    template_id: site.template,
-    location: site.location,
-    type: site.type,
-    description: site.about || null,
-    hero_title: site.heroTitle,
-    hero_subtitle: site.heroSubtitle || null,
-    hero_image_url: null,
-    whatsapp_number: site.whatsappNumber,
-    capacity: null,
-    bedrooms: null,
-    bathrooms: null,
-    features: site.features,
-    gallery: [],
-    experiences: site.experiences,
-    booking_message_template: `Hello, I would like to make a reservation at ${site.name}.
-Check-in:
-Check-out:
-Guests:
-Airport Pickup:`,
-    is_active: site.isActive,
-    updated_at: new Date().toISOString(),
-  };
-}
+import type { Resort } from "@/types/resort";
 
 function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onSiteUpdate: (site: ResortConsoleData) => Promise<void>) {
   switch (activeTab) {
@@ -104,14 +44,14 @@ function renderTab(activeTab: DashboardTab, selectedSite: ResortConsoleData, onS
   }
 }
 
-export function DashboardShell() {
+export function DashboardShell({ siteId }: { siteId: string }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<DashboardTab>("dashboard");
   const [sites, setSites] = useState<ResortConsoleData[]>([]);
-  const [selectedSiteId, setSelectedSiteId] = useState("");
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [status, setStatus] = useState("Loading sites from database...");
-  const selectedSite = sites.find((site) => site.id === selectedSiteId) ?? sites[0] ?? null;
+  const selectedSite = sites.find((site) => site.id === siteId) ?? null;
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -171,14 +111,7 @@ export function DashboardShell() {
 
       const loadedSites = ((data.resorts ?? []) as Resort[]).map(siteFromResort);
       setSites(loadedSites);
-      setSelectedSiteId((currentId) => {
-        if (loadedSites.some((site) => site.id === currentId)) {
-          return currentId;
-        }
-
-        return loadedSites[0]?.id ?? "";
-      });
-      setStatus(loadedSites.length > 0 ? "" : "No sites found in the database.");
+      setStatus(loadedSites.length > 0 ? "" : "Site not found in the database.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not load sites.");
     }
@@ -215,10 +148,10 @@ export function DashboardShell() {
         <section className="grid min-w-0 gap-5 pb-10">
           {!authReady ? <DashboardMessage text="Checking account session..." /> : null}
           {authReady && !accessToken ? <DashboardMessage text={status} actionHref="/login?next=/dashboard" actionLabel="Sign in" /> : null}
-          {authReady && accessToken && !selectedSite ? <DashboardMessage text={status} actionHref="/create" actionLabel="Create site" /> : null}
+          {authReady && accessToken && !selectedSite ? <DashboardMessage text={status} actionHref="/dashboard" actionLabel="Back to sites" /> : null}
           {authReady && accessToken && selectedSite ? (
             <>
-              <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={setSelectedSiteId} />
+              <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={(nextSiteId) => router.push(`/dashboard/${nextSiteId}`)} />
               {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
               {renderTab(activeTab, selectedSite, updateSelectedSite)}
             </>

@@ -1,10 +1,10 @@
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { DashboardHub } from "@/components/dashboard/DashboardHub";
 
 export const metadata = {
-  title: "Customer Console | Travelseed",
-  description: "Mock customer operations console for Travelseed direct booking sites.",
+  title: "Your Sites | Travelseed",
+  description: "Manage and create Travelseed direct booking sites.",
 };
 
 export default function DashboardPage() {
-  return <DashboardShell />;
+  return <DashboardHub />;
 }
