@@ -1,10 +1,10 @@
-import { OperatorDashboard } from "@/components/operator/OperatorDashboard";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
 export const metadata = {
-  title: "Site Management | Travelseed",
-  description: "Manage your Travelseed direct booking sites.",
+  title: "Customer Console | Travelseed",
+  description: "Mock customer operations console for Travelseed direct booking sites.",
 };
 
 export default function DashboardPage() {
-  return <OperatorDashboard />;
+  return <DashboardShell />;
 }
