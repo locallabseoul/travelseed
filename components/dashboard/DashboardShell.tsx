@@ -9,6 +9,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { DesignManager } from "@/components/dashboard/DesignManager";
 import { DomainManager } from "@/components/dashboard/DomainManager";
+import { InquiriesManager } from "@/components/dashboard/InquiriesManager";
 import { PlanBillingView } from "@/components/dashboard/PlanBillingView";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
@@ -37,6 +38,8 @@ function renderTab(
       return <DesignManager site={selectedSite} />;
     case "whatsapp":
       return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+    case "inquiries":
+      return <InquiriesManager site={selectedSite} operatorFetch={operatorFetch} />;
     case "domain":
       return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} />;
     case "analytics":

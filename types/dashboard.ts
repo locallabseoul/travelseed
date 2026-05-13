@@ -4,6 +4,7 @@ export type DashboardTab =
   | "content"
   | "design"
   | "whatsapp"
+  | "inquiries"
   | "domain"
   | "analytics"
   | "plan"
@@ -48,6 +49,23 @@ export type ResortConsoleData = {
   createdAt: string | null;
   updatedAt: string | null;
   analytics: SiteAnalyticsSummary;
+};
+
+export type InquiryStatus = "new" | "contacted" | "confirmed" | "cancelled";
+
+export type BookingInquiry = {
+  id: string;
+  resortId: string;
+  guestName: string;
+  guestContact: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  status: InquiryStatus;
+  source: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ResortServiceData = {
