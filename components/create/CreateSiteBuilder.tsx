@@ -361,10 +361,16 @@ export function CreateSiteBuilder() {
       return;
     }
 
-    if (!session?.access_token) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const { data: refreshedData } = await supabase.auth.refreshSession();
+    const activeSession = refreshedData.session ?? sessionData.session;
+
+    if (!activeSession?.access_token) {
       setBuildStatus("Create an account or sign in before building your site.");
       return;
     }
+
+    setSession(activeSession);
 
     if (!form.name.trim()) {
       setBuildStatus("Add a resort name first. This becomes the site name and URL slug.");
@@ -379,14 +385,32 @@ export function CreateSiteBuilder() {
     setBuildStatus("Creating your direct booking site...");
 
     try {
-      const response = await fetch("/api/create-site", {
+      let response = await fetch("/api/create-site", {
         method: "POST",
         headers: {
-          authorization: `Bearer ${session.access_token}`,
+          authorization: `Bearer ${activeSession.access_token}`,
           "content-type": "application/json",
         },
         body: JSON.stringify({ resort }),
       });
+
+      if (response.status === 401) {
+        const { data: refreshedData } = await supabase.auth.refreshSession();
+        const refreshedSession = refreshedData.session;
+
+        if (refreshedSession?.access_token) {
+          setSession(refreshedSession);
+          response = await fetch("/api/create-site", {
+            method: "POST",
+            headers: {
+              authorization: `Bearer ${refreshedSession.access_token}`,
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({ resort }),
+          });
+        }
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
