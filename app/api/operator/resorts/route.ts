@@ -20,15 +20,30 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceRoleClient();
-  const { data, error } = await supabase.from("resorts").select("*").or(
-    `owner_user_id.eq.${user.userId},owner_email.eq.${user.email}`,
-  ).order("created_at", { ascending: false });
+  const [ownedResult, legacyResult] = await Promise.all([
+    supabase
+      .from("resorts")
+      .select("*")
+      .or(`owner_user_id.eq.${user.userId},owner_email.eq.${user.email}`)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("resorts")
+      .select("*")
+      .is("owner_user_id", null)
+      .is("owner_email", null)
+      .order("created_at", { ascending: false }),
+  ]);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (ownedResult.error || legacyResult.error) {
+    return NextResponse.json({ error: ownedResult.error?.message ?? legacyResult.error?.message }, { status: 500 });
   }
 
-  return NextResponse.json({ resorts: (data ?? []) as Resort[] });
+  const resortsById = new Map<string, Resort>();
+  for (const resort of [...(ownedResult.data ?? []), ...(legacyResult.data ?? [])] as Resort[]) {
+    resortsById.set(resort.id, resort);
+  }
+
+  return NextResponse.json({ resorts: Array.from(resortsById.values()) });
 }
 
 export async function POST(request: Request) {

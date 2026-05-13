@@ -119,7 +119,6 @@ export function OperatorDashboard() {
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [form, setForm] = useState<SiteForm>(emptyForm);
   const [status, setStatus] = useState("");
-  const [claimSlug, setClaimSlug] = useState("");
   const [uploading, setUploading] = useState<"hero" | "gallery" | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -268,37 +267,6 @@ export function OperatorDashboard() {
       await loadSites();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save site.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleClaimSite(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!claimSlug.trim()) {
-      setStatus("Enter the existing site slug.");
-      return;
-    }
-
-    setSaving(true);
-    setStatus("Connecting existing site...");
-    try {
-      const data = await operatorFetch("/api/operator/resorts/claim", {
-        method: "POST",
-        body: JSON.stringify({ slug: claimSlug }),
-      });
-      const claimedSite = data.resort as Resort;
-      setSites((current) => {
-        const exists = current.some((site) => site.id === claimedSite.id);
-        return exists ? current.map((site) => (site.id === claimedSite.id ? claimedSite : site)) : [claimedSite, ...current];
-      });
-      setClaimSlug("");
-      setSelectedSiteId(claimedSite.id);
-      setForm(formFromResort(claimedSite));
-      setStatus("Existing site connected to your account.");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Could not connect this site.");
     } finally {
       setSaving(false);
     }
@@ -511,24 +479,6 @@ export function OperatorDashboard() {
               <div className="w-full max-w-md text-center">
                 <h2 className="text-2xl font-semibold">No site selected</h2>
                 <p className="mt-2 text-sm text-[#51635b]">{status || "Create a site first, then manage it here."}</p>
-                <form onSubmit={handleClaimSite} className="mt-6 grid gap-3 rounded-md bg-white p-4 text-left shadow-sm">
-                  <label className="grid gap-2 text-sm font-medium">
-                    Existing site slug
-                    <input
-                      value={claimSlug}
-                      onChange={(event) => setClaimSlug(event.target.value)}
-                      placeholder="villa-jeruk"
-                      className={fieldClassName}
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="min-h-11 rounded-md bg-[#18352f] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {saving ? "Connecting..." : "Connect existing site"}
-                  </button>
-                </form>
                 <Link href="/create" className="mt-5 inline-flex min-h-11 items-center rounded-md bg-[#18352f] px-5 text-sm font-semibold text-white">
                   Build new site
                 </Link>

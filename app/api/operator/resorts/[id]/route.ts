@@ -25,7 +25,11 @@ function canManageResort(resort: Resort, user: Extract<Awaited<ReturnType<typeof
     return resort.owner_user_id === user.userId;
   }
 
-  return Boolean(resort.owner_email && resort.owner_email === user.email);
+  if (resort.owner_email) {
+    return resort.owner_email === user.email;
+  }
+
+  return true;
 }
 
 export async function PUT(request: Request, { params }: RouteContext) {
