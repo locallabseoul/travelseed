@@ -23,6 +23,7 @@ type RawPage = {
   slug: string;
   page_type: SiteStructurePage["pageType"];
   is_published: boolean;
+  hero_image_url: string | null;
   sort_order: number;
 };
 
@@ -34,9 +35,11 @@ const structureCopy = {
 
 export function SiteStructureManager({
   site,
+  accessToken,
   operatorFetch,
 }: {
   site: ResortConsoleData;
+  accessToken: string | null;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
 }) {
   const planType = effectivePlanType(site);
@@ -145,7 +148,18 @@ export function SiteStructureManager({
         {isLanding ? (
           <LandingSectionsView sections={sections} onToggle={toggleSection} />
         ) : (
-          <PagesView planType={planType} pages={pages} onToggle={togglePage} onAddCustomPage={addCustomPage} />
+          <PagesView
+            site={site}
+            accessToken={accessToken}
+            planType={planType}
+            pages={pages}
+            onToggle={togglePage}
+            onAddCustomPage={addCustomPage}
+            onPagesChange={(nextPages) => {
+              setPages(nextPages);
+              void saveStructure(sections, nextPages);
+            }}
+          />
         )}
         <FeatureAccessPanel planType={planType} />
       </div>
@@ -201,18 +215,26 @@ function LandingSectionsView({ sections, onToggle }: { sections: SiteStructureSe
 }
 
 function PagesView({
+  site,
+  accessToken,
   planType,
   pages,
   onToggle,
   onAddCustomPage,
+  onPagesChange,
 }: {
+  site: ResortConsoleData;
+  accessToken: string | null;
   planType: PlanType;
   pages: SiteStructurePage[];
   onToggle: (page: SiteStructurePage) => void;
   onAddCustomPage: () => void;
+  onPagesChange: (pages: SiteStructurePage[]) => void;
 }) {
   const isForest = planType === "forest";
   const [selectedSlug, setSelectedSlug] = useState(pages[0]?.slug ?? "/");
+  const [uploadingSlug, setUploadingSlug] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState("");
   const selectedPage = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
 
   useEffect(() => {
@@ -220,6 +242,45 @@ function PagesView({
       setSelectedSlug(pages[0]?.slug ?? "/");
     }
   }, [pages, selectedSlug]);
+
+  async function uploadPageHero(page: SiteStructurePage, file: File) {
+    if (!accessToken) {
+      setUploadStatus("Sign in before uploading page images.");
+      return;
+    }
+
+    setUploadingSlug(page.slug);
+    setUploadStatus(`Uploading ${page.name} hero image...`);
+
+    try {
+      const formData = new FormData();
+      formData.set("file", file, file.name);
+      formData.set("folder", "page-hero");
+      formData.set("slug", site.slug);
+
+      const response = await fetch("/api/operator/images", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Page hero upload failed.");
+      }
+
+      const publicUrl = String(data.publicUrl);
+      const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, heroImageUrl: publicUrl } : item));
+      onPagesChange(nextPages);
+      setUploadStatus(`${page.name} hero image uploaded and saved.`);
+    } catch (error) {
+      setUploadStatus(error instanceof Error ? error.message : "Page hero upload failed.");
+    } finally {
+      setUploadingSlug(null);
+    }
+  }
 
   return (
     <Panel>
@@ -256,7 +317,17 @@ function PagesView({
             );
           })}
         </nav>
-        {selectedPage ? <PageDetail page={selectedPage} isForest={isForest} onToggle={() => onToggle(selectedPage)} /> : null}
+        {selectedPage ? (
+          <PageDetail
+            site={site}
+            page={selectedPage}
+            isForest={isForest}
+            uploading={uploadingSlug === selectedPage.slug}
+            uploadStatus={uploadStatus}
+            onUpload={(file) => uploadPageHero(selectedPage, file)}
+            onToggle={() => onToggle(selectedPage)}
+          />
+        ) : null}
       </div>
     </Panel>
   );
@@ -318,10 +389,27 @@ function SectionCard({ section, onToggle }: { section: SiteStructureSection; onT
   );
 }
 
-function PageDetail({ page, isForest, onToggle }: { page: SiteStructurePage; isForest: boolean; onToggle: () => void }) {
+function PageDetail({
+  site,
+  page,
+  isForest,
+  uploading,
+  uploadStatus,
+  onUpload,
+  onToggle,
+}: {
+  site: ResortConsoleData;
+  page: SiteStructurePage;
+  isForest: boolean;
+  uploading: boolean;
+  uploadStatus: string;
+  onUpload: (file: File) => void;
+  onToggle: () => void;
+}) {
   const customOnly = ["Wedding", "Tour", "Membership", "Event"].includes(page.pageType);
   const locked = customOnly && !isForest;
   const publicPath = page.slug === "/" ? "/" : page.slug;
+  const heroImageUrl = page.heroImageUrl || site.heroImageUrl;
 
   return (
     <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
@@ -343,6 +431,41 @@ function PageDetail({ page, isForest, onToggle }: { page: SiteStructurePage; isF
         <PageMetaCard label="URL path" value={publicPath} />
         <PageMetaCard label="Page type" value={page.pageType} />
         <PageMetaCard label="Visibility" value={page.isPublished ? "Live on website" : "Draft only"} />
+      </div>
+
+      <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[#18352f]">Page hero image</p>
+            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+              {page.heroImageUrl ? "Using a custom hero image for this page." : "Using main site hero image as fallback."}
+            </p>
+          </div>
+          <label className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            {uploading ? "Uploading..." : "Upload page hero"}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              disabled={uploading}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.currentTarget.value = "";
+                if (file) {
+                  onUpload(file);
+                }
+              }}
+              className="sr-only"
+            />
+          </label>
+        </div>
+        {heroImageUrl ? (
+          <div className="aspect-[16/7] rounded-2xl bg-cover bg-center shadow-sm" style={{ backgroundImage: `linear-gradient(rgba(24, 53, 47, 0.35), rgba(24, 53, 47, 0.35)), url(${heroImageUrl})` }} />
+        ) : (
+          <div className="flex min-h-44 items-center justify-center rounded-2xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] text-sm text-[#6f7b74]">
+            No page or main hero image selected
+          </div>
+        )}
+        {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
       </div>
 
       <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
@@ -420,6 +543,7 @@ function pageFromApi(page: RawPage): SiteStructurePage {
     slug: page.slug,
     pageType: page.page_type,
     isPublished: page.is_published,
+    heroImageUrl: page.hero_image_url ?? "",
   };
 }
 
@@ -429,6 +553,7 @@ function pageToApi(page: SiteStructurePage, index: number) {
     slug: page.slug,
     page_type: page.pageType,
     is_published: page.isPublished,
+    hero_image_url: page.heroImageUrl || null,
     sort_order: index,
   };
 }

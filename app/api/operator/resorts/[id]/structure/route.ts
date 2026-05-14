@@ -71,6 +71,7 @@ function sanitizePages(pages: ResortSitePageInput[], resortId: string) {
       slug: normalizePageSlug(page.slug),
       page_type: pageTypes.includes(String(page.page_type)) ? page.page_type : "Standard",
       is_published: page.is_published ?? true,
+      hero_image_url: page.hero_image_url ? String(page.hero_image_url).trim() : null,
       seo_title: page.seo_title ? String(page.seo_title).trim() : null,
       seo_description: page.seo_description ? String(page.seo_description).trim() : null,
       sort_order: page.sort_order ?? index,

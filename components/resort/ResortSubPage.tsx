@@ -8,6 +8,7 @@ import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { designTokensFor } from "@/lib/design-settings";
+import Image from "next/image";
 import type { Resort, ResortSitePage } from "@/types/resort";
 
 type ResortSubPageProps = {
@@ -44,15 +45,22 @@ export function ResortSubPage({ resort, page }: ResortSubPageProps) {
 
 function SubPageHero({ resort, page }: ResortSubPageProps) {
   const design = designTokensFor(resort.design_settings);
+  const heroImageUrl = page.hero_image_url || resort.hero_image_url || resort.gallery[0] || null;
 
   return (
-    <section className="px-5 py-14 sm:px-6 lg:py-20" style={{ backgroundColor: design.colors.section }}>
-      <div className="mx-auto max-w-6xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6f7f57]">{resort.name}</p>
-        <h1 className={`mt-4 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl ${design.headingClassName}`} style={{ color: design.colors.text }}>
+    <section className={`relative overflow-hidden px-5 py-16 sm:px-6 lg:py-24 ${heroImageUrl ? "text-white" : ""}`} style={{ backgroundColor: design.colors.section }}>
+      {heroImageUrl ? (
+        <>
+          <Image src={heroImageUrl} alt={`${page.title} at ${resort.name}`} fill priority sizes="100vw" className="object-cover" />
+          <div className="absolute inset-0 bg-[#18352f]/62" />
+        </>
+      ) : null}
+      <div className="relative mx-auto max-w-6xl">
+        <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${heroImageUrl ? "text-white/72" : "text-[#6f7f57]"}`}>{resort.name}</p>
+        <h1 className={`mt-4 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl ${design.headingClassName}`} style={{ color: heroImageUrl ? "white" : design.colors.text }}>
           {page.title}
         </h1>
-        <p className={`mt-5 max-w-2xl text-base leading-8 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
+        <p className={`mt-5 max-w-2xl text-base leading-8 ${design.bodyClassName}`} style={{ color: heroImageUrl ? "rgba(255,255,255,0.78)" : design.colors.muted }}>
           {page.seo_description || `Explore ${page.title.toLowerCase()} at ${resort.name}, then continue your reservation directly with the host.`}
         </p>
       </div>

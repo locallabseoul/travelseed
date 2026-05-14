@@ -74,6 +74,7 @@ export function publishedSitePages(resort: Resort) {
     slug: page.slug,
     page_type: page.page_type,
     is_published: page.is_published,
+    hero_image_url: null,
     seo_title: null,
     seo_description: null,
     sort_order: index,

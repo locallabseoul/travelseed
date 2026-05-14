@@ -105,6 +105,7 @@ export type ResortSitePageInput = {
   slug: string;
   page_type?: ResortSitePage["page_type"];
   is_published?: boolean;
+  hero_image_url?: string | null;
   seo_title?: string | null;
   seo_description?: string | null;
   sort_order?: number;
@@ -156,6 +157,7 @@ export type ResortSitePage = {
   slug: string;
   page_type: "Standard" | "Landing" | "Event" | "Wedding" | "Tour" | "Membership";
   is_published: boolean;
+  hero_image_url: string | null;
   seo_title: string | null;
   seo_description: string | null;
   sort_order: number;

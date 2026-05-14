@@ -182,6 +182,7 @@ export type SiteStructurePage = {
   slug: string;
   pageType: SitePageType;
   isPublished: boolean;
+  heroImageUrl?: string;
   locked?: boolean;
 };
 

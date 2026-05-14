@@ -40,7 +40,7 @@ function renderTab(
     case "offers":
       return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "structure":
-      return <SiteStructureManager site={selectedSite} operatorFetch={operatorFetch} />;
+      return <SiteStructureManager site={selectedSite} accessToken={accessToken} operatorFetch={operatorFetch} />;
     case "design":
       return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "whatsapp":

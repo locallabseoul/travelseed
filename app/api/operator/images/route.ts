@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
   const folderValue = String(formData.get("folder") ?? "");
-  const folder = folderValue === "gallery" ? "gallery" : folderValue === "hero" ? "hero" : null;
+  const folder = folderValue === "gallery" ? "gallery" : folderValue === "hero" ? "hero" : folderValue === "page-hero" ? "page-hero" : null;
   const slug = sanitizePathPart(String(formData.get("slug") ?? ""));
 
   if (!(file instanceof File) || !folder) {
