@@ -1,28 +1,19 @@
 import Image from "next/image";
+import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
-import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { designTokensFor } from "@/lib/design-settings";
-import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
 type TemplateProps = {
   resort: Resort;
 };
 
-function bookingUrlFor(resort: Resort) {
-  return createWhatsAppBookingUrl(
-    resort.whatsapp_number,
-    resort.booking_message_template || createDefaultBookingMessage(resort.name),
-  );
-}
-
 // Minimal stay template for quiet boutique stays, long-stay rentals, and calm design-led properties.
 export function MinimalStayTemplate({ resort }: TemplateProps) {
   const design = designTokensFor(resort.design_settings);
-  const bookingUrl = bookingUrlFor(resort);
   const heroImage = resort.hero_image_url || resort.gallery[0];
   const stayDetails = [
     resort.capacity ? `${resort.capacity} guests` : null,
@@ -134,9 +125,14 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               Send a clear WhatsApp inquiry and reserve directly with the host.
             </p>
           </div>
-          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className={`inline-flex min-h-14 items-center justify-center px-8 text-base font-semibold ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
-            Book on WhatsApp
-          </TrackedWhatsAppLink>
+          <div className="rounded-2xl bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+            <BookingInquiryForm
+              resort={resort}
+              source="booking_cta"
+              buttonClassName={design.buttonClassName}
+              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
+            />
+          </div>
         </div>
       </section>
 

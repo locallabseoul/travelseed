@@ -1,28 +1,19 @@
 import Image from "next/image";
+import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
-import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { designTokensFor } from "@/lib/design-settings";
-import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
 type TemplateProps = {
   resort: Resort;
 };
 
-function bookingUrlFor(resort: Resort) {
-  return createWhatsAppBookingUrl(
-    resort.whatsapp_number,
-    resort.booking_message_template || createDefaultBookingMessage(resort.name),
-  );
-}
-
 // Surf camp template for energetic beach stays, camps, retreats, and activity-led resorts.
 export function SurfCampTemplate({ resort }: TemplateProps) {
   const design = designTokensFor(resort.design_settings);
-  const bookingUrl = bookingUrlFor(resort);
   const featuredImage = resort.hero_image_url || resort.gallery[0];
   const stats = [
     resort.capacity ? { label: "Guests", value: resort.capacity } : null,
@@ -151,7 +142,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
       <ReviewSection resort={resort} variant="surf" />
 
       <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
-        <div className={`mx-auto flex max-w-6xl flex-col gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between ${design.imageClassName}`}>
+        <div className={`mx-auto grid max-w-6xl gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:grid-cols-[1fr_0.8fr] lg:items-center ${design.imageClassName}`}>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b7380]">Direct booking</p>
             <h2 className="mt-4 text-4xl font-black text-[#0c2f35]">Book Direct & Save</h2>
@@ -159,9 +150,12 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
               Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
             </p>
           </div>
-          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className={`inline-flex min-h-14 items-center justify-center px-8 text-base font-black ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
-            Book on WhatsApp
-          </TrackedWhatsAppLink>
+          <BookingInquiryForm
+            resort={resort}
+            source="booking_cta"
+            buttonClassName={`font-black ${design.buttonClassName}`}
+            buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
+          />
         </div>
       </section>
 

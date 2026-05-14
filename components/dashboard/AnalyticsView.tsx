@@ -18,7 +18,7 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
         {[
           ["Page Views", site.monthlyVisitorsUsed.toLocaleString()],
           ["WhatsApp Clicks", site.analytics.whatsappClicks30d.toLocaleString()],
-          ["Last 7 Days", site.analytics.whatsappClicks7d.toLocaleString()],
+          ["Booking Inquiries", site.inquiriesUsed.toLocaleString()],
           ["CTA Conversion", `${conversion}%`],
         ].map(([label, value]) => (
           <Panel key={label}>

@@ -1,6 +1,5 @@
 import type { Resort } from "@/types/resort";
-import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
-import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
+import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
 import { designTokensFor } from "@/lib/design-settings";
 
 type BookingSectionProps = {
@@ -10,8 +9,6 @@ type BookingSectionProps = {
 
 // Creates the primary direct-booking call to action through WhatsApp.
 export function BookingSection({ resort, buttonClassName = "bg-forest text-white" }: BookingSectionProps) {
-  const message = resort.booking_message_template || createDefaultBookingMessage(resort.name);
-  const bookingUrl = createWhatsAppBookingUrl(resort.whatsapp_number, message);
   const design = designTokensFor(resort.design_settings);
 
   return (
@@ -28,17 +25,14 @@ export function BookingSection({ resort, buttonClassName = "bg-forest text-white
         </div>
         <div className="rounded-md border border-white/12 bg-white/8 p-5 backdrop-blur">
           <p className="text-sm leading-6 text-white/70">Ready to check dates for {resort.name}?</p>
-          <TrackedWhatsAppLink
-            href={bookingUrl}
-            resortId={resort.id}
-            source="booking_cta"
-            target="_blank"
-            rel="noreferrer"
-            className={`mt-5 inline-flex min-h-14 w-full items-center justify-center px-7 text-base font-semibold ${buttonClassName} ${design.buttonClassName}`}
-            style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
-          >
-            Book on WhatsApp
-          </TrackedWhatsAppLink>
+          <div className="mt-5 rounded-2xl bg-white p-4">
+            <BookingInquiryForm
+              resort={resort}
+              source="booking_cta"
+              buttonClassName={`${buttonClassName} ${design.buttonClassName}`}
+              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
+            />
+          </div>
         </div>
       </div>
     </section>

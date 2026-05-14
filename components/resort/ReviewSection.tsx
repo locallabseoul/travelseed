@@ -4,8 +4,8 @@ import type { Resort } from "@/types/resort";
 export function ReviewSection({ resort, variant = "boutique" }: { resort: Resort; variant?: "boutique" | "surf" | "minimal" }) {
   const design = designTokensFor(resort.design_settings);
   const reviews = (resort.reviews ?? [])
-    .filter((review) => review.status === "published" && review.show_on_website && review.featured)
-    .sort((first, second) => first.sort_order - second.sort_order)
+    .filter((review) => review.status === "published" && review.show_on_website)
+    .sort((first, second) => Number(second.featured) - Number(first.featured) || first.sort_order - second.sort_order)
     .slice(0, 3);
 
   if (reviews.length === 0) {

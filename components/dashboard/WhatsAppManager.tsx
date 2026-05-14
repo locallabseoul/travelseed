@@ -71,11 +71,19 @@ export function WhatsAppManager({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_0.72fr]">
+    <div className="grid gap-6">
+      <div className="grid gap-4 md:grid-cols-4">
+        <StatCard label="Active number" value={normalizedNumber || "Not set"} helper="Destination for booking inquiries" />
+        <StatCard label="WhatsApp clicks" value={site.whatsappClicksUsed.toLocaleString()} helper={`${site.whatsappClicksLimit.toLocaleString()} monthly plan limit`} />
+        <StatCard label="Booking inquiries" value={site.inquiriesUsed.toLocaleString()} helper={site.inquiriesLimit ? `${site.inquiriesLimit.toLocaleString()} monthly plan limit` : "Unlimited on current plan"} />
+        <StatCard label="Template status" value={bookingMessageTemplate.trim() ? "Ready" : "Draft"} helper="Used by public booking forms" />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1fr_0.72fr]">
       <Panel>
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">WhatsApp</p>
         <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Booking settings</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Configure the guided WhatsApp message that guests send from the direct booking site.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Configure the guided WhatsApp message that guests send from the direct booking form.</p>
         <div className="mt-6 grid gap-5">
           <EditableField label="WhatsApp Number" value={whatsappNumber} onChange={setWhatsappNumber} helper={normalizedNumber ? `Saved as ${normalizedNumber}` : "Use country code, for example 6282147901202."} />
           <div className="grid gap-3">
@@ -154,7 +162,18 @@ export function WhatsAppManager({
           </div>
         </div>
       </Panel>
+      </div>
     </div>
+  );
+}
+
+function StatCard({ label, value, helper }: { label: string; value: string; helper: string }) {
+  return (
+    <Panel>
+      <p className="text-sm font-medium text-[#6f7b74]">{label}</p>
+      <p className="mt-3 break-words text-2xl font-semibold text-[#18352f]">{value}</p>
+      <p className="mt-2 text-xs leading-5 text-[#72815e]">{helper}</p>
+    </Panel>
   );
 }
 

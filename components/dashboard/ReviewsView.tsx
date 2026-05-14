@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import type { GoogleReviewsSyncFeature, ResortConsoleData, WebsiteReview } from "@/types/dashboard";
 
@@ -350,7 +351,7 @@ function AddReviewFormCard({
         <EditableField label="Guest Name" value={form.guestName} placeholder="Guest name" onChange={(guestName) => onChange({ ...form, guestName })} />
         <SelectField label="Rating" value={String(form.rating)} options={["5", "4", "3", "2", "1"]} onChange={(rating) => onChange({ ...form, rating: Number(rating) })} />
         <SelectField label="Source Label" value={form.sourceLabel} options={["Manual", "Google", "Guest Message"]} onChange={(sourceLabel) => onChange({ ...form, sourceLabel: sourceLabel as WebsiteReview["sourceLabel"] })} />
-        <EditableField label="Stay Date" value={form.stayDate ?? ""} placeholder="Apr 2026" onChange={(stayDate) => onChange({ ...form, stayDate })} />
+        <DatePickerField label="Stay Date" value={form.stayDate ?? ""} onChange={(stayDate) => onChange({ ...form, stayDate })} />
         <div className="md:col-span-2">
           <EditableField label="Review Text" value={form.reviewText} placeholder="Paste or write the guest review..." textarea onChange={(reviewText) => onChange({ ...form, reviewText })} />
         </div>
@@ -423,7 +424,7 @@ function ReviewCard({
             <span className="font-semibold tracking-[0.12em] text-[#d29735]" aria-label={`${review.rating} star rating`}>
               {ratingStars(review.rating)}
             </span>
-            <span className="text-[#6f7b74]">{review.stayDate ?? "Stay date not set"}</span>
+            <span className="text-[#6f7b74]">{review.stayDate ? formatDateLabel(review.stayDate) : "Stay date not set"}</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-4">
@@ -458,9 +459,9 @@ function WebsiteTestimonialsCard({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-[#18352f]">Website Testimonials</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">These reviews will appear on your public website.</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Published reviews with Show on Website enabled will appear on your public website. Featured reviews appear first.</p>
         </div>
-        <Badge tone="green">{reviews.length} featured</Badge>
+        <Badge tone="green">{reviews.length} visible</Badge>
       </div>
       {reviews.length > 0 ? (
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
@@ -486,7 +487,7 @@ function WebsiteTestimonialsCard({
       ) : (
         <div className="mt-5 rounded-2xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] p-5">
           <p className="text-sm font-semibold text-[#18352f]">No website testimonials selected</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Turn on Show on Website and Featured for reviews you want to publish.</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Turn on Show on Website for published reviews you want to display publicly.</p>
         </div>
       )}
     </Panel>
@@ -633,8 +634,8 @@ function reviewFromApi(review: RawWebsiteReview): WebsiteReview {
 
 function websiteReviewsForDisplay(reviews: WebsiteReview[]) {
   return reviews
-    .filter((review) => review.status === "published" && review.showOnWebsite && review.featured)
-    .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
+    .filter((review) => review.status === "published" && review.showOnWebsite)
+    .sort((left, right) => Number(right.featured) - Number(left.featured) || (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
     .slice(0, 3);
 }
 

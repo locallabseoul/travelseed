@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import type { BookingInquiry, InquiryStatus, ResortConsoleData } from "@/types/dashboard";
 
@@ -114,8 +115,8 @@ export function InquiriesManager({
             <Field label="Guest name" value={form.guestName} onChange={(guestName) => setForm((current) => ({ ...current, guestName }))} />
             <Field label="Guest contact" value={form.guestContact} onChange={(guestContact) => setForm((current) => ({ ...current, guestContact }))} />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Check-in" type="date" value={form.checkIn} onChange={(checkIn) => setForm((current) => ({ ...current, checkIn }))} />
-              <Field label="Check-out" type="date" value={form.checkOut} onChange={(checkOut) => setForm((current) => ({ ...current, checkOut }))} />
+              <DatePickerField label="Check-in" value={form.checkIn} onChange={(checkIn) => setForm((current) => ({ ...current, checkIn }))} />
+              <DatePickerField label="Check-out" value={form.checkOut} onChange={(checkOut) => setForm((current) => ({ ...current, checkOut }))} />
             </div>
             <Field label="Guests" type="number" value={form.guests} onChange={(guests) => setForm((current) => ({ ...current, guests }))} />
             <Field label="Notes" value={form.notes} onChange={(notes) => setForm((current) => ({ ...current, notes }))} textarea />
@@ -137,10 +138,11 @@ export function InquiriesManager({
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-lg font-semibold text-[#18352f]">{inquiry.guestName}</h3>
                         <Badge tone={toneForStatus(inquiry.status)}>{inquiry.status}</Badge>
+                        <Badge tone="gray">{sourceLabel(inquiry.source)}</Badge>
                       </div>
                       <p className="mt-2 text-sm text-[#6f7b74]">{inquiry.guestContact || "No contact saved"}</p>
                       <p className="mt-2 text-sm text-[#52615a]">
-                        {inquiry.checkIn || "No check-in"} to {inquiry.checkOut || "No check-out"} · {inquiry.guests || "?"} guests
+                        {inquiry.checkIn ? formatDateLabel(inquiry.checkIn) : "No check-in"} to {inquiry.checkOut ? formatDateLabel(inquiry.checkOut) : "No check-out"} · {inquiry.guests || "?"} guests
                       </p>
                       {inquiry.notes ? <p className="mt-3 text-sm leading-6 text-[#52615a]">{inquiry.notes}</p> : null}
                     </div>
@@ -198,6 +200,10 @@ function inquiryFromApi(inquiry: RawInquiry): BookingInquiry {
 
 function toneForStatus(status: InquiryStatus) {
   return status === "confirmed" ? "green" : status === "cancelled" ? "gray" : "sand";
+}
+
+function sourceLabel(source: string) {
+  return source === "booking_cta" || source === "booking_form" ? "WhatsApp form" : source;
 }
 
 function Field({
