@@ -437,11 +437,15 @@ function PageDetail({
   const heroImageUrl = page.heroImageUrl || site.heroImageUrl;
   const [seoTitle, setSeoTitle] = useState(page.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(page.seoDescription ?? "");
+  const [showSeoForm, setShowSeoForm] = useState(false);
   const contentTarget = contentTabForPage(page);
+  const seoPreview = seoPreviewForPage(site, page);
+  const hasCustomSeo = Boolean((page.seoTitle ?? "").trim() || (page.seoDescription ?? "").trim());
 
   useEffect(() => {
     setSeoTitle(page.seoTitle ?? "");
     setSeoDescription(page.seoDescription ?? "");
+    setShowSeoForm(false);
   }, [page.seoDescription, page.seoTitle, page.slug]);
 
   return (
@@ -502,23 +506,39 @@ function PageDetail({
       </div>
 
       <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
-        <div>
-          <p className="text-sm font-semibold text-[#18352f]">SEO Settings</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Set the page title and description used by search previews and social sharing.</p>
-        </div>
-        <label className="grid gap-2 text-sm font-medium text-[#18352f]">
-          SEO title
-          <input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-[#18352f]">
-          SEO description
-          <textarea value={seoDescription} rows={3} onChange={(event) => setSeoDescription(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
-        </label>
-        <div>
-          <button type="button" disabled={locked} onClick={() => onSaveSeo(seoTitle, seoDescription)} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
-            Save SEO
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-[#18352f]">SEO Preview</p>
+              <Badge tone={hasCustomSeo ? "green" : "sand"}>{hasCustomSeo ? "Custom SEO" : "Auto-generated"}</Badge>
+            </div>
+            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">You can leave this empty. Travelseed will generate SEO from your page and property details.</p>
+          </div>
+          <button type="button" onClick={() => setShowSeoForm((current) => !current)} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            {showSeoForm ? "Hide SEO" : "Customize SEO"}
           </button>
         </div>
+        <div className="rounded-2xl bg-[#fbfaf7] p-4">
+          <p className="text-base font-semibold text-[#18352f]">{seoPreview.title}</p>
+          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{seoPreview.description}</p>
+        </div>
+        {showSeoForm ? (
+          <>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              SEO title
+              <input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} placeholder={seoPreview.autoTitle} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              SEO description
+              <textarea value={seoDescription} rows={3} onChange={(event) => setSeoDescription(event.target.value)} placeholder={seoPreview.autoDescription} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+            </label>
+            <div>
+              <button type="button" disabled={locked} onClick={() => onSaveSeo(seoTitle, seoDescription)} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
+                Save SEO
+              </button>
+            </div>
+          </>
+        ) : null}
       </div>
 
       <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
@@ -573,6 +593,20 @@ function NavigationPreview({ site, pages }: { site: ResortConsoleData; pages: Si
 
 function publicPathForPage(site: ResortConsoleData, page: SiteStructurePage) {
   return page.slug === "/" ? `/${site.slug}` : `/${site.slug}${page.slug}`;
+}
+
+function seoPreviewForPage(site: ResortConsoleData, page: SiteStructurePage) {
+  const autoTitle = page.slug === "/" ? `${site.name} | Direct Booking` : `${page.name} | ${site.name}`;
+  const autoDescription = site.heroSubtitle || site.about || `${page.name} at ${site.name} in ${site.location}.`;
+  const title = page.seoTitle?.trim() || autoTitle;
+  const description = page.seoDescription?.trim() || autoDescription;
+
+  return {
+    title,
+    description,
+    autoTitle,
+    autoDescription,
+  };
 }
 
 function contentTabForPage(page: SiteStructurePage): DashboardTab | null {
