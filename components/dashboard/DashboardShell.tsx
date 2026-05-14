@@ -36,7 +36,7 @@ function renderTab(
     case "setup":
       return <SetupWizard />;
     case "content":
-      return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
+      return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} onTabChange={onTabChange} />;
     case "offers":
       return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "structure":

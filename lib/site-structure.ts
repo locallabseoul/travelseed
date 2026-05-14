@@ -13,6 +13,19 @@ const landingNavigationSections = [
   { key: "experiences", href: "#experiences", label: "Experiences" },
 ];
 
+const defaultMultipagePages = [
+  { title: "Home", slug: "/", page_type: "Standard" as const, is_published: true },
+  { title: "Rooms", slug: "/rooms", page_type: "Standard" as const, is_published: true },
+  { title: "Experiences", slug: "/experiences", page_type: "Standard" as const, is_published: true },
+  { title: "Gallery", slug: "/gallery", page_type: "Standard" as const, is_published: true },
+  { title: "Reviews", slug: "/reviews", page_type: "Standard" as const, is_published: true },
+  { title: "Dining", slug: "/dining", page_type: "Standard" as const, is_published: false },
+  { title: "Promotions", slug: "/promotions", page_type: "Landing" as const, is_published: true },
+  { title: "Blog", slug: "/blog", page_type: "Standard" as const, is_published: false },
+  { title: "About", slug: "/about", page_type: "Standard" as const, is_published: true },
+  { title: "Contact", slug: "/contact", page_type: "Standard" as const, is_published: true },
+];
+
 function sortByOrder<T extends { sort_order: number }>(items: T[] | undefined) {
   return [...(items ?? [])].sort((first, second) => first.sort_order - second.sort_order);
 }
@@ -47,7 +60,29 @@ export function activeSiteSections(resort: Resort) {
 }
 
 export function publishedSitePages(resort: Resort) {
-  return sortByOrder(resort.pages).filter((page) => page.is_published);
+  const savedPages = sortByOrder(resort.pages);
+
+  if (!isMultipageResort(resort)) {
+    return savedPages.filter((page) => page.is_published);
+  }
+
+  const savedBySlug = new Map(savedPages.map((page) => [normalizeSlug(page.slug), page]));
+  const defaults = defaultMultipagePages.map((page, index): ResortSitePage => ({
+    id: `default-${resort.id}-${normalizeSlug(page.slug)}`,
+    resort_id: resort.id,
+    title: page.title,
+    slug: page.slug,
+    page_type: page.page_type,
+    is_published: page.is_published,
+    seo_title: null,
+    seo_description: null,
+    sort_order: index,
+  }));
+  const mergedDefaults = defaults.map((page) => savedBySlug.get(normalizeSlug(page.slug)) ?? page);
+  const defaultSlugs = new Set(defaults.map((page) => normalizeSlug(page.slug)));
+  const customPages = savedPages.filter((page) => !defaultSlugs.has(normalizeSlug(page.slug)));
+
+  return [...mergedDefaults, ...customPages].filter((page) => page.is_published);
 }
 
 export function activeNavigationItems(resort: Resort) {

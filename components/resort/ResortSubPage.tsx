@@ -3,6 +3,8 @@ import { BookingSection } from "@/components/resort/BookingSection";
 import { ExperienceSection } from "@/components/resort/ExperienceSection";
 import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
+import { GallerySection } from "@/components/resort/GallerySection";
+import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { designTokensFor } from "@/lib/design-settings";
@@ -27,10 +29,12 @@ export function ResortSubPage({ resort, page }: ResortSubPageProps) {
       <SubPageHero resort={resort} page={page} />
       {slugKey === "rooms" ? <ServiceSection resort={resort} variant="boutique" /> : null}
       {slugKey === "experiences" ? <ExperienceSection resort={resort} /> : null}
+      {slugKey === "gallery" ? <GallerySection resort={resort} /> : null}
+      {slugKey === "reviews" ? <ReviewSection resort={resort} variant="boutique" /> : null}
       {slugKey === "about" ? <AboutSection resort={resort} /> : null}
       {slugKey === "contact" ? <BookingSection resort={resort} buttonClassName="bg-[#d9c49e] text-[#18352f]" /> : null}
       {["dining", "promotions", "blog"].includes(slugKey) ? <EditorialPlaceholder resort={resort} page={page} /> : null}
-      {!["rooms", "experiences", "about", "contact", "dining", "promotions", "blog"].includes(slugKey) ? <EditorialPlaceholder resort={resort} page={page} /> : null}
+      {!["rooms", "experiences", "gallery", "reviews", "about", "contact", "dining", "promotions", "blog"].includes(slugKey) ? <EditorialPlaceholder resort={resort} page={page} /> : null}
       {slugKey !== "contact" ? <BookingSection resort={resort} buttonClassName="bg-[#d9c49e] text-[#18352f]" /> : null}
       <FooterSection resort={resort} />
       <FloatingWhatsAppButton resort={resort} />

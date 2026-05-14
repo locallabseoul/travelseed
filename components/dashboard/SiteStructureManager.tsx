@@ -56,8 +56,8 @@ export function SiteStructureManager({
       setStatus("Loading site structure...");
       try {
         const data = await operatorFetch(`/api/operator/resorts/${site.id}/structure`) as StructureResponse;
-        setSections(data.sections && data.sections.length > 0 ? data.sections.map(sectionFromApi) : defaultSections);
-        setPages(data.pages && data.pages.length > 0 ? data.pages.map(pageFromApi) : defaultPages);
+        setSections(data.sections && data.sections.length > 0 ? mergeSectionsWithDefaults(data.sections.map(sectionFromApi), defaultSections) : defaultSections);
+        setPages(data.pages && data.pages.length > 0 ? mergePagesWithDefaults(data.pages.map(pageFromApi), defaultPages) : defaultPages);
         setStatus(data.sections?.length || data.pages?.length ? "" : "Using default structure. Save once to store it in the database.");
       } catch (error) {
         setStatus(error instanceof Error ? error.message : "Could not load site structure.");
@@ -161,6 +161,24 @@ function sectionsForPlan(planType: PlanType) {
     locked: allowSeedFeatures && (section.name === "Reviews" || section.name === "Promotion Banner") ? false : section.locked,
     lockReason: allowSeedFeatures && (section.name === "Reviews" || section.name === "Promotion Banner") ? undefined : section.lockReason,
   }));
+}
+
+function mergeSectionsWithDefaults(savedSections: SiteStructureSection[], defaultSections: SiteStructureSection[]) {
+  const savedByName = new Map(savedSections.map((section) => [section.name, section]));
+  const defaultSectionNames = new Set(defaultSections.map((section) => section.name));
+  const mergedDefaults = defaultSections.map((section) => ({ ...section, ...savedByName.get(section.name) }));
+  const customSections = savedSections.filter((section) => !defaultSectionNames.has(section.name));
+
+  return [...mergedDefaults, ...customSections];
+}
+
+function mergePagesWithDefaults(savedPages: SiteStructurePage[], defaultPages: SiteStructurePage[]) {
+  const savedBySlug = new Map(savedPages.map((page) => [page.slug, page]));
+  const defaultPageSlugs = new Set(defaultPages.map((page) => page.slug));
+  const mergedDefaults = defaultPages.map((page) => ({ ...page, ...savedBySlug.get(page.slug) }));
+  const customPages = savedPages.filter((page) => !defaultPageSlugs.has(page.slug));
+
+  return [...mergedDefaults, ...customPages];
 }
 
 function LandingSectionsView({ sections, onToggle }: { sections: SiteStructureSection[]; onToggle: (section: SiteStructureSection) => void }) {

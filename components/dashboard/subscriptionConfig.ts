@@ -78,6 +78,8 @@ export const treePages: SiteStructurePage[] = [
   { name: "Home", slug: "/", pageType: "Standard", isPublished: true },
   { name: "Rooms", slug: "/rooms", pageType: "Standard", isPublished: true },
   { name: "Experiences", slug: "/experiences", pageType: "Standard", isPublished: true },
+  { name: "Gallery", slug: "/gallery", pageType: "Standard", isPublished: true },
+  { name: "Reviews", slug: "/reviews", pageType: "Standard", isPublished: true },
   { name: "Dining", slug: "/dining", pageType: "Standard", isPublished: false },
   { name: "Promotions", slug: "/promotions", pageType: "Landing", isPublished: true },
   { name: "Blog", slug: "/blog", pageType: "Standard", isPublished: false },

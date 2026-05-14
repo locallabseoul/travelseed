@@ -1,24 +1,163 @@
 import { useEffect, useState } from "react";
 import { FeatureSelector } from "@/components/dashboard/FeatureSelector";
 import { contentSections } from "@/components/dashboard/mockData";
+import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
-import type { ContentSection, ResortConsoleData } from "@/types/dashboard";
+import type { ContentSection, DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
 type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Experiences" | "Booking CTA" | "Footer";
+type ContentPageKey = "home" | "rooms" | "experiences" | "gallery" | "reviews" | "about" | "contact" | "promotions" | "blog";
+
+type PageContentBlock = ContentSection & {
+  kind: "editable" | "linked" | "comingSoon";
+  editTarget?: EditableSection;
+  targetTab?: DashboardTab;
+  helper?: string;
+};
+
+type ContentPage = {
+  key: ContentPageKey;
+  label: string;
+  slug: string;
+  blocks: PageContentBlock[];
+};
 
 function isEditableSection(title: ContentSection["title"]): title is EditableSection {
   return ["Hero", "About", "Features", "Gallery", "Experiences", "Booking CTA", "Footer"].includes(title);
+}
+
+function blockFor(section: ContentSection, overrides: Partial<PageContentBlock> = {}): PageContentBlock {
+  return {
+    ...section,
+    kind: isEditableSection(section.title) ? "editable" : "comingSoon",
+    editTarget: isEditableSection(section.title) ? section.title : undefined,
+    ...overrides,
+  };
+}
+
+function landingBlocks() {
+  return contentSections.map((section) => blockFor(section));
+}
+
+function pageBlock(title: PageContentBlock["title"], description: string, status: ContentSection["status"], overrides: Partial<PageContentBlock> = {}): PageContentBlock {
+  return blockFor({ title, description, status }, overrides);
+}
+
+function pagesForSite(site: ResortConsoleData): ContentPage[] {
+  return [
+    {
+      key: "home",
+      label: "Home",
+      slug: "/",
+      blocks: [
+        pageBlock("Hero", "Main homepage headline, subtitle, image, and CTA.", "Ready"),
+        pageBlock("About", "Homepage brand story and property positioning.", "Ready"),
+        pageBlock("Features", "Homepage facilities and stay highlights.", site.features.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Booking CTA", "Homepage direct-booking WhatsApp block.", "Ready"),
+      ],
+    },
+    {
+      key: "rooms",
+      label: "Rooms",
+      slug: "/rooms",
+      blocks: [
+        pageBlock("Rooms / Services", "Rooms, packages, and services shown on the Rooms page.", site.services.length > 0 ? "Ready" : "Needs review", {
+          kind: "linked",
+          targetTab: "offers",
+          helper: "Rooms, packages, and services are managed from Offers so pricing, images, and service types stay consistent.",
+        }),
+        pageBlock("Booking CTA", "Inquiry message used from room and package cards.", "Ready"),
+      ],
+    },
+    {
+      key: "experiences",
+      label: "Experiences",
+      slug: "/experiences",
+      blocks: [
+        pageBlock("Experiences", "Nearby beaches, activities, restaurants, and local attractions.", site.experiences.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Booking CTA", "Direct inquiry CTA at the bottom of the Experiences page.", "Ready"),
+      ],
+    },
+    {
+      key: "gallery",
+      label: "Gallery",
+      slug: "/gallery",
+      blocks: [
+        pageBlock("Gallery", "Curated photos for exterior, rooms, pool, food, and area.", site.gallery.length > 0 ? "Ready" : "Needs review"),
+      ],
+    },
+    {
+      key: "reviews",
+      label: "Reviews",
+      slug: "/reviews",
+      blocks: [
+        pageBlock("Reviews", "Published testimonials shown on the Reviews page.", "Ready", {
+          kind: "linked",
+          targetTab: "reviews",
+          helper: "Review content is managed separately so testimonial publishing rules stay clear.",
+        }),
+      ],
+    },
+    {
+      key: "about",
+      label: "About",
+      slug: "/about",
+      blocks: [
+        pageBlock("About", "Property story, positioning, and location context.", "Ready"),
+        pageBlock("Features", "Facilities and practical selling points for the About page.", site.features.length > 0 ? "Ready" : "Needs review"),
+      ],
+    },
+    {
+      key: "contact",
+      label: "Contact",
+      slug: "/contact",
+      blocks: [
+        pageBlock("Booking CTA", "WhatsApp booking message template and direct inquiry prompt.", "Ready"),
+        pageBlock("Footer", "Business name and location used in the site footer.", "Needs review"),
+      ],
+    },
+    {
+      key: "promotions",
+      label: "Promotions",
+      slug: "/promotions",
+      blocks: [
+        pageBlock("Promotions", "Direct booking offers shown on the Promotions page.", "Draft", {
+          kind: "linked",
+          targetTab: "offers",
+          helper: "Offer cards are managed in Offers and can later be promoted into this public page.",
+        }),
+      ],
+    },
+    {
+      key: "blog",
+      label: "Blog",
+      slug: "/blog",
+      blocks: [
+        pageBlock("Blog", "Editorial updates, guides, and SEO articles.", "Draft", {
+          kind: "comingSoon",
+          helper: "Blog CMS is planned for a later content operations phase.",
+        }),
+      ],
+    },
+  ];
 }
 
 export function ContentManager({
   site,
   accessToken,
   onSiteUpdate,
+  onTabChange,
 }: {
   site: ResortConsoleData;
   accessToken: string | null;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+  onTabChange: (tab: DashboardTab) => void;
 }) {
+  const planType = effectivePlanType(site);
+  const isLanding = planConfig[planType].siteType === "landing";
+  const pages = pagesForSite(site);
+  const [selectedPageKey, setSelectedPageKey] = useState<ContentPageKey>("home");
+  const selectedPage = pages.find((page) => page.key === selectedPageKey) ?? pages[0];
   const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
   const [heroTitle, setHeroTitle] = useState(site.heroTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(site.heroSubtitle);
@@ -50,6 +189,7 @@ export function ContentManager({
 
   useEffect(() => {
     setEditingSection(null);
+    setSelectedPageKey("home");
   }, [site.id]);
 
   function startEditing(section: EditableSection) {
@@ -178,10 +318,54 @@ export function ContentManager({
   return (
     <div className="grid gap-6">
       <Panel>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Content</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Site sections</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Manage fixed hospitality sections with simple forms. No drag-and-drop page builder required.</p>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Content</p>
+            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">{isLanding ? "Landing page sections" : "Page content"}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">
+              {isLanding
+                ? "Manage your one-page site with fixed hospitality sections. Page URLs stay simple until you upgrade to Tree."
+                : "Choose a public page, then manage the sections that appear on that page. Pages controls handle URL, SEO, and publish status."}
+            </p>
+          </div>
+          <Badge tone={isLanding ? "sand" : "green"}>{isLanding ? "One-page" : "Page-based"}</Badge>
+        </div>
       </Panel>
+
+      {!isLanding ? (
+        <Panel>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#18352f]">Select page</h2>
+              <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Edit content by public page. Use Pages for publishing and SEO settings.</p>
+            </div>
+            <button type="button" onClick={() => onTabChange("structure")} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+              Manage URLs & SEO
+            </button>
+          </div>
+          <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+            {pages.map((page) => (
+              <button
+                key={page.key}
+                type="button"
+                onClick={() => {
+                  setSelectedPageKey(page.key);
+                  setEditingSection(null);
+                }}
+                className={`min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ring-1 ${
+                  selectedPage.key === page.key ? "bg-[#18352f] text-white ring-[#18352f]" : "bg-white text-[#52615a] ring-[#d8cebb]"
+                }`}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
+          <div className="mt-4 rounded-2xl bg-[#fbfaf7] p-4">
+            <p className="text-sm font-semibold text-[#18352f]">{selectedPage.label}</p>
+            <p className="mt-1 text-sm text-[#6f7b74]">{selectedPage.slug === "/" ? `/${site.slug}` : `/${site.slug}${selectedPage.slug}`}</p>
+          </div>
+        </Panel>
+      ) : null}
 
       {editingSection ? (
         <Panel className="border-[#2d6b50]">
@@ -236,7 +420,7 @@ export function ContentManager({
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-2">
-        {contentSections.map((section) => (
+        {(isLanding ? landingBlocks() : selectedPage.blocks).map((section) => (
           <Panel key={section.title}>
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -249,19 +433,28 @@ export function ContentManager({
               <button
                 type="button"
                 onClick={() => {
-                  if (isEditableSection(section.title)) {
-                    startEditing(section.title);
+                  if (section.kind === "linked" && section.targetTab) {
+                    onTabChange(section.targetTab);
+                    return;
+                  }
+
+                  if (section.kind === "editable" && section.editTarget) {
+                    startEditing(section.editTarget);
                   }
                 }}
+                disabled={section.kind === "comingSoon"}
                 className={`min-h-11 rounded-full px-5 text-sm font-semibold ring-1 ${
-                  editingSection === section.title
+                  editingSection === section.editTarget
                     ? "bg-[#18352f] text-white ring-[#18352f]"
+                    : section.kind === "comingSoon"
+                      ? "cursor-not-allowed bg-[#f4f0e7] text-[#9a8d78] ring-[#eadfce]"
                     : "bg-white text-[#18352f] ring-[#d8cebb]"
                 }`}
               >
-                {editingSection === section.title ? "Editing" : "Edit"}
+                {section.kind === "linked" ? "Open" : section.kind === "comingSoon" ? "Soon" : editingSection === section.editTarget ? "Editing" : "Edit"}
               </button>
             </div>
+            {section.helper ? <p className="mt-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{section.helper}</p> : null}
             {section.title === "Hero" ? (
               <div
                 className="mt-5 overflow-hidden rounded-2xl bg-[#18352f] text-white"
@@ -282,6 +475,28 @@ export function ContentManager({
                   <span key={feature} className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#18352f]">{feature}</span>
                 ))}
               </div>
+            ) : null}
+            {section.title === "Rooms / Services" ? (
+              <div className="mt-5 grid gap-3">
+                {site.services.length > 0 ? site.services.slice(0, 3).map((service) => (
+                  <div key={service.id} className="rounded-2xl bg-[#fbfaf7] p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone="sand">{service.kind}</Badge>
+                      <p className="font-semibold text-[#18352f]">{service.title}</p>
+                    </div>
+                    {service.description ? <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{service.description}</p> : null}
+                  </div>
+                )) : <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">No rooms, packages, or services yet.</p>}
+              </div>
+            ) : null}
+            {section.title === "Reviews" ? (
+              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Website testimonials are managed in the Reviews tab and can appear on the Reviews page or Home page.</p>
+            ) : null}
+            {section.title === "Promotions" ? (
+              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Promotion content is managed in Offers and can be surfaced on the Promotions page.</p>
+            ) : null}
+            {section.title === "Blog" ? (
+              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Blog authoring will be added after the page structure is stable.</p>
             ) : null}
             {section.title === "Experiences" ? (
               <div className="mt-5 flex flex-wrap gap-2">
