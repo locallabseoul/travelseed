@@ -7,6 +7,7 @@ const menuItems: Array<{ id: DashboardTab; label: string; icon: string }> = [
   { id: "setup", label: "Setup", icon: "S" },
   { id: "content", label: "Content", icon: "C" },
   { id: "offers", label: "Offers", icon: "O" },
+  { id: "structure", label: "Pages", icon: "P" },
   { id: "design", label: "Design", icon: "D" },
   { id: "whatsapp", label: "WhatsApp", icon: "W" },
   { id: "inquiries", label: "Inquiries", icon: "I" },

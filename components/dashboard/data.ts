@@ -1,8 +1,10 @@
 import type { ResortConsoleData } from "@/types/dashboard";
 import type { ResortWithMetrics, ResortUpsert } from "@/types/resort";
+import { planConfig, planNameToType } from "@/components/dashboard/subscriptionConfig";
 
 export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
   const plan = resort.plan ?? "Tree";
+  const planType = planNameToType[plan];
   const planLimits = limitsForPlan(plan);
   const designSettings = resort.design_settings ?? {};
 
@@ -23,6 +25,8 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     type: resort.type ?? "Direct Booking Site",
     location: resort.location,
     plan,
+    planType,
+    siteType: planConfig[planType].siteType,
     status: resort.is_active ? "Published" : "Paused",
     travelseedUrl: `${resort.slug}.travelseed.app`,
     customDomain: resort.domain ?? "",

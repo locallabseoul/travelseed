@@ -1,5 +1,5 @@
 import type { Resort } from "@/types/resort";
-import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
+import { BookingInquiryModal } from "@/components/resort/BookingInquiryForm";
 import { designTokensFor } from "@/lib/design-settings";
 
 type BookingSectionProps = {
@@ -25,14 +25,12 @@ export function BookingSection({ resort, buttonClassName = "bg-forest text-white
         </div>
         <div className="rounded-md border border-white/12 bg-white/8 p-5 backdrop-blur">
           <p className="text-sm leading-6 text-white/70">Ready to check dates for {resort.name}?</p>
-          <div className="mt-5 rounded-2xl bg-white p-4">
-            <BookingInquiryForm
-              resort={resort}
-              source="booking_cta"
-              buttonClassName={`${buttonClassName} ${design.buttonClassName}`}
-              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
-            />
-          </div>
+          <BookingInquiryModal
+            resort={resort}
+            source="booking_cta"
+            buttonClassName={`mt-5 w-full ${buttonClassName} ${design.buttonClassName}`}
+            buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
+          />
         </div>
       </div>
     </section>

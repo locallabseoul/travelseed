@@ -1,4 +1,5 @@
 import { planOptions } from "@/components/dashboard/mockData";
+import { planConfig, planNameToType } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import type { ResortConsoleData } from "@/types/dashboard";
 
@@ -37,7 +38,8 @@ export function PlanBillingView({
   ];
 
   async function selectPlan(plan: ResortConsoleData["plan"]) {
-    await onSiteUpdate({ ...site, plan });
+    const planType = planNameToType[plan];
+    await onSiteUpdate({ ...site, plan, planType, siteType: planConfig[planType].siteType });
   }
 
   return (
@@ -45,7 +47,7 @@ export function PlanBillingView({
       <Panel>
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Plan</p>
         <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Billing and plan</h1>
-        <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{site.plan} is the current plan for {site.name}.</p>
+        <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{site.plan} is the current plan for {site.name}. Site structure expands from landing page to multi-page to custom platform.</p>
       </Panel>
 
       <Panel>

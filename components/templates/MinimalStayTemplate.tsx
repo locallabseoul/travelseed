@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
+import { BookingInquiryModal } from "@/components/resort/BookingInquiryForm";
+import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
@@ -125,18 +126,17 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               Send a clear WhatsApp inquiry and reserve directly with the host.
             </p>
           </div>
-          <div className="rounded-2xl bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
-            <BookingInquiryForm
-              resort={resort}
-              source="booking_cta"
-              buttonClassName={design.buttonClassName}
-              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
-            />
-          </div>
+          <BookingInquiryModal
+            resort={resort}
+            source="booking_cta"
+            buttonClassName={`w-full ${design.buttonClassName}`}
+            buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
+          />
         </div>
       </section>
 
       <FooterSection resort={resort} />
+      <FloatingWhatsAppButton resort={resort} />
     </main>
   );
 }

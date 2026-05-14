@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { BookingInquiryForm } from "@/components/resort/BookingInquiryForm";
+import { BookingInquiryModal } from "@/components/resort/BookingInquiryForm";
+import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
@@ -150,16 +151,17 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
               Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
             </p>
           </div>
-          <BookingInquiryForm
+          <BookingInquiryModal
             resort={resort}
             source="booking_cta"
-            buttonClassName={`font-black ${design.buttonClassName}`}
+            buttonClassName={`w-full font-black ${design.buttonClassName}`}
             buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
           />
         </div>
       </section>
 
       <FooterSection resort={resort} />
+      <FloatingWhatsAppButton resort={resort} />
     </main>
   );
 }

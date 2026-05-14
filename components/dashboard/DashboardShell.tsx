@@ -14,6 +14,7 @@ import { OffersManager } from "@/components/dashboard/OffersManager";
 import { PlanBillingView } from "@/components/dashboard/PlanBillingView";
 import { ReviewsView } from "@/components/dashboard/ReviewsView";
 import { SettingsView } from "@/components/dashboard/SettingsView";
+import { SiteStructureManager } from "@/components/dashboard/SiteStructureManager";
 import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
@@ -38,6 +39,8 @@ function renderTab(
       return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "offers":
       return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
+    case "structure":
+      return <SiteStructureManager site={selectedSite} />;
     case "design":
       return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "whatsapp":

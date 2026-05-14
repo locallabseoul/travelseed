@@ -3,6 +3,7 @@ export type DashboardTab =
   | "setup"
   | "content"
   | "offers"
+  | "structure"
   | "design"
   | "whatsapp"
   | "inquiries"
@@ -12,6 +13,10 @@ export type DashboardTab =
   | "plan"
   | "settings";
 
+export type PlanType = "freeTrial" | "seed" | "tree" | "forest";
+export type SiteType = "landing" | "multipage" | "custom";
+export type SitePageType = "Standard" | "Landing" | "Event" | "Wedding" | "Tour" | "Membership";
+
 export type ResortConsoleData = {
   id: string;
   slug: string;
@@ -20,6 +25,8 @@ export type ResortConsoleData = {
   type: string;
   location: string;
   plan: "Seed Trial" | "Seed" | "Tree" | "Forest";
+  planType: PlanType;
+  siteType: SiteType;
   status: "Draft" | "Published" | "Paused";
   travelseedUrl: string;
   customDomain: string;
@@ -168,6 +175,21 @@ export type TemplateOption = {
   name: string;
   description: string;
   selected?: boolean;
+};
+
+export type SiteStructurePage = {
+  name: string;
+  slug: string;
+  pageType: SitePageType;
+  isPublished: boolean;
+  locked?: boolean;
+};
+
+export type SiteStructureSection = {
+  name: string;
+  description: string;
+  locked?: boolean;
+  lockReason?: string;
 };
 
 export type PlanOption = {

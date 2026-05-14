@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { DatePickerField } from "@/components/dashboard/DatePickerField";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
@@ -13,6 +15,11 @@ type BookingInquiryFormProps = {
   buttonStyle?: CSSProperties;
 };
 
+type BookingInquiryModalProps = BookingInquiryFormProps & {
+  triggerLabel?: ReactNode;
+  triggerAriaLabel?: string;
+};
+
 const emptyForm = {
   guestName: "",
   guestContact: "",
@@ -21,6 +28,57 @@ const emptyForm = {
   guests: "2",
   airportPickup: false,
 };
+
+export function BookingInquiryModal({
+  resort,
+  source = "booking_form",
+  buttonClassName = "",
+  buttonStyle,
+  triggerLabel = "Book on WhatsApp",
+  triggerAriaLabel,
+}: BookingInquiryModalProps) {
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={triggerAriaLabel}
+        className={`inline-flex min-h-14 items-center justify-center px-7 text-base font-semibold ${buttonClassName}`}
+        style={buttonStyle}
+      >
+        {triggerLabel}
+      </button>
+      {open && mounted ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#10241f]/70 px-4 py-6 backdrop-blur-sm">
+          <button type="button" aria-label="Close booking form" onClick={() => setOpen(false)} className="absolute inset-0 cursor-default" />
+          <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 text-[#18352f] shadow-[0_28px_100px_rgba(16,36,31,0.34)] sm:p-6">
+            <div className="flex items-start justify-between gap-4 border-b border-[#eadfce] pb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#72815e]">Direct booking</p>
+                <h2 className="mt-2 text-2xl font-semibold text-[#18352f]">Check dates on WhatsApp</h2>
+                <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Share your stay details and continue the reservation conversation with the host.</p>
+              </div>
+              <button type="button" onClick={() => setOpen(false)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fbfaf7] text-xl font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+                x
+              </button>
+            </div>
+            <div className="mt-5">
+              <BookingInquiryForm resort={resort} source={source} buttonClassName={buttonClassName} buttonStyle={buttonStyle} />
+            </div>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
+    </>
+  );
+}
 
 export function BookingInquiryForm({
   resort,

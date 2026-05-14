@@ -3,11 +3,13 @@ import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { UsageCard } from "@/components/dashboard/UsageCard";
 import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
+import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
 export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
   const dashboardMetrics = dashboardMetricsFor(site);
   const usageMetrics = usageMetricsFor(site);
+  const structure = planConfig[effectivePlanType(site)];
 
   return (
     <div className="grid gap-6">
@@ -37,6 +39,13 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{site.type}</p>
             <h2 className="mt-3 text-2xl font-semibold">{site.template}</h2>
             <p className="mt-3 text-sm leading-6 text-white/70">{site.location}</p>
+            <div className="mt-5 rounded-2xl bg-white/10 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">Site structure</p>
+              <p className="mt-2 text-lg font-semibold">{structure.structureLabel}</p>
+              <button type="button" onClick={() => onTabChange("structure")} className="mt-4 min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f]">
+                {structure.siteType === "landing" ? "Manage Sections" : "Manage Pages"}
+              </button>
+            </div>
             <div className="mt-6 h-32 rounded-2xl bg-gradient-to-br from-[#9eb39f] to-[#eadfce]" />
           </div>
         </div>

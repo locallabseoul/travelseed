@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { colorThemes, templateOptions } from "@/components/dashboard/mockData";
+import { colorThemes } from "@/components/dashboard/mockData";
+import { canUsePlan, effectivePlanType, templateCatalog } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { designTokensFor } from "@/lib/design-settings";
 import type { ResortConsoleData } from "@/types/dashboard";
@@ -7,13 +8,7 @@ import type { ResortConsoleData } from "@/types/dashboard";
 const fontOptions = ["Editorial Sans", "Clean Modern", "Warm Serif", "Compact UI"];
 const buttonStyles = ["Rounded", "Pill", "Sharp", "Soft Outline"];
 const imageStyles = ["Soft Corners", "Square Editorial", "Full Bleed", "Postcard"];
-
-const templateIdByName: Record<string, string> = {
-  "Boutique Villa": "boutique-villa",
-  "Surf Camp": "surf-camp",
-  "Minimal Stay": "minimal-stay",
-  "Local Business": "minimal-stay",
-};
+const templateFilters = ["All", "Landing", "Multi-page", "Custom", "Seed", "Tree", "Forest"];
 
 const templateNameById: Record<string, string> = {
   "boutique-villa": "Boutique Villa",
@@ -41,6 +36,7 @@ export function DesignManager({
   const [fontStyle, setFontStyle] = useState(site.designSettings.fontStyle);
   const [buttonStyle, setButtonStyle] = useState(site.designSettings.buttonStyle);
   const [imageStyle, setImageStyle] = useState(site.designSettings.imageStyle);
+  const [templateFilter, setTemplateFilter] = useState("All");
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -75,6 +71,13 @@ export function DesignManager({
   const selectedTemplateName = templateNameById[template] ?? template;
   const selectedSwatches = themeSwatches[colorTheme] ?? themeSwatches["Tropical Green"];
   const previewDesign = designTokensFor({ colorTheme, logoUrl, fontStyle, buttonStyle, imageStyle });
+  const planType = effectivePlanType(site);
+  const filteredTemplates = templateCatalog.filter((option) => {
+    if (templateFilter === "All") {
+      return true;
+    }
+    return option.tags.includes(templateFilter);
+  });
 
   return (
     <div className="grid gap-6">
@@ -84,19 +87,47 @@ export function DesignManager({
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Choose a guided template and practical brand settings for your direct booking site.</p>
       </Panel>
 
+      <Panel>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-[#18352f]">Template library</h2>
+            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Templates show which site structure and plan they are designed for. Current renderer still uses the existing visual templates.</p>
+          </div>
+          <Badge tone="sand">{site.plan}</Badge>
+        </div>
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+          {templateFilters.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setTemplateFilter(filter)}
+              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold ${filter === templateFilter ? "bg-[#18352f] text-white" : "bg-[#fbfaf7] text-[#18352f] ring-1 ring-[#d8cebb]"}`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </Panel>
+
       <div className="grid gap-4 xl:grid-cols-4">
-        {templateOptions.map((option) => {
-          const templateId = templateIdByName[option.name] ?? option.name;
+        {filteredTemplates.map((option) => {
+          const templateId = option.templateId;
           const selected = templateId === template;
+          const locked = !canUsePlan(planType, option.planType);
           return (
-            <button key={option.name} type="button" onClick={() => setTemplate(templateId)} className="text-left">
-              <Panel className={selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"}>
+            <button key={option.name} type="button" onClick={() => !locked && setTemplate(templateId)} className="text-left">
+              <Panel className={`${selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"} ${locked ? "opacity-70" : ""}`}>
                 <TemplatePreview name={option.name} />
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <h2 className="font-semibold text-[#18352f]">{option.name}</h2>
-                  {selected ? <Badge>Current</Badge> : null}
+                  {locked ? <Badge tone="gray">Locked</Badge> : selected ? <Badge>Current</Badge> : null}
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{option.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge tone="sand">{option.tags[0]}</Badge>
+                  <Badge tone="gray">{option.tags[1]}</Badge>
+                </div>
+                {locked ? <p className="mt-3 text-xs font-semibold text-[#7b5b24]">Upgrade to {option.tags[1]} to use this structure.</p> : null}
               </Panel>
             </button>
           );

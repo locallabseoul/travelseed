@@ -2,6 +2,7 @@ import { AboutSection } from "@/components/resort/AboutSection";
 import { BookingSection } from "@/components/resort/BookingSection";
 import { ExperienceSection } from "@/components/resort/ExperienceSection";
 import { FeatureSection } from "@/components/resort/FeatureSection";
+import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
 import { GallerySection } from "@/components/resort/GallerySection";
 import { HeroSection } from "@/components/resort/HeroSection";
@@ -29,6 +30,7 @@ export function BoutiqueVillaTemplate({ resort }: TemplateProps) {
       <ExperienceSection resort={resort} />
       <BookingSection resort={resort} buttonClassName="bg-[#d9c49e] text-[#18352f]" />
       <FooterSection resort={resort} />
+      <FloatingWhatsAppButton resort={resort} />
     </main>
   );
 }
