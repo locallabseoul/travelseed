@@ -6,6 +6,7 @@ import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { designTokensFor } from "@/lib/design-settings";
+import { isSiteSectionEnabled } from "@/lib/site-structure";
 import type { Resort } from "@/types/resort";
 
 type TemplateProps = {
@@ -16,6 +17,13 @@ type TemplateProps = {
 export function MinimalStayTemplate({ resort }: TemplateProps) {
   const design = designTokensFor(resort.design_settings);
   const heroImage = resort.hero_image_url || resort.gallery[0];
+  const showAbout = isSiteSectionEnabled(resort, "about");
+  const showFacilities = isSiteSectionEnabled(resort, "facilities");
+  const showRooms = isSiteSectionEnabled(resort, "rooms");
+  const showReviews = isSiteSectionEnabled(resort, "reviews");
+  const showGallery = isSiteSectionEnabled(resort, "gallery");
+  const showExperiences = isSiteSectionEnabled(resort, "experiences");
+  const showContact = isSiteSectionEnabled(resort, "contact");
   const stayDetails = [
     resort.capacity ? `${resort.capacity} guests` : null,
     resort.bedrooms ? `${resort.bedrooms} bedrooms` : null,
@@ -54,31 +62,37 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         </div>
       </section>
 
-      <section id="about" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">
-              {resort.type ?? "Minimal stay"}
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">A slower way to arrive.</h2>
-          </div>
-          <div>
-            <p className="text-lg leading-9 text-[#555d58]">
-              {resort.description ??
-                `${resort.name} is a quiet direct-booking stay for guests who care about calm spaces, practical comfort, and a more personal reservation experience.`}
-            </p>
-            <div id="features" className="mt-10 grid gap-3 sm:grid-cols-2">
-              {resort.features.map((feature) => (
-                <div key={feature} className="border-t border-[#ddd6c9] py-5 text-base font-medium">
-                  {feature}
+      {showAbout || showFacilities ? (
+        <section id="about" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">
+                {resort.type ?? "Minimal stay"}
+              </p>
+              <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">A slower way to arrive.</h2>
+            </div>
+            <div>
+              {showAbout ? (
+                <p className="text-lg leading-9 text-[#555d58]">
+                  {resort.description ??
+                    `${resort.name} is a quiet direct-booking stay for guests who care about calm spaces, practical comfort, and a more personal reservation experience.`}
+                </p>
+              ) : null}
+              {showFacilities ? (
+                <div id="features" className="mt-10 grid gap-3 sm:grid-cols-2">
+                  {resort.features.map((feature) => (
+                    <div key={feature} className="border-t border-[#ddd6c9] py-5 text-base font-medium">
+                      {feature}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : null}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      {resort.gallery.length > 0 ? (
+      {showGallery && resort.gallery.length > 0 ? (
         <section id="gallery" className="px-5 py-16 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-6xl">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -98,10 +112,10 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      <ServiceSection resort={resort} variant="minimal" />
-      <ReviewSection resort={resort} variant="minimal" />
+      {showRooms ? <ServiceSection resort={resort} variant="minimal" /> : null}
+      {showReviews ? <ReviewSection resort={resort} variant="minimal" /> : null}
 
-      {resort.experiences.length > 0 ? (
+      {showExperiences && resort.experiences.length > 0 ? (
         <section id="experiences" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-6xl">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Nearby</p>
@@ -117,23 +131,25 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      <section id="booking" className="px-5 py-16 sm:px-6 lg:py-24">
-        <div className="mx-auto grid max-w-6xl gap-8 border-y border-[#d8cebb] py-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Direct booking</p>
-            <h2 className="mt-4 text-4xl font-semibold">Book Direct & Save</h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#555d58]">
-              Send a clear WhatsApp inquiry and reserve directly with the host.
-            </p>
+      {showContact ? (
+        <section id="booking" className="px-5 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto grid max-w-6xl gap-8 border-y border-[#d8cebb] py-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Direct booking</p>
+              <h2 className="mt-4 text-4xl font-semibold">Book Direct & Save</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#555d58]">
+                Send a clear WhatsApp inquiry and reserve directly with the host.
+              </p>
+            </div>
+            <BookingInquiryModal
+              resort={resort}
+              source="booking_cta"
+              buttonClassName={`w-full ${design.buttonClassName}`}
+              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
+            />
           </div>
-          <BookingInquiryModal
-            resort={resort}
-            source="booking_cta"
-            buttonClassName={`w-full ${design.buttonClassName}`}
-            buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
-          />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <FooterSection resort={resort} />
       <FloatingWhatsAppButton resort={resort} />

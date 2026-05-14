@@ -6,6 +6,7 @@ import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { designTokensFor } from "@/lib/design-settings";
+import { isSiteSectionEnabled } from "@/lib/site-structure";
 import type { Resort } from "@/types/resort";
 
 type TemplateProps = {
@@ -16,6 +17,13 @@ type TemplateProps = {
 export function SurfCampTemplate({ resort }: TemplateProps) {
   const design = designTokensFor(resort.design_settings);
   const featuredImage = resort.hero_image_url || resort.gallery[0];
+  const showAbout = isSiteSectionEnabled(resort, "about");
+  const showFacilities = isSiteSectionEnabled(resort, "facilities");
+  const showRooms = isSiteSectionEnabled(resort, "rooms");
+  const showReviews = isSiteSectionEnabled(resort, "reviews");
+  const showGallery = isSiteSectionEnabled(resort, "gallery");
+  const showExperiences = isSiteSectionEnabled(resort, "experiences");
+  const showContact = isSiteSectionEnabled(resort, "contact");
   const stats = [
     resort.capacity ? { label: "Guests", value: resort.capacity } : null,
     resort.bedrooms ? { label: "Rooms", value: resort.bedrooms } : null,
@@ -74,41 +82,45 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
         </div>
       </section>
 
-      <section id="about" className="px-5 py-16 sm:px-6 lg:py-24">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">
-              {resort.type ?? "Surf camp stay"}
-            </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">Wake up close to the breaks.</h2>
-          </div>
-          <p className="text-lg leading-9 text-[#31585f]">
-            {resort.description ??
-              `${resort.name} is built for guests who want easy beach access, simple comfort, and a direct line to the host before they arrive.`}
-          </p>
-        </div>
-      </section>
-
-      <section id="features" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      {showAbout ? (
+        <section id="about" className="px-5 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Camp essentials</p>
-              <h2 className="mt-4 text-3xl font-black sm:text-4xl">Everything set up for active days.</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">
+                {resort.type ?? "Surf camp stay"}
+              </p>
+              <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">Wake up close to the breaks.</h2>
+            </div>
+            <p className="text-lg leading-9 text-[#31585f]">
+              {resort.description ??
+                `${resort.name} is built for guests who want easy beach access, simple comfort, and a direct line to the host before they arrive.`}
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {showFacilities ? (
+        <section id="features" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Camp essentials</p>
+                <h2 className="mt-4 text-3xl font-black sm:text-4xl">Everything set up for active days.</h2>
+              </div>
+            </div>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {resort.features.map((feature) => (
+                <div key={feature} className="rounded-md border border-cyan-100 bg-[#f5fbf8] p-5">
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#0b7380]">Included</p>
+                  <p className="mt-8 text-lg font-black">{feature}</p>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {resort.features.map((feature) => (
-              <div key={feature} className="rounded-md border border-cyan-100 bg-[#f5fbf8] p-5">
-                <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#0b7380]">Included</p>
-                <p className="mt-8 text-lg font-black">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      {resort.gallery.length > 0 ? (
+      {showGallery && resort.gallery.length > 0 ? (
         <section id="gallery" className="px-5 py-16 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-6xl">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Gallery</p>
@@ -123,7 +135,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      {resort.experiences.length > 0 ? (
+      {showExperiences && resort.experiences.length > 0 ? (
         <section id="experiences" className="bg-[#0c2f35] px-5 py-16 text-white sm:px-6 lg:py-24">
           <div className="mx-auto max-w-6xl">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#f6d365]">Nearby experiences</p>
@@ -139,26 +151,28 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      <ServiceSection resort={resort} variant="surf" />
-      <ReviewSection resort={resort} variant="surf" />
+      {showRooms ? <ServiceSection resort={resort} variant="surf" /> : null}
+      {showReviews ? <ReviewSection resort={resort} variant="surf" /> : null}
 
-      <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
-        <div className={`mx-auto grid max-w-6xl gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:grid-cols-[1fr_0.8fr] lg:items-center ${design.imageClassName}`}>
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b7380]">Direct booking</p>
-            <h2 className="mt-4 text-4xl font-black text-[#0c2f35]">Book Direct & Save</h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#31585f]">
-              Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
-            </p>
+      {showContact ? (
+        <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
+          <div className={`mx-auto grid max-w-6xl gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:grid-cols-[1fr_0.8fr] lg:items-center ${design.imageClassName}`}>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b7380]">Direct booking</p>
+              <h2 className="mt-4 text-4xl font-black text-[#0c2f35]">Book Direct & Save</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#31585f]">
+                Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
+              </p>
+            </div>
+            <BookingInquiryModal
+              resort={resort}
+              source="booking_cta"
+              buttonClassName={`w-full font-black ${design.buttonClassName}`}
+              buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
+            />
           </div>
-          <BookingInquiryModal
-            resort={resort}
-            source="booking_cta"
-            buttonClassName={`w-full font-black ${design.buttonClassName}`}
-            buttonStyle={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}
-          />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <FooterSection resort={resort} />
       <FloatingWhatsAppButton resort={resort} />

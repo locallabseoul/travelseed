@@ -1,13 +1,10 @@
 import { getSampleResortBySlug } from "@/lib/sample-resorts";
+import { sortedPublicSiteData } from "@/lib/site-structure";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort } from "@/types/resort";
 
 function sortResortServices(resort: Resort): Resort {
-  return {
-    ...resort,
-    services: [...(resort.services ?? [])].sort((first, second) => first.sort_order - second.sort_order),
-    reviews: [...(resort.reviews ?? [])].sort((first, second) => first.sort_order - second.sort_order),
-  };
+  return sortedPublicSiteData(resort);
 }
 
 // Fetches an active resort by slug for root-level public site rendering.
@@ -18,7 +15,7 @@ export async function getActiveResortBySlug(slug: string): Promise<Resort | null
 
   const { data, error } = await supabase
     .from("resorts")
-    .select("*, services:resort_services(*), reviews:website_reviews(*)")
+    .select("*, services:resort_services(*), reviews:website_reviews(*), sections:site_sections(*), pages:site_pages(*), navigation_items:site_navigation_items(*)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -44,7 +41,7 @@ export async function getActiveResortByHost(host: string): Promise<Resort | null
   const domain = normalizeHost(host);
   const { data, error } = await supabase
     .from("resorts")
-    .select("*, services:resort_services(*), reviews:website_reviews(*)")
+    .select("*, services:resort_services(*), reviews:website_reviews(*), sections:site_sections(*), pages:site_pages(*), navigation_items:site_navigation_items(*)")
     .eq("domain", domain)
     .eq("is_active", true)
     .single();
