@@ -2,11 +2,13 @@ export type DashboardTab =
   | "dashboard"
   | "setup"
   | "content"
+  | "offers"
   | "design"
   | "whatsapp"
   | "inquiries"
   | "domain"
   | "analytics"
+  | "reviews"
   | "plan"
   | "settings";
 
@@ -113,6 +115,28 @@ export type SiteAnalyticsSummary = {
   pageViews30d: number;
   recentEvents: SiteAnalyticsEvent[];
   dailyClicks: SiteAnalyticsDailyPoint[];
+};
+
+export type WebsiteReview = {
+  id: string;
+  resortId?: string;
+  guestName: string;
+  rating: number;
+  reviewText: string;
+  sourceLabel: "Manual" | "Google" | "Guest Message";
+  stayDate?: string;
+  status: "published" | "draft";
+  showOnWebsite: boolean;
+  featured: boolean;
+  sortOrder?: number;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+};
+
+export type GoogleReviewsSyncFeature = {
+  title: string;
+  description: string;
+  status: "coming_soon";
 };
 
 export type DashboardMetric = {

@@ -4,6 +4,7 @@ import type { DashboardTab } from "@/types/dashboard";
 const actionTargets: Record<string, DashboardTab> = {
   "Edit Hero Section": "content",
   "Update Gallery": "content",
+  "Manage Rooms & Services": "offers",
   "Change WhatsApp Number": "whatsapp",
   "Connect Domain": "domain",
   "Upgrade Plan": "plan",

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
+import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
@@ -106,6 +107,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
       ) : null}
 
       <ServiceSection resort={resort} variant="minimal" />
+      <ReviewSection resort={resort} variant="minimal" />
 
       {resort.experiences.length > 0 ? (
         <section id="experiences" className="bg-white px-5 py-16 sm:px-6 lg:py-24">

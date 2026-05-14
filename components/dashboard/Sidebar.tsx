@@ -6,11 +6,13 @@ const menuItems: Array<{ id: DashboardTab; label: string; icon: string }> = [
   { id: "dashboard", label: "Dashboard", icon: "D" },
   { id: "setup", label: "Setup", icon: "S" },
   { id: "content", label: "Content", icon: "C" },
+  { id: "offers", label: "Offers", icon: "O" },
   { id: "design", label: "Design", icon: "D" },
   { id: "whatsapp", label: "WhatsApp", icon: "W" },
   { id: "inquiries", label: "Inquiries", icon: "I" },
   { id: "domain", label: "Domain", icon: "D" },
   { id: "analytics", label: "Analytics", icon: "A" },
+  { id: "reviews", label: "Reviews", icon: "R" },
   { id: "plan", label: "Plan", icon: "P" },
   { id: "settings", label: "Settings", icon: "S" },
 ];

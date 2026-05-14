@@ -36,6 +36,7 @@ export function usageMetricsFor(site: ResortConsoleData): UsageMetric[] {
 export const quickActions = [
   "Edit Hero Section",
   "Update Gallery",
+  "Manage Rooms & Services",
   "Change WhatsApp Number",
   "Connect Domain",
   "Upgrade Plan",
@@ -62,7 +63,6 @@ export const contentSections: ContentSection[] = [
   { title: "About", description: "Short property story and positioning for direct guests.", status: "Ready" },
   { title: "Features", description: "Amenities, stay highlights, and practical selling points.", status: "Needs review" },
   { title: "Gallery", description: "Curated photos for exterior, rooms, pool, food, and area.", status: "Ready" },
-  { title: "Rooms / Services", description: "Room types, villa capacity, packages, or MSME services.", status: "Draft" },
   { title: "Experiences", description: "Nearby beaches, activities, restaurants, and local attractions.", status: "Ready" },
   { title: "Booking CTA", description: "WhatsApp booking block and message template.", status: "Ready" },
   { title: "Footer", description: "Contact details, location, legal notes, and brand links.", status: "Needs review" },

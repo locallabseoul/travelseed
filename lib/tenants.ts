@@ -6,6 +6,7 @@ function sortResortServices(resort: Resort): Resort {
   return {
     ...resort,
     services: [...(resort.services ?? [])].sort((first, second) => first.sort_order - second.sort_order),
+    reviews: [...(resort.reviews ?? [])].sort((first, second) => first.sort_order - second.sort_order),
   };
 }
 
@@ -17,7 +18,7 @@ export async function getActiveResortBySlug(slug: string): Promise<Resort | null
 
   const { data, error } = await supabase
     .from("resorts")
-    .select("*, services:resort_services(*)")
+    .select("*, services:resort_services(*), reviews:website_reviews(*)")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -43,7 +44,7 @@ export async function getActiveResortByHost(host: string): Promise<Resort | null
   const domain = normalizeHost(host);
   const { data, error } = await supabase
     .from("resorts")
-    .select("*, services:resort_services(*)")
+    .select("*, services:resort_services(*), reviews:website_reviews(*)")
     .eq("domain", domain)
     .eq("is_active", true)
     .single();

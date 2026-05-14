@@ -10,7 +10,9 @@ import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { DesignManager } from "@/components/dashboard/DesignManager";
 import { DomainManager } from "@/components/dashboard/DomainManager";
 import { InquiriesManager } from "@/components/dashboard/InquiriesManager";
+import { OffersManager } from "@/components/dashboard/OffersManager";
 import { PlanBillingView } from "@/components/dashboard/PlanBillingView";
+import { ReviewsView } from "@/components/dashboard/ReviewsView";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
@@ -34,6 +36,8 @@ function renderTab(
       return <SetupWizard />;
     case "content":
       return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
+    case "offers":
+      return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "design":
       return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "whatsapp":
@@ -44,6 +48,8 @@ function renderTab(
       return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} />;
     case "analytics":
       return <AnalyticsView site={selectedSite} />;
+    case "reviews":
+      return <ReviewsView site={selectedSite} accessToken={accessToken} />;
     case "plan":
       return <PlanBillingView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "settings":

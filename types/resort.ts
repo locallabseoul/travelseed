@@ -3,6 +3,7 @@ export type ResortPlan = "Seed Trial" | "Seed" | "Tree" | "Forest";
 export type DomainStatus = "not_connected" | "pending" | "verified" | "active" | "error";
 export type SslStatus = "pending" | "active" | "error";
 export type ResortServiceKind = "room" | "service" | "package";
+export type ResortReviewSourceLabel = "Manual" | "Google" | "Guest Message";
 
 export type ResortDesignSettings = {
   colorTheme?: string;
@@ -41,6 +42,7 @@ export type Resort = {
   ssl_status?: SslStatus;
   domain_verified_at?: string | null;
   services?: ResortService[];
+  reviews?: ResortWebsiteReview[];
   created_at?: string | null;
   updated_at?: string | null;
 };
@@ -78,6 +80,22 @@ export type ResortServiceInput = {
   cta_label?: string | null;
   sort_order?: number;
   is_active?: boolean;
+};
+
+export type ResortWebsiteReview = {
+  id: string;
+  resort_id: string;
+  guest_name: string;
+  rating: number;
+  review_text: string;
+  source_label: ResortReviewSourceLabel;
+  stay_date: string | null;
+  status: "published" | "draft";
+  show_on_website: boolean;
+  featured: boolean;
+  sort_order: number;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> & {

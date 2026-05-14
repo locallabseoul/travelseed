@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { FooterSection } from "@/components/resort/FooterSection";
+import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
@@ -147,6 +148,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
       ) : null}
 
       <ServiceSection resort={resort} variant="surf" />
+      <ReviewSection resort={resort} variant="surf" />
 
       <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
         <div className={`mx-auto flex max-w-6xl flex-col gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between ${design.imageClassName}`}>
