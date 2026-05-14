@@ -183,6 +183,8 @@ export type SiteStructurePage = {
   pageType: SitePageType;
   isPublished: boolean;
   heroImageUrl?: string;
+  seoTitle?: string;
+  seoDescription?: string;
   locked?: boolean;
 };
 

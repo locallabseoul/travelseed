@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { effectivePlanType, forestCustomPages, landingSections, planConfig, treePages } from "@/components/dashboard/subscriptionConfig";
-import type { PlanType, ResortConsoleData, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
+import type { DashboardTab, PlanType, ResortConsoleData, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
 
 type StructureResponse = {
   sections?: RawSection[];
@@ -24,6 +24,8 @@ type RawPage = {
   page_type: SiteStructurePage["pageType"];
   is_published: boolean;
   hero_image_url: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
   sort_order: number;
 };
 
@@ -37,10 +39,12 @@ export function SiteStructureManager({
   site,
   accessToken,
   operatorFetch,
+  onTabChange,
 }: {
   site: ResortConsoleData;
   accessToken: string | null;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
+  onTabChange: (tab: DashboardTab) => void;
 }) {
   const planType = effectivePlanType(site);
   const config = planConfig[planType];
@@ -155,6 +159,7 @@ export function SiteStructureManager({
             pages={pages}
             onToggle={togglePage}
             onAddCustomPage={addCustomPage}
+            onTabChange={onTabChange}
             onPagesChange={(nextPages) => {
               setPages(nextPages);
               void saveStructure(sections, nextPages);
@@ -221,6 +226,7 @@ function PagesView({
   pages,
   onToggle,
   onAddCustomPage,
+  onTabChange,
   onPagesChange,
 }: {
   site: ResortConsoleData;
@@ -229,12 +235,14 @@ function PagesView({
   pages: SiteStructurePage[];
   onToggle: (page: SiteStructurePage) => void;
   onAddCustomPage: () => void;
+  onTabChange: (tab: DashboardTab) => void;
   onPagesChange: (pages: SiteStructurePage[]) => void;
 }) {
   const isForest = planType === "forest";
   const [selectedSlug, setSelectedSlug] = useState(pages[0]?.slug ?? "/");
   const [uploadingSlug, setUploadingSlug] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [showNavigation, setShowNavigation] = useState(false);
   const selectedPage = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
 
   useEffect(() => {
@@ -282,6 +290,11 @@ function PagesView({
     }
   }
 
+  function updatePageSeo(page: SiteStructurePage, seoTitle: string, seoDescription: string) {
+    const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, seoTitle, seoDescription } : item));
+    onPagesChange(nextPages);
+  }
+
   return (
     <Panel>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -293,7 +306,7 @@ function PagesView({
           <button type="button" onClick={onAddCustomPage} disabled={!isForest} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
             Add Custom Page
           </button>
-          <button type="button" disabled={!isForest} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
+          <button type="button" onClick={() => setShowNavigation((current) => !current)} disabled={!isForest} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
             Navigation
           </button>
         </div>
@@ -325,10 +338,18 @@ function PagesView({
             uploading={uploadingSlug === selectedPage.slug}
             uploadStatus={uploadStatus}
             onUpload={(file) => uploadPageHero(selectedPage, file)}
+            onSaveSeo={(seoTitle, seoDescription) => updatePageSeo(selectedPage, seoTitle, seoDescription)}
+            onEditContent={() => {
+              const targetTab = contentTabForPage(selectedPage);
+              if (targetTab) {
+                onTabChange(targetTab);
+              }
+            }}
             onToggle={() => onToggle(selectedPage)}
           />
         ) : null}
       </div>
+      {showNavigation && isForest ? <NavigationPreview site={site} pages={pages} /> : null}
     </Panel>
   );
 }
@@ -396,6 +417,8 @@ function PageDetail({
   uploading,
   uploadStatus,
   onUpload,
+  onSaveSeo,
+  onEditContent,
   onToggle,
 }: {
   site: ResortConsoleData;
@@ -404,12 +427,22 @@ function PageDetail({
   uploading: boolean;
   uploadStatus: string;
   onUpload: (file: File) => void;
+  onSaveSeo: (seoTitle: string, seoDescription: string) => void;
+  onEditContent: () => void;
   onToggle: () => void;
 }) {
   const customOnly = ["Wedding", "Tour", "Membership", "Event"].includes(page.pageType);
   const locked = customOnly && !isForest;
-  const publicPath = page.slug === "/" ? "/" : page.slug;
+  const publicPath = publicPathForPage(site, page);
   const heroImageUrl = page.heroImageUrl || site.heroImageUrl;
+  const [seoTitle, setSeoTitle] = useState(page.seoTitle ?? "");
+  const [seoDescription, setSeoDescription] = useState(page.seoDescription ?? "");
+  const contentTarget = contentTabForPage(page);
+
+  useEffect(() => {
+    setSeoTitle(page.seoTitle ?? "");
+    setSeoDescription(page.seoDescription ?? "");
+  }, [page.seoDescription, page.seoTitle, page.slug]);
 
   return (
     <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
@@ -468,6 +501,26 @@ function PageDetail({
         {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
       </div>
 
+      <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">SEO Settings</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Set the page title and description used by search previews and social sharing.</p>
+        </div>
+        <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+          SEO title
+          <input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+        </label>
+        <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+          SEO description
+          <textarea value={seoDescription} rows={3} onChange={(event) => setSeoDescription(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+        </label>
+        <div>
+          <button type="button" disabled={locked} onClick={() => onSaveSeo(seoTitle, seoDescription)} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
+            Save SEO
+          </button>
+        </div>
+      </div>
+
       <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
         <div>
           <p className="text-sm font-semibold text-[#18352f]">Content workflow</p>
@@ -476,9 +529,10 @@ function PageDetail({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <SmallButton disabled={locked}>SEO Settings</SmallButton>
-          <SmallButton disabled={locked}>Edit Content</SmallButton>
-          <SmallButton disabled={locked}>Preview Page</SmallButton>
+          <SmallButton disabled={locked || !contentTarget} onClick={onEditContent}>{contentTarget ? "Edit Content" : "Content coming soon"}</SmallButton>
+          <a href={publicPath} target="_blank" rel="noreferrer" className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            Preview Page
+          </a>
         </div>
       </div>
     </article>
@@ -492,6 +546,55 @@ function PageMetaCard({ label, value }: { label: string; value: string }) {
       <p className="mt-2 break-words text-sm font-semibold text-[#18352f]">{value}</p>
     </div>
   );
+}
+
+function NavigationPreview({ site, pages }: { site: ResortConsoleData; pages: SiteStructurePage[] }) {
+  const publishedPages = pages.filter((page) => page.isPublished);
+
+  return (
+    <div className="mt-5 rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">Navigation preview</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Forest navigation is generated from published pages in the current order.</p>
+        </div>
+        <Badge tone="sand">Forest</Badge>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {publishedPages.map((page) => (
+          <a key={page.slug} href={publicPathForPage(site, page)} target="_blank" rel="noreferrer" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+            {page.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function publicPathForPage(site: ResortConsoleData, page: SiteStructurePage) {
+  return page.slug === "/" ? `/${site.slug}` : `/${site.slug}${page.slug}`;
+}
+
+function contentTabForPage(page: SiteStructurePage): DashboardTab | null {
+  const slug = page.slug.replace(/^\/+|\/+$/g, "");
+
+  if (["rooms", "promotions"].includes(slug)) {
+    return "offers";
+  }
+
+  if (slug === "reviews") {
+    return "reviews";
+  }
+
+  if (slug === "contact") {
+    return "whatsapp";
+  }
+
+  if (["", "about", "experiences", "gallery"].includes(slug)) {
+    return "content";
+  }
+
+  return null;
 }
 
 function FeaturePill({ feature, locked }: { feature: string; locked: boolean }) {
@@ -544,6 +647,8 @@ function pageFromApi(page: RawPage): SiteStructurePage {
     pageType: page.page_type,
     isPublished: page.is_published,
     heroImageUrl: page.hero_image_url ?? "",
+    seoTitle: page.seo_title ?? "",
+    seoDescription: page.seo_description ?? "",
   };
 }
 
@@ -554,6 +659,8 @@ function pageToApi(page: SiteStructurePage, index: number) {
     page_type: page.pageType,
     is_published: page.isPublished,
     hero_image_url: page.heroImageUrl || null,
+    seo_title: page.seoTitle || null,
+    seo_description: page.seoDescription || null,
     sort_order: index,
   };
 }
