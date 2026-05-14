@@ -4,7 +4,7 @@ import { planConfig, planNameToType } from "@/components/dashboard/subscriptionC
 
 export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
   const plan = resort.plan ?? "Tree";
-  const planType = planNameToType[plan];
+  const planType = resort.plan_type ?? planNameToType[plan];
   const planLimits = limitsForPlan(plan);
   const designSettings = resort.design_settings ?? {};
 
@@ -26,7 +26,7 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     location: resort.location,
     plan,
     planType,
-    siteType: planConfig[planType].siteType,
+    siteType: resort.site_type ?? planConfig[planType].siteType,
     status: resort.is_active ? "Published" : "Paused",
     travelseedUrl: `${resort.slug}.travelseed.app`,
     customDomain: resort.domain ?? "",
@@ -117,6 +117,8 @@ export function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
     ssl_status: site.sslStatus,
     domain_verified_at: site.domainVerifiedAt,
     plan: site.plan,
+    plan_type: site.planType,
+    site_type: site.siteType,
     updated_at: new Date().toISOString(),
   };
 }

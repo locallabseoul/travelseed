@@ -188,6 +188,7 @@ export type SiteStructurePage = {
 export type SiteStructureSection = {
   name: string;
   description: string;
+  isEnabled?: boolean;
   locked?: boolean;
   lockReason?: string;
 };

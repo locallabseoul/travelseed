@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnalyticsView } from "@/components/dashboard/AnalyticsView";
 import { ContentManager } from "@/components/dashboard/ContentManager";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -40,7 +40,7 @@ function renderTab(
     case "offers":
       return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "structure":
-      return <SiteStructureManager site={selectedSite} />;
+      return <SiteStructureManager site={selectedSite} operatorFetch={operatorFetch} />;
     case "design":
       return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "whatsapp":
@@ -93,7 +93,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function operatorFetch(path: string, init: RequestInit = {}) {
+  const operatorFetch = useCallback(async (path: string, init: RequestInit = {}) => {
     if (!accessToken) {
       throw new Error("Sign in before managing sites.");
     }
@@ -112,7 +112,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
     }
 
     return data;
-  }
+  }, [accessToken]);
 
   async function loadSites(token: string) {
     setStatus("Loading sites from database...");

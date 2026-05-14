@@ -97,6 +97,9 @@ export async function verifyAuthenticatedRequest(request: Request): Promise<User
 }
 
 export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUpsert {
+  const plan = payload.plan ?? "Tree";
+  const planType = payload.plan_type ?? planTypeFor(plan);
+
   return {
     name: String(payload.name ?? "").trim(),
     slug: String(payload.slug ?? "").trim(),
@@ -123,9 +126,39 @@ export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUps
     domain_status: payload.domain_status ?? (payload.domain ? "pending" : "not_connected"),
     ssl_status: payload.ssl_status ?? "pending",
     domain_verified_at: payload.domain_verified_at ?? null,
-    plan: payload.plan ?? "Tree",
+    plan,
+    plan_type: planType,
+    site_type: payload.site_type ?? siteTypeForPlanType(planType),
     updated_at: payload.updated_at ?? new Date().toISOString(),
   };
+}
+
+function planTypeFor(plan: ResortUpsert["plan"]) {
+  if (plan === "Seed Trial") {
+    return "freeTrial";
+  }
+
+  if (plan === "Seed") {
+    return "seed";
+  }
+
+  if (plan === "Forest") {
+    return "forest";
+  }
+
+  return "tree";
+}
+
+function siteTypeForPlanType(planType: NonNullable<ResortUpsert["plan_type"]>) {
+  if (planType === "freeTrial" || planType === "seed") {
+    return "landing";
+  }
+
+  if (planType === "forest") {
+    return "custom";
+  }
+
+  return "multipage";
 }
 
 export function validateResortPayload(payload: ResortUpsert) {

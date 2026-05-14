@@ -1,5 +1,7 @@
 export type ResortTemplateId = "boutique-villa" | "surf-camp" | "minimal-stay";
 export type ResortPlan = "Seed Trial" | "Seed" | "Tree" | "Forest";
+export type ResortPlanType = "freeTrial" | "seed" | "tree" | "forest";
+export type ResortSiteType = "landing" | "multipage" | "custom";
 export type DomainStatus = "not_connected" | "pending" | "verified" | "active" | "error";
 export type SslStatus = "pending" | "active" | "error";
 export type ResortServiceKind = "room" | "service" | "package";
@@ -22,6 +24,8 @@ export type Resort = {
   domain: string | null;
   template_id: string;
   plan?: ResortPlan;
+  plan_type?: ResortPlanType;
+  site_type?: ResortSiteType;
   location: string;
   type: string | null;
   description: string | null;
@@ -43,6 +47,9 @@ export type Resort = {
   domain_verified_at?: string | null;
   services?: ResortService[];
   reviews?: ResortWebsiteReview[];
+  pages?: ResortSitePage[];
+  sections?: ResortSiteSection[];
+  navigation_items?: ResortNavigationItem[];
   created_at?: string | null;
   updated_at?: string | null;
 };
@@ -82,6 +89,37 @@ export type ResortServiceInput = {
   is_active?: boolean;
 };
 
+export type ResortSiteSectionInput = {
+  id?: string;
+  section_key: string;
+  label: string;
+  is_enabled?: boolean;
+  is_locked?: boolean;
+  sort_order?: number;
+  settings?: Record<string, unknown>;
+};
+
+export type ResortSitePageInput = {
+  id?: string;
+  title: string;
+  slug: string;
+  page_type?: ResortSitePage["page_type"];
+  is_published?: boolean;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  sort_order?: number;
+  settings?: Record<string, unknown>;
+};
+
+export type ResortNavigationItemInput = {
+  id?: string;
+  label: string;
+  href: string;
+  page_id?: string | null;
+  is_enabled?: boolean;
+  sort_order?: number;
+};
+
 export type ResortWebsiteReview = {
   id: string;
   resort_id: string;
@@ -93,6 +131,46 @@ export type ResortWebsiteReview = {
   status: "published" | "draft";
   show_on_website: boolean;
   featured: boolean;
+  sort_order: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type ResortSiteSection = {
+  id: string;
+  resort_id: string;
+  section_key: string;
+  label: string;
+  is_enabled: boolean;
+  is_locked: boolean;
+  sort_order: number;
+  settings?: Record<string, unknown>;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type ResortSitePage = {
+  id: string;
+  resort_id: string;
+  title: string;
+  slug: string;
+  page_type: "Standard" | "Landing" | "Event" | "Wedding" | "Tour" | "Membership";
+  is_published: boolean;
+  seo_title: string | null;
+  seo_description: string | null;
+  sort_order: number;
+  settings?: Record<string, unknown>;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type ResortNavigationItem = {
+  id: string;
+  resort_id: string;
+  label: string;
+  href: string;
+  page_id: string | null;
+  is_enabled: boolean;
   sort_order: number;
   created_at?: string | null;
   updated_at?: string | null;
