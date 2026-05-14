@@ -3,12 +3,11 @@ import { colorThemes } from "@/components/dashboard/mockData";
 import { canUsePlan, effectivePlanType, templateCatalog } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { designTokensFor } from "@/lib/design-settings";
-import type { ResortConsoleData } from "@/types/dashboard";
+import type { PlanType, ResortConsoleData } from "@/types/dashboard";
 
 const fontOptions = ["Editorial Sans", "Clean Modern", "Warm Serif", "Compact UI"];
 const buttonStyles = ["Rounded", "Pill", "Sharp", "Soft Outline"];
 const imageStyles = ["Soft Corners", "Square Editorial", "Full Bleed", "Postcard"];
-const templateFilters = ["All", "Landing", "Multi-page", "Custom", "Seed", "Tree", "Forest"];
 
 const templateNameById: Record<string, string> = {
   "boutique-villa": "Boutique Villa",
@@ -23,6 +22,22 @@ const themeSwatches: Record<string, string[]> = {
   "Minimal White": ["#ffffff", "#e7e1d6", "#202724"],
 };
 
+function templateLibraryCopy(planType: PlanType) {
+  if (planType === "seed") {
+    return "One-page templates available on your plan.";
+  }
+
+  if (planType === "tree") {
+    return "Landing and multi-page templates available on your plan.";
+  }
+
+  if (planType === "forest") {
+    return "All templates are available on your plan.";
+  }
+
+  return "Upgrade to Seed to unlock one-page direct booking templates.";
+}
+
 export function DesignManager({
   site,
   onSiteUpdate,
@@ -36,7 +51,6 @@ export function DesignManager({
   const [fontStyle, setFontStyle] = useState(site.designSettings.fontStyle);
   const [buttonStyle, setButtonStyle] = useState(site.designSettings.buttonStyle);
   const [imageStyle, setImageStyle] = useState(site.designSettings.imageStyle);
-  const [templateFilter, setTemplateFilter] = useState("All");
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -72,12 +86,10 @@ export function DesignManager({
   const selectedSwatches = themeSwatches[colorTheme] ?? themeSwatches["Tropical Green"];
   const previewDesign = designTokensFor({ colorTheme, logoUrl, fontStyle, buttonStyle, imageStyle });
   const planType = effectivePlanType(site);
-  const filteredTemplates = templateCatalog.filter((option) => {
-    if (templateFilter === "All") {
-      return true;
-    }
-    return option.tags.includes(templateFilter);
-  });
+  const availableTemplates = templateCatalog.filter((option) => canUsePlan(planType, option.planType));
+  const upgradeTemplates = templateCatalog.filter((option) => !canUsePlan(planType, option.planType));
+  const selectedTemplate = templateCatalog.find((option) => option.templateId === template);
+  const selectedTemplateUnavailable = selectedTemplate ? !canUsePlan(planType, selectedTemplate.planType) : false;
 
   return (
     <div className="grid gap-6">
@@ -91,48 +103,76 @@ export function DesignManager({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-[#18352f]">Template library</h2>
-            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Templates show which site structure and plan they are designed for. Current renderer still uses the existing visual templates.</p>
+            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">{templateLibraryCopy(planType)}</p>
           </div>
-          <Badge tone="sand">{site.plan}</Badge>
+          <div className="flex flex-wrap gap-2">
+            <Badge tone="sand">{site.plan}</Badge>
+            <Badge tone="green">Available for your plan</Badge>
+          </div>
         </div>
-        <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
-          {templateFilters.map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setTemplateFilter(filter)}
-              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold ${filter === templateFilter ? "bg-[#18352f] text-white" : "bg-[#fbfaf7] text-[#18352f] ring-1 ring-[#d8cebb]"}`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
+        {selectedTemplateUnavailable ? (
+          <p className="mt-4 rounded-2xl bg-[#fff7e8] p-4 text-sm leading-6 text-[#7b5b24]">
+            The currently saved template belongs to a higher plan. Choose an available template before saving design settings.
+          </p>
+        ) : null}
       </Panel>
 
       <div className="grid gap-4 xl:grid-cols-4">
-        {filteredTemplates.map((option) => {
+        {availableTemplates.length > 0 ? availableTemplates.map((option) => {
           const templateId = option.templateId;
           const selected = templateId === template;
-          const locked = !canUsePlan(planType, option.planType);
           return (
-            <button key={option.name} type="button" onClick={() => !locked && setTemplate(templateId)} className="text-left">
-              <Panel className={`${selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"} ${locked ? "opacity-70" : ""}`}>
+            <button key={option.name} type="button" onClick={() => setTemplate(templateId)} className="text-left">
+              <Panel className={selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"}>
                 <TemplatePreview name={option.name} />
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <h2 className="font-semibold text-[#18352f]">{option.name}</h2>
-                  {locked ? <Badge tone="gray">Locked</Badge> : selected ? <Badge>Current</Badge> : null}
+                  {selected ? <Badge>Current</Badge> : null}
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{option.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Badge tone="sand">{option.tags[0]}</Badge>
                   <Badge tone="gray">{option.tags[1]}</Badge>
                 </div>
-                {locked ? <p className="mt-3 text-xs font-semibold text-[#7b5b24]">Upgrade to {option.tags[1]} to use this structure.</p> : null}
               </Panel>
             </button>
           );
-        })}
+        }) : (
+          <Panel className="xl:col-span-4">
+            <h2 className="text-xl font-semibold text-[#18352f]">No templates available on this plan yet</h2>
+            <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Upgrade to Seed to unlock one-page direct booking templates.</p>
+          </Panel>
+        )}
       </div>
+
+      {upgradeTemplates.length > 0 ? (
+        <Panel>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#18352f]">Upgrade templates</h2>
+              <p className="mt-1 text-sm leading-6 text-[#6f7b74]">These templates require a higher plan and are shown as upgrade options only.</p>
+            </div>
+            <Badge tone="gray">Locked</Badge>
+          </div>
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {upgradeTemplates.map((option) => (
+              <article key={option.name} className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-semibold text-[#18352f]">{option.name}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{option.description}</p>
+                  </div>
+                  <Badge tone="gray">{option.tags[1]}</Badge>
+                </div>
+                <p className="mt-4 text-xs font-semibold text-[#7b5b24]">Upgrade to {option.tags[1]} to use this template.</p>
+                <button type="button" className="mt-4 min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                  Upgrade to {option.tags[1]}
+                </button>
+              </article>
+            ))}
+          </div>
+        </Panel>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <Panel>
