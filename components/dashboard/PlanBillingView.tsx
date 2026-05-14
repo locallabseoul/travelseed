@@ -3,6 +3,8 @@ import { planConfig, planNameToType } from "@/components/dashboard/subscriptionC
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import type { ResortConsoleData } from "@/types/dashboard";
 
+const planOrder: Array<ResortConsoleData["plan"]> = ["Seed Trial", "Seed", "Tree", "Forest"];
+
 export function PlanBillingView({
   site,
   onSiteUpdate,
@@ -42,6 +44,8 @@ export function PlanBillingView({
     await onSiteUpdate({ ...site, plan, planType, siteType: planConfig[planType].siteType });
   }
 
+  const downgradeTargets = planOptions.filter((plan) => isDowngrade(site.plan, plan.name));
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -71,6 +75,29 @@ export function PlanBillingView({
         </div>
       </Panel>
 
+      <Panel>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-[#18352f]">Plan change data policy</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6f7b74]">
+              Downgrading never deletes your content. Higher-plan pages, navigation, images, SEO, reviews, and custom structures are preserved but locked or hidden until you upgrade again.
+            </p>
+          </div>
+          <Badge tone="green">No content deleted</Badge>
+        </div>
+        {downgradeTargets.length > 0 ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {downgradeTargets.map((plan) => (
+              <DowngradeImpactCard key={plan.name} fromPlan={site.plan} toPlan={plan.name} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">
+            You are on the entry plan. Upgrading will unlock more structure without changing your existing content.
+          </p>
+        )}
+      </Panel>
+
       <div className="grid gap-4 xl:grid-cols-4">
         {planOptions.map((plan) => (
           <Panel key={plan.name} className={plan.name === site.plan ? "ring-2 ring-[#2d6b50]" : ""}>
@@ -91,6 +118,11 @@ export function PlanBillingView({
               ))}
             </ul>
             <div className="mt-6">
+              {isDowngrade(site.plan, plan.name) ? (
+                <p className="mb-3 rounded-2xl bg-[#fff7e8] p-3 text-xs leading-5 text-[#7b5b24]">
+                  Downgrade impact: content is preserved, but higher-plan features become locked.
+                </p>
+              ) : null}
               <button
                 type="button"
                 disabled={plan.name === site.plan}
@@ -109,4 +141,56 @@ export function PlanBillingView({
       </div>
     </div>
   );
+}
+
+function isDowngrade(currentPlan: ResortConsoleData["plan"], targetPlan: ResortConsoleData["plan"]) {
+  return planOrder.indexOf(targetPlan) < planOrder.indexOf(currentPlan);
+}
+
+function DowngradeImpactCard({ fromPlan, toPlan }: { fromPlan: ResortConsoleData["plan"]; toPlan: ResortConsoleData["plan"] }) {
+  const impacts = downgradeImpacts(fromPlan, toPlan);
+
+  return (
+    <article className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-semibold text-[#18352f]">{fromPlan} to {toPlan}</h3>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Locked but preserved</p>
+        </div>
+        <Badge tone="sand">Downgrade</Badge>
+      </div>
+      <ul className="mt-4 grid gap-2 text-sm text-[#52615a]">
+        {impacts.map((impact) => (
+          <li key={impact} className="flex gap-2">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#c9a15a]" />
+            <span>{impact}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+function downgradeImpacts(fromPlan: ResortConsoleData["plan"], toPlan: ResortConsoleData["plan"]) {
+  const fromIndex = planOrder.indexOf(fromPlan);
+  const toIndex = planOrder.indexOf(toPlan);
+  const impacts = new Set<string>();
+
+  if (fromIndex >= planOrder.indexOf("Forest") && toIndex < planOrder.indexOf("Forest")) {
+    impacts.add("Custom pages and navigation builder become locked.");
+    impacts.add("Wedding, tour, event, and membership pages stay stored but hidden if not supported.");
+  }
+
+  if (fromIndex >= planOrder.indexOf("Tree") && toIndex < planOrder.indexOf("Tree")) {
+    impacts.add("Multi-page URLs, page hero images, and page SEO stay stored but are hidden.");
+    impacts.add("The public website switches back to one-page landing mode.");
+  }
+
+  if (fromIndex >= planOrder.indexOf("Seed") && toIndex < planOrder.indexOf("Seed")) {
+    impacts.add("Reviews, promotion banner, custom domain, and branding controls become locked.");
+  }
+
+  impacts.add("Nothing is permanently deleted.");
+
+  return Array.from(impacts);
 }
