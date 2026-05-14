@@ -35,7 +35,7 @@ function renderTab(
     case "content":
       return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
     case "design":
-      return <DesignManager site={selectedSite} />;
+      return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "whatsapp":
       return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
     case "inquiries":
@@ -150,7 +150,9 @@ export function DashboardShell({ siteId }: { siteId: string }) {
       setSites((currentSites) => currentSites.map((site) => (site.id === savedSite.id ? { ...savedSite, services: nextSite.services } : site)));
       setStatus("Site saved to database.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Could not save site.");
+      const message = error instanceof Error ? error.message : "Could not save site.";
+      setStatus(message);
+      throw new Error(message);
     }
   }
 

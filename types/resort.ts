@@ -4,6 +4,14 @@ export type DomainStatus = "not_connected" | "pending" | "verified" | "active" |
 export type SslStatus = "pending" | "active" | "error";
 export type ResortServiceKind = "room" | "service" | "package";
 
+export type ResortDesignSettings = {
+  colorTheme?: string;
+  logoUrl?: string;
+  fontStyle?: string;
+  buttonStyle?: string;
+  imageStyle?: string;
+};
+
 export type Resort = {
   id: string;
   owner_user_id: string | null;
@@ -27,6 +35,7 @@ export type Resort = {
   gallery: string[];
   experiences: string[];
   booking_message_template: string | null;
+  design_settings?: ResortDesignSettings;
   is_active: boolean;
   domain_status?: DomainStatus;
   ssl_status?: SslStatus;
@@ -45,6 +54,10 @@ export type ResortService = {
   price_label: string | null;
   capacity: number | null;
   image_url: string | null;
+  highlight?: string | null;
+  duration?: string | null;
+  included?: string[];
+  cta_label?: string | null;
   sort_order: number;
   is_active: boolean;
   created_at?: string | null;
@@ -59,6 +72,10 @@ export type ResortServiceInput = {
   price_label?: string | null;
   capacity?: number | null;
   image_url?: string | null;
+  highlight?: string | null;
+  duration?: string | null;
+  included?: string[];
+  cta_label?: string | null;
   sort_order?: number;
   is_active?: boolean;
 };

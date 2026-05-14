@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { validatePublicSlug } from "@/lib/slugs";
 import type { Resort, ResortUpsert } from "@/types/resort";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -117,6 +118,7 @@ export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUps
     booking_message_template: payload.booking_message_template
       ? String(payload.booking_message_template)
       : null,
+    design_settings: typeof payload.design_settings === "object" && payload.design_settings ? payload.design_settings : {},
     is_active: Boolean(payload.is_active),
     domain_status: payload.domain_status ?? (payload.domain ? "pending" : "not_connected"),
     ssl_status: payload.ssl_status ?? "pending",
@@ -137,6 +139,11 @@ export function validateResortPayload(payload: ResortUpsert) {
 
   if (missingFields.length > 0) {
     return `Missing required fields: ${missingFields.map(([field]) => field).join(", ")}.`;
+  }
+
+  const slugError = validatePublicSlug(payload.slug);
+  if (slugError) {
+    return slugError;
   }
 
   return null;

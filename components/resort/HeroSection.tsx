@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { designTokensFor } from "@/lib/design-settings";
 import type { Resort } from "@/types/resort";
 
 type HeroSectionProps = {
@@ -9,8 +10,10 @@ type HeroSectionProps = {
 
 // Displays the first visual impression for a resort website.
 export function HeroSection({ resort, accentClassName = "bg-forest" }: HeroSectionProps) {
+  const design = designTokensFor(resort.design_settings);
+
   return (
-    <section className="relative min-h-screen overflow-hidden bg-neutral-900 text-white">
+    <section className="relative min-h-screen overflow-hidden bg-neutral-900 text-white" style={{ backgroundColor: design.colors.primary }}>
       {resort.hero_image_url ? (
         <Image
           src={resort.hero_image_url}
@@ -33,24 +36,25 @@ export function HeroSection({ resort, accentClassName = "bg-forest" }: HeroSecti
         <p className="mb-5 text-xs font-semibold uppercase tracking-[0.26em] text-white/80">
           {resort.location}
         </p>
-        <h1 className="max-w-4xl text-5xl font-semibold leading-[0.98] sm:text-6xl lg:text-7xl">
+        <h1 className={`max-w-4xl text-5xl font-semibold leading-[0.98] sm:text-6xl lg:text-7xl ${design.headingClassName}`}>
           {resort.hero_title}
         </h1>
         {resort.hero_subtitle ? (
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-white/85 sm:text-xl">
+          <p className={`mt-6 max-w-2xl text-lg leading-8 text-white/85 sm:text-xl ${design.bodyClassName}`}>
             {resort.hero_subtitle}
           </p>
         ) : null}
         <div className="mt-9 flex flex-wrap gap-3">
           <a
             href="#booking"
-            className="inline-flex min-h-12 items-center rounded-full bg-white px-6 text-sm font-semibold text-[#18352f]"
+            className={`inline-flex min-h-12 items-center bg-white px-6 text-sm font-semibold ${design.buttonClassName}`}
+            style={{ color: design.colors.primary }}
           >
             Book Direct & Save
           </a>
           <a
             href="#experiences"
-            className="inline-flex min-h-12 items-center rounded-full border border-white/35 px-6 text-sm font-semibold text-white backdrop-blur"
+            className={`inline-flex min-h-12 items-center border border-white/35 px-6 text-sm font-semibold text-white backdrop-blur ${design.buttonClassName}`}
           >
             Explore the stay
           </a>

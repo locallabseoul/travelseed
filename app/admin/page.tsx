@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { FeaturePresetManager } from "@/components/admin/FeaturePresetManager";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { resortTemplateOptions } from "@/components/templates";
 import { sampleResorts } from "@/lib/sample-resorts";
@@ -132,7 +133,7 @@ const fieldClassName =
   "min-h-11 rounded-md border border-forest/15 bg-white px-3 text-sm outline-none focus:border-forest";
 
 function previewHref(slug: string, templateId: string) {
-  return `/sites/${slug}?template=${templateId}`;
+  return `/${slug}?template=${templateId}`;
 }
 
 // Authenticated admin page for managing resort content and uploaded images.
@@ -149,6 +150,7 @@ export default function AdminPage() {
   const [loginPassword, setLoginPassword] = useState("");
   const [authStatus, setAuthStatus] = useState("");
   const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [adminView, setAdminView] = useState<"resorts" | "feature-presets">("resorts");
 
   const selectedResort = useMemo(
     () => resorts.find((resort) => resort.id === selectedResortId) ?? null,
@@ -499,6 +501,27 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-sand px-5 py-8 sm:px-6">
       <HeaderNav />
+      <div className="mx-auto mb-8 flex max-w-7xl flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setAdminView("resorts")}
+          className={`min-h-10 rounded-md px-4 text-sm font-semibold ${
+            adminView === "resorts" ? "bg-forest text-white" : "bg-white text-forest ring-1 ring-forest/15"
+          }`}
+        >
+          Resorts
+        </button>
+        <button
+          type="button"
+          onClick={() => setAdminView("feature-presets")}
+          className={`min-h-10 rounded-md px-4 text-sm font-semibold ${
+            adminView === "feature-presets" ? "bg-forest text-white" : "bg-white text-forest ring-1 ring-forest/15"
+          }`}
+        >
+          Feature Presets
+        </button>
+      </div>
+      {adminView === "feature-presets" ? <FeaturePresetManager adminFetch={adminFetch} /> : (
       <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.86fr_1.14fr]">
         <section>
           <div className="flex items-end justify-between gap-4">
@@ -545,7 +568,7 @@ export default function AdminPage() {
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-                  <a className="font-semibold text-ocean" href={`/sites/${resort.slug}`} target="_blank" rel="noreferrer">
+                  <a className="font-semibold text-ocean" href={`/${resort.slug}`} target="_blank" rel="noreferrer">
                     View live
                   </a>
                   <a
@@ -721,6 +744,7 @@ export default function AdminPage() {
           </form>
         </section>
       </div>
+      )}
     </main>
   );
 }

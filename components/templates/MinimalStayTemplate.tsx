@@ -3,6 +3,7 @@ import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
+import { designTokensFor } from "@/lib/design-settings";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
@@ -19,6 +20,7 @@ function bookingUrlFor(resort: Resort) {
 
 // Minimal stay template for quiet boutique stays, long-stay rentals, and calm design-led properties.
 export function MinimalStayTemplate({ resort }: TemplateProps) {
+  const design = designTokensFor(resort.design_settings);
   const bookingUrl = bookingUrlFor(resort);
   const heroImage = resort.hero_image_url || resort.gallery[0];
   const stayDetails = [
@@ -28,16 +30,16 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
   ].filter(Boolean);
 
   return (
-    <main className="bg-[#f8f6f0] text-[#202724]">
+    <main className="text-[#202724]" style={{ backgroundColor: design.colors.page }}>
       <ResortNavigation resort={resort} variant="minimal" />
 
       <section className="px-5 pb-16 pt-8 sm:px-6 lg:pb-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">{resort.location}</p>
-            <h1 className="mt-5 text-5xl font-semibold leading-[1.02] sm:text-6xl">{resort.hero_title}</h1>
+            <h1 className={`mt-5 text-5xl font-semibold leading-[1.02] sm:text-6xl ${design.headingClassName}`}>{resort.hero_title}</h1>
             {resort.hero_subtitle ? (
-              <p className="mt-6 text-lg leading-8 text-[#5b625e]">{resort.hero_subtitle}</p>
+              <p className={`mt-6 text-lg leading-8 text-[#5b625e] ${design.bodyClassName}`}>{resort.hero_subtitle}</p>
             ) : null}
             {stayDetails.length > 0 ? (
               <div className="mt-8 flex flex-wrap gap-2">
@@ -49,7 +51,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               </div>
             ) : null}
           </div>
-          <div className="relative min-h-[520px] overflow-hidden rounded-md bg-[#ded7c9]">
+          <div className={`relative min-h-[520px] overflow-hidden bg-[#ded7c9] ${design.imageClassName}`}>
             {heroImage ? (
               <Image src={heroImage} alt={resort.name} fill priority sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover" />
             ) : (
@@ -94,7 +96,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
               {resort.gallery.slice(0, 4).map((imageUrl, index) => (
-                <div key={imageUrl} className={index === 0 ? "relative min-h-[430px] overflow-hidden rounded-md sm:row-span-2" : "relative min-h-[210px] overflow-hidden rounded-md"}>
+                <div key={imageUrl} className={`${index === 0 ? "relative min-h-[430px] overflow-hidden sm:row-span-2" : "relative min-h-[210px] overflow-hidden"} ${design.imageClassName}`}>
                   <Image src={imageUrl} alt={`${resort.name} minimal gallery ${index + 1}`} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
                 </div>
               ))}
@@ -103,7 +105,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      <ServiceSection resort={resort} />
+      <ServiceSection resort={resort} variant="minimal" />
 
       {resort.experiences.length > 0 ? (
         <section id="experiences" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
@@ -130,7 +132,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               Send a clear WhatsApp inquiry and reserve directly with the host.
             </p>
           </div>
-          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-md bg-[#202724] px-8 text-base font-semibold text-white">
+          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className={`inline-flex min-h-14 items-center justify-center px-8 text-base font-semibold ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
             Book on WhatsApp
           </TrackedWhatsAppLink>
         </div>

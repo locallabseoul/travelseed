@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { validatePublicSlug } from "@/lib/slugs";
 import { createServiceRoleClient, verifyAuthenticatedRequest } from "@/lib/server/supabase-admin";
 import type { Resort } from "@/types/resort";
 
@@ -26,6 +27,11 @@ export async function POST(request: Request) {
 
   if (!slug) {
     return NextResponse.json({ error: "Enter the site slug to connect." }, { status: 400 });
+  }
+
+  const slugError = validatePublicSlug(slug);
+  if (slugError) {
+    return NextResponse.json({ error: slugError }, { status: 400 });
   }
 
   const supabase = createServiceRoleClient();

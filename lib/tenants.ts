@@ -2,7 +2,14 @@ import { getSampleResortBySlug } from "@/lib/sample-resorts";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort } from "@/types/resort";
 
-// Fetches an active resort by slug for /sites/[slug] rendering.
+function sortResortServices(resort: Resort): Resort {
+  return {
+    ...resort,
+    services: [...(resort.services ?? [])].sort((first, second) => first.sort_order - second.sort_order),
+  };
+}
+
+// Fetches an active resort by slug for root-level public site rendering.
 export async function getActiveResortBySlug(slug: string): Promise<Resort | null> {
   if (!isSupabaseConfigured) {
     return getSampleResortBySlug(slug);
@@ -19,7 +26,7 @@ export async function getActiveResortBySlug(slug: string): Promise<Resort | null
     return null;
   }
 
-  return data as Resort;
+  return sortResortServices(data as Resort);
 }
 
 // Normalizes host values so future custom-domain lookups are consistent.
@@ -45,5 +52,5 @@ export async function getActiveResortByHost(host: string): Promise<Resort | null
     return null;
   }
 
-  return data as Resort;
+  return sortResortServices(data as Resort);
 }

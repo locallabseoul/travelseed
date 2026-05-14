@@ -8,21 +8,21 @@ const demoResorts = [
     location: "Selong Belanak, Lombok",
     image:
       "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
-    href: "/sites/villa-jeruk",
+    href: "/villa-jeruk",
   },
   {
     name: "Surf Camp Example",
     location: "South Lombok Coast",
     image:
       "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=85",
-    href: "/sites/villa-jeruk?template=surf-camp",
+    href: "/villa-jeruk?template=surf-camp",
   },
   {
     name: "Boutique Resort Example",
     location: "Island Hideaway",
     image:
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=85",
-    href: "/sites/villa-jeruk?template=minimal-stay",
+    href: "/villa-jeruk?template=minimal-stay",
   },
 ];
 
@@ -110,7 +110,7 @@ function HeroSection() {
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#dbc895] px-7 text-sm font-semibold text-[#18352f] shadow-[0_18px_50px_rgba(176,142,86,0.2)]">
               Build My Site
             </Link>
-            <Link href="/sites/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#18352f] px-7 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(24,53,47,0.22)]">
+            <Link href="/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#18352f] px-7 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(24,53,47,0.22)]">
               View Demo Resort
             </Link>
           </div>
@@ -304,7 +304,7 @@ function FinalCtaSection() {
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-[#18352f]">
               Build My Site
             </Link>
-            <Link href="/sites/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/25 px-7 text-sm font-semibold text-white">
+            <Link href="/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/25 px-7 text-sm font-semibold text-white">
               View Demo Resort
             </Link>
           </div>

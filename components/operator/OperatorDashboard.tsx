@@ -374,7 +374,7 @@ export function OperatorDashboard() {
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-                  <a className="font-semibold text-[#0f5f6b]" href={`/sites/${site.slug}`} target="_blank" rel="noreferrer">
+                  <a className="font-semibold text-[#0f5f6b]" href={`/${site.slug}`} target="_blank" rel="noreferrer">
                     View live
                   </a>
                   <span className="text-[#51635b]">/{site.slug}</span>

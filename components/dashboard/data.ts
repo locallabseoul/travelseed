@@ -4,6 +4,7 @@ import type { ResortWithMetrics, ResortUpsert } from "@/types/resort";
 export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
   const plan = resort.plan ?? "Tree";
   const planLimits = limitsForPlan(plan);
+  const designSettings = resort.design_settings ?? {};
 
   const defaultAnalytics = {
     whatsappClicks7d: 0,
@@ -35,6 +36,13 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     storageLimitGb: planLimits.storageGb,
     storageImagesUsed: resort.storage_images_count ?? imageCountFor(resort),
     template: resort.template_id,
+    designSettings: {
+      colorTheme: designSettings.colorTheme ?? "Tropical Green",
+      logoUrl: designSettings.logoUrl ?? "",
+      fontStyle: designSettings.fontStyle ?? "Editorial Sans",
+      buttonStyle: designSettings.buttonStyle ?? "Rounded",
+      imageStyle: designSettings.imageStyle ?? "Soft Corners",
+    },
     whatsappNumber: resort.whatsapp_number,
     heroTitle: resort.hero_title,
     heroSubtitle: resort.hero_subtitle ?? "",
@@ -50,6 +58,10 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
       priceLabel: service.price_label ?? "",
       capacity: service.capacity?.toString() ?? "",
       imageUrl: service.image_url ?? "",
+      highlight: service.highlight ?? "",
+      duration: service.duration ?? "",
+      included: service.included ?? [],
+      ctaLabel: service.cta_label ?? "",
       sortOrder: service.sort_order,
       isActive: service.is_active,
     })),
@@ -95,6 +107,7 @@ export function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
     gallery: site.gallery,
     experiences: site.experiences,
     booking_message_template: site.bookingMessageTemplate || null,
+    design_settings: site.designSettings,
     is_active: site.isActive,
     domain_status: site.domainStatus,
     ssl_status: site.sslStatus,

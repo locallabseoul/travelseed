@@ -39,7 +39,7 @@ export function HomeAccountNav() {
         <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">
           Log in
         </Link>
-        <Link href="/sites/villa-jeruk" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/villa-jeruk" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
           Demo Resort
         </Link>
       </div>
@@ -62,7 +62,7 @@ export function HomeAccountNav() {
         <Link href="/create" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
           Build new site
         </Link>
-        <Link href="/sites/villa-jeruk" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
+        <Link href="/villa-jeruk" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
           Demo resort
         </Link>
         <button

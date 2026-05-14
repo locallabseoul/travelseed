@@ -483,7 +483,7 @@ export function CreateSiteBuilder() {
       }
 
       setBuildStatus("Site created. Opening your new direct booking page...");
-      router.push(`/sites/${slug}`);
+      router.push(`/${slug}`);
     } catch (error) {
       setBuildStatus(error instanceof Error ? error.message : "Could not create the site.");
     } finally {

@@ -31,6 +31,13 @@ export type ResortConsoleData = {
   storageLimitGb: number;
   storageImagesUsed: number;
   template: string;
+  designSettings: {
+    colorTheme: string;
+    logoUrl: string;
+    fontStyle: string;
+    buttonStyle: string;
+    imageStyle: string;
+  };
   whatsappNumber: string;
   heroTitle: string;
   heroSubtitle: string;
@@ -79,6 +86,10 @@ export type ResortServiceData = {
   priceLabel: string;
   capacity: string;
   imageUrl: string;
+  highlight: string;
+  duration: string;
+  included: string[];
+  ctaLabel: string;
   sortOrder: number;
   isActive: boolean;
 };

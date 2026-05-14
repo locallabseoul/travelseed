@@ -2,7 +2,7 @@ import { dashboardMetricsFor, quickActions, recentActivity, usageMetricsFor } fr
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { UsageCard } from "@/components/dashboard/UsageCard";
-import { Badge, Panel, PrimaryButton, SecondaryButton } from "@/components/dashboard/ui";
+import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
 export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
@@ -27,7 +27,9 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
               <span className="text-[#6f7b74]">{site.customDomain || "Custom domain not connected"}</span>
             </div>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <PrimaryButton>View Site</PrimaryButton>
+              <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white shadow-sm">
+                View Site
+              </a>
               <SecondaryButton>Edit Site</SecondaryButton>
             </div>
           </div>

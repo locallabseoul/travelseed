@@ -266,7 +266,7 @@ function SiteCard({
         <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
           Manage
         </Link>
-        <Link href={`/sites/${site.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+        <Link href={`/${site.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
           View site
         </Link>
         <button

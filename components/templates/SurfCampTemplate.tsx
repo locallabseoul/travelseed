@@ -3,6 +3,7 @@ import { FooterSection } from "@/components/resort/FooterSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
+import { designTokensFor } from "@/lib/design-settings";
 import { createDefaultBookingMessage, createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { Resort } from "@/types/resort";
 
@@ -19,6 +20,7 @@ function bookingUrlFor(resort: Resort) {
 
 // Surf camp template for energetic beach stays, camps, retreats, and activity-led resorts.
 export function SurfCampTemplate({ resort }: TemplateProps) {
+  const design = designTokensFor(resort.design_settings);
   const bookingUrl = bookingUrlFor(resort);
   const featuredImage = resort.hero_image_url || resort.gallery[0];
   const stats = [
@@ -28,8 +30,8 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
   ].filter(Boolean) as Array<{ label: string; value: number }>;
 
   return (
-    <main className="bg-[#f5fbf8] text-[#0c2f35]">
-      <section className="relative overflow-hidden bg-[#0b5f6f] px-5 pb-12 pt-6 text-white sm:px-6 lg:pb-16">
+    <main className="text-[#0c2f35]" style={{ backgroundColor: design.colors.page }}>
+      <section className="relative overflow-hidden px-5 pb-12 pt-6 text-white sm:px-6 lg:pb-16" style={{ backgroundColor: design.colors.primary }}>
         <div className="-mx-5 -mt-6 sm:-mx-6">
           <ResortNavigation resort={resort} variant="light" />
         </div>
@@ -37,7 +39,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
         <div className="mx-auto grid max-w-6xl gap-8 pt-10 sm:pt-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:pt-14">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-cyan-100">{resort.location}</p>
-            <h1 className="mt-5 text-4xl font-black leading-[0.98] sm:text-5xl lg:text-6xl">
+            <h1 className={`mt-5 text-4xl font-black leading-[0.98] sm:text-5xl lg:text-6xl ${design.headingClassName}`}>
               {resort.hero_title}
             </h1>
             {resort.hero_subtitle ? (
@@ -46,20 +48,21 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#booking"
-                className="inline-flex min-h-13 items-center rounded-full bg-[#f6d365] px-6 text-sm font-bold text-[#0c2f35]"
+                className={`inline-flex min-h-13 items-center px-6 text-sm font-bold ${design.buttonClassName}`}
+                style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
               >
                 Book Direct & Save
               </a>
               <a
                 href="#experiences"
-                className="inline-flex min-h-13 items-center rounded-full border border-white/35 px-6 text-sm font-bold text-white"
+                className={`inline-flex min-h-13 items-center border border-white/35 px-6 text-sm font-bold text-white ${design.buttonClassName}`}
               >
                 See experiences
               </a>
             </div>
           </div>
 
-          <div className="relative min-h-[320px] overflow-hidden rounded-md bg-[#063e48] shadow-[0_30px_100px_rgba(4,43,50,0.35)] sm:min-h-[380px] lg:min-h-[440px]">
+          <div className={`relative min-h-[320px] overflow-hidden bg-[#063e48] shadow-[0_30px_100px_rgba(4,43,50,0.35)] sm:min-h-[380px] lg:min-h-[440px] ${design.imageClassName}`}>
             {featuredImage ? (
               <Image src={featuredImage} alt={resort.name} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
             ) : (
@@ -118,7 +121,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0b7380]">Gallery</p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {resort.gallery.slice(0, 6).map((imageUrl, index) => (
-                <div key={imageUrl} className={index === 0 ? "relative min-h-80 overflow-hidden rounded-md sm:col-span-2" : "relative min-h-64 overflow-hidden rounded-md"}>
+                <div key={imageUrl} className={`${index === 0 ? "relative min-h-80 overflow-hidden sm:col-span-2" : "relative min-h-64 overflow-hidden"} ${design.imageClassName}`}>
                   <Image src={imageUrl} alt={`${resort.name} surf gallery ${index + 1}`} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
                 </div>
               ))}
@@ -143,10 +146,10 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
         </section>
       ) : null}
 
-      <ServiceSection resort={resort} />
+      <ServiceSection resort={resort} variant="surf" />
 
       <section id="booking" className="bg-[#f6d365] px-5 py-16 sm:px-6 lg:py-20">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-md bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+        <div className={`mx-auto flex max-w-6xl flex-col gap-8 bg-white p-7 shadow-[0_24px_90px_rgba(12,47,53,0.14)] sm:p-10 lg:flex-row lg:items-center lg:justify-between ${design.imageClassName}`}>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b7380]">Direct booking</p>
             <h2 className="mt-4 text-4xl font-black text-[#0c2f35]">Book Direct & Save</h2>
@@ -154,7 +157,7 @@ export function SurfCampTemplate({ resort }: TemplateProps) {
               Ask about dates, airport pickup, and surf-friendly stays directly on WhatsApp.
             </p>
           </div>
-          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#0c2f35] px-8 text-base font-black text-white">
+          <TrackedWhatsAppLink href={bookingUrl} resortId={resort.id} source="booking_cta" target="_blank" rel="noreferrer" className={`inline-flex min-h-14 items-center justify-center px-8 text-base font-black ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
             Book on WhatsApp
           </TrackedWhatsAppLink>
         </div>
