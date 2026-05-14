@@ -212,6 +212,14 @@ function PagesView({
   onAddCustomPage: () => void;
 }) {
   const isForest = planType === "forest";
+  const [selectedSlug, setSelectedSlug] = useState(pages[0]?.slug ?? "/");
+  const selectedPage = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
+
+  useEffect(() => {
+    if (!pages.some((page) => page.slug === selectedSlug)) {
+      setSelectedSlug(pages[0]?.slug ?? "/");
+    }
+  }, [pages, selectedSlug]);
 
   return (
     <Panel>
@@ -229,10 +237,26 @@ function PagesView({
           </button>
         </div>
       </div>
-      <div className="mt-5 grid gap-3 lg:grid-cols-2">
-        {pages.map((page) => (
-          <PageCard key={page.slug} page={page} isForest={isForest} onToggle={() => onToggle(page)} />
-        ))}
+      <div className="mt-5 grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <nav aria-label="Page submenu" className="flex gap-2 overflow-x-auto rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-2 lg:grid lg:content-start lg:overflow-visible">
+          {pages.map((page) => {
+            const isSelected = page.slug === selectedPage?.slug;
+            return (
+              <button
+                key={page.slug}
+                type="button"
+                onClick={() => setSelectedSlug(page.slug)}
+                className={`flex min-h-11 shrink-0 items-center justify-between gap-3 rounded-xl px-3 text-left text-sm font-semibold transition ${
+                  isSelected ? "bg-[#18352f] text-white shadow-sm" : "bg-white text-[#52615a] ring-1 ring-[#eadfce] hover:text-[#18352f]"
+                }`}
+              >
+                <span>{page.name}</span>
+                <span className={`h-2 w-2 rounded-full ${page.isPublished ? "bg-[#4f9b6b]" : "bg-[#c9b891]"} ${isSelected ? "ring-2 ring-white/30" : ""}`} />
+              </button>
+            );
+          })}
+        </nav>
+        {selectedPage ? <PageDetail page={selectedPage} isForest={isForest} onToggle={() => onToggle(selectedPage)} /> : null}
       </div>
     </Panel>
   );
@@ -294,30 +318,56 @@ function SectionCard({ section, onToggle }: { section: SiteStructureSection; onT
   );
 }
 
-function PageCard({ page, isForest, onToggle }: { page: SiteStructurePage; isForest: boolean; onToggle: () => void }) {
+function PageDetail({ page, isForest, onToggle }: { page: SiteStructurePage; isForest: boolean; onToggle: () => void }) {
   const customOnly = ["Wedding", "Tour", "Membership", "Event"].includes(page.pageType);
   const locked = customOnly && !isForest;
+  const publicPath = page.slug === "/" ? "/" : page.slug;
 
   return (
-    <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4 ${locked ? "opacity-70" : ""}`}>
-      <div className="flex items-start justify-between gap-3">
+    <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-semibold text-[#18352f]">{page.name}</h3>
+            <h3 className="text-2xl font-semibold text-[#18352f]">{page.name}</h3>
             <Badge tone={page.isPublished ? "green" : "gray"}>{page.isPublished ? "Published" : "Draft"}</Badge>
+            {locked ? <Badge tone="sand">Forest</Badge> : null}
           </div>
-          <p className="mt-2 text-sm text-[#6f7b74]">{page.slug}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">{page.pageType}</p>
+          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Manage URL, publishing, SEO, and preview for this public page.</p>
         </div>
-        {locked ? <Badge tone="sand">Forest</Badge> : null}
+        <button type="button" disabled={locked} onClick={onToggle} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
+          {page.isPublished ? "Unpublish" : "Publish"}
+        </button>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <SmallButton disabled={locked}>SEO</SmallButton>
-        <SmallButton disabled={locked}>Edit</SmallButton>
-        <SmallButton disabled={locked}>Preview</SmallButton>
-        <SmallButton disabled={locked} onClick={onToggle}>{page.isPublished ? "Unpublish" : "Publish"}</SmallButton>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <PageMetaCard label="URL path" value={publicPath} />
+        <PageMetaCard label="Page type" value={page.pageType} />
+        <PageMetaCard label="Visibility" value={page.isPublished ? "Live on website" : "Draft only"} />
+      </div>
+
+      <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">Content workflow</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+            Edit this page&apos;s visible content from the relevant content area. Pages controls stay focused on structure, URL, SEO, and publishing.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <SmallButton disabled={locked}>SEO Settings</SmallButton>
+          <SmallButton disabled={locked}>Edit Content</SmallButton>
+          <SmallButton disabled={locked}>Preview Page</SmallButton>
+        </div>
       </div>
     </article>
+  );
+}
+
+function PageMetaCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">{label}</p>
+      <p className="mt-2 break-words text-sm font-semibold text-[#18352f]">{value}</p>
+    </div>
   );
 }
 
