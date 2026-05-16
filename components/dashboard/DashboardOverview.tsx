@@ -1,52 +1,89 @@
 import { dashboardMetricsFor, quickActions, recentActivity, usageMetricsFor } from "@/components/dashboard/mockData";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { setupReadinessFor } from "@/components/dashboard/setup-readiness";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { UsageCard } from "@/components/dashboard/UsageCard";
-import { Badge, Panel, SecondaryButton } from "@/components/dashboard/ui";
+import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
+
+const templateNameById: Record<string, string> = {
+  "boutique-villa": "Boutique Villa",
+  "surf-camp": "Surf Camp",
+  "minimal-stay": "Minimal Stay",
+};
 
 export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
   const dashboardMetrics = dashboardMetricsFor(site);
   const usageMetrics = usageMetricsFor(site);
   const structure = planConfig[effectivePlanType(site)];
+  const readiness = setupReadinessFor(site);
+  const templateName = templateNameById[site.template] ?? site.template;
 
   return (
     <div className="grid gap-6">
       <Panel className="overflow-hidden">
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.42fr] lg:items-center">
-          <div>
-            <div className="flex flex-wrap gap-2">
-              <Badge>{site.status}</Badge>
-              <Badge tone="sand">{site.plan}</Badge>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <Badge>{site.status}</Badge>
+                <Badge tone="sand">{site.plan}</Badge>
+              </div>
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[#18352f]">Welcome back, {site.name}</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f7b74]">
+                Manage your direct booking presence, content, WhatsApp flow, domain, and growth signals from one calm operations console.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
+                <span className="rounded-full bg-[#f8f5ef] px-4 py-2 font-semibold text-[#18352f]">{site.travelseedUrl}</span>
+                <span className="text-[#6f7b74]">{site.customDomain || "Custom domain not connected"}</span>
+              </div>
             </div>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[#18352f]">Welcome back, {site.name}</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f7b74]">
-              Manage your direct booking presence, content, WhatsApp flow, domain, and growth signals from one calm operations console.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
-              <span className="rounded-full bg-[#f8f5ef] px-4 py-2 font-semibold text-[#18352f]">{site.travelseedUrl}</span>
-              <span className="text-[#6f7b74]">{site.customDomain || "Custom domain not connected"}</span>
-            </div>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:pt-8">
               <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white shadow-sm">
                 View Site
               </a>
-              <SecondaryButton>Edit Site</SecondaryButton>
-            </div>
-          </div>
-          <div className="rounded-2xl bg-[#18352f] p-5 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{site.type}</p>
-            <h2 className="mt-3 text-2xl font-semibold">{site.template}</h2>
-            <p className="mt-3 text-sm leading-6 text-white/70">{site.location}</p>
-            <div className="mt-5 rounded-2xl bg-white/10 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">Site structure</p>
-              <p className="mt-2 text-lg font-semibold">{structure.structureLabel}</p>
-              <button type="button" onClick={() => onTabChange("structure")} className="mt-4 min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f]">
-                {structure.siteType === "landing" ? "Manage Sections" : "Manage Pages"}
+              <button type="button" onClick={() => onTabChange("setup")} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                Continue Setup
               </button>
             </div>
-            <div className="mt-6 h-32 rounded-2xl bg-gradient-to-br from-[#9eb39f] to-[#eadfce]" />
+          </div>
+
+          <div className="rounded-2xl bg-[#18352f] p-4 text-white">
+            <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_260px] xl:items-center">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Launch readiness</p>
+                <div className="mt-3 flex items-end gap-3">
+                  <p className="text-3xl font-semibold">{readiness.progress}%</p>
+                  <Badge tone={readiness.progress === 100 ? "green" : "sand"}>{readiness.nextStep?.title ?? "Ready to promote"}</Badge>
+                </div>
+                <div className="mt-4">
+                  <ProgressBar value={readiness.progress} />
+                </div>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                {readiness.steps.map((step) => (
+                  <div key={step.id} className="rounded-xl bg-white/10 px-4 py-3 text-sm">
+                    <p className="font-semibold text-white">{step.title}</p>
+                    <p className={step.status === "Done" ? "mt-1 text-xs font-semibold text-[#d8f0dc]" : "mt-1 text-xs font-semibold text-[#f1e4c9]"}>{step.status === "Done" ? "Ready" : "Needs review"}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid gap-2 rounded-xl bg-white/10 p-3 text-sm text-white/78">
+                <div className="flex justify-between gap-3">
+                  <span>Structure</span>
+                  <span className="text-right font-semibold text-white">{structure.structureLabel}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Template</span>
+                  <span className="text-right font-semibold text-white">{templateName}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Status</span>
+                  <span className="text-right font-semibold text-white">{site.isActive ? "Published" : "Paused"}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Panel>

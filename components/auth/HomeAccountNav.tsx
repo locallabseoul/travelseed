@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
-export function HomeAccountNav() {
+export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: number }) {
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
+  const hasNotifications = notificationCount > 0;
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -48,11 +49,12 @@ export function HomeAccountNav() {
 
   return (
     <details className="group relative">
-      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] shadow-sm">
+      <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] shadow-sm">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#18352f] text-xs text-white">
           {(session.user.email ?? "U").slice(0, 1).toUpperCase()}
         </span>
         Profile
+        {hasNotifications ? <NotificationCountBadge count={notificationCount} className="-right-1 -top-1" /> : null}
       </summary>
       <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-md border border-[#eadfce] bg-white p-2 text-sm shadow-[0_18px_55px_rgba(54,43,29,0.16)]">
         <p className="truncate px-3 py-2 text-xs font-medium text-[#51635b]">{session.user.email}</p>
@@ -77,13 +79,21 @@ export function HomeAccountNav() {
   );
 }
 
-export function AppHeader({ className = "" }: { className?: string }) {
+export function AppHeader({ className = "", notificationCount = 0 }: { className?: string; notificationCount?: number }) {
   return (
     <header className={`mx-auto flex max-w-7xl items-center justify-between ${className}`}>
       <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">
         TRAVELSEED
       </Link>
-      <HomeAccountNav />
+      <HomeAccountNav notificationCount={notificationCount} />
     </header>
+  );
+}
+
+function NotificationCountBadge({ count, className = "" }: { count: number; className?: string }) {
+  return (
+    <span className={`absolute flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#b4362a] px-1.5 text-[10px] font-bold leading-none text-white ring-2 ring-white ${className}`}>
+      {count > 99 ? "99+" : count}
+    </span>
   );
 }

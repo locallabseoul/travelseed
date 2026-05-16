@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Panel } from "@/components/dashboard/ui";
 import { createWhatsAppBookingUrl } from "@/lib/whatsapp";
-import type { ResortConsoleData } from "@/types/dashboard";
+import type { DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
 const languageOptions = ["English", "Bahasa Indonesia", "Korean"] as const;
 
@@ -36,9 +36,11 @@ function applyAirportPickup(template: string, enabled: boolean) {
 export function WhatsAppManager({
   site,
   onSiteUpdate,
+  onUnsavedChangesChange,
 }: {
   site: ResortConsoleData;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
 }) {
   const [whatsappNumber, setWhatsappNumber] = useState(site.whatsappNumber);
   const [language, setLanguage] = useState(site.language);
@@ -54,6 +56,19 @@ export function WhatsAppManager({
 
   const normalizedNumber = normalizeWhatsAppNumber(whatsappNumber);
   const testBookingUrl = normalizedNumber ? createWhatsAppBookingUrl(normalizedNumber, bookingMessageTemplate) : "";
+  const isDirty = normalizedNumber !== site.whatsappNumber ||
+    language !== site.language ||
+    bookingMessageTemplate !== site.bookingMessageTemplate;
+
+  useEffect(() => {
+    onUnsavedChangesChange?.({
+      isDirty,
+      title: "Discard WhatsApp changes?",
+      description: "You have booking message or WhatsApp settings that have not been saved. Continue without saving them?",
+    });
+
+    return () => onUnsavedChangesChange?.({ isDirty: false, title: "", description: "" });
+  }, [isDirty, onUnsavedChangesChange]);
 
   async function saveSettings() {
     await onSiteUpdate({ ...site, whatsappNumber: normalizedNumber, language, bookingMessageTemplate });

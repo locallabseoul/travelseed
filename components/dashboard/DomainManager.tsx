@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
-import type { ResortConsoleData } from "@/types/dashboard";
+import type { DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 import type { Resort } from "@/types/resort";
 
 const dnsRows = [
@@ -13,10 +13,12 @@ export function DomainManager({
   site,
   onSiteUpdate,
   operatorFetch,
+  onUnsavedChangesChange,
 }: {
   site: ResortConsoleData;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
 }) {
   const hasCustomDomain = Boolean(site.customDomain);
   const [slug, setSlug] = useState(site.slug);
@@ -28,6 +30,18 @@ export function DomainManager({
     setCustomDomain(site.customDomain);
     setStatus("");
   }, [site.customDomain, site.id, site.slug]);
+
+  const isDirty = slug !== site.slug || customDomain !== site.customDomain;
+
+  useEffect(() => {
+    onUnsavedChangesChange?.({
+      isDirty,
+      title: "Discard domain changes?",
+      description: "You have domain settings that have not been saved. Continue without saving them?",
+    });
+
+    return () => onUnsavedChangesChange?.({ isDirty: false, title: "", description: "" });
+  }, [isDirty, onUnsavedChangesChange]);
 
   async function saveDomainSettings() {
     const normalizedSlug = slug.trim().toLowerCase();

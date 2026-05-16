@@ -17,9 +17,11 @@ const emptyForm = {
 export function InquiriesManager({
   site,
   operatorFetch,
+  onNotificationsRefresh,
 }: {
   site: ResortConsoleData;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
+  onNotificationsRefresh?: () => void;
 }) {
   const [inquiries, setInquiries] = useState<BookingInquiry[]>([]);
   const [form, setForm] = useState(emptyForm);
@@ -64,6 +66,7 @@ export function InquiriesManager({
       if (data.inquiry) {
         setInquiries((current) => [inquiryFromApi(data.inquiry as RawInquiry), ...current]);
       }
+      onNotificationsRefresh?.();
       setForm(emptyForm);
       setStatus("Inquiry saved.");
     } catch (error) {
@@ -85,6 +88,7 @@ export function InquiriesManager({
         const updatedInquiry = inquiryFromApi(data.inquiry);
         setInquiries((current) => current.map((item) => (item.id === updatedInquiry.id ? updatedInquiry : item)));
       }
+      onNotificationsRefresh?.();
       setStatus("Inquiry updated.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not update inquiry.");

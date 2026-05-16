@@ -3,10 +3,10 @@ import { FeatureSelector } from "@/components/dashboard/FeatureSelector";
 import { contentSections } from "@/components/dashboard/mockData";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
-import type { ContentSection, DashboardTab, ResortConsoleData } from "@/types/dashboard";
+import type { ContentSection, DashboardTab, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
 type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Experiences" | "Booking CTA" | "Footer";
-type ContentPageKey = "home" | "rooms" | "experiences" | "gallery" | "reviews" | "about" | "contact" | "promotions" | "blog";
+type ContentPageKey = "home" | "rooms" | "experiences" | "gallery" | "reviews" | "dining" | "about" | "contact" | "promotions" | "blog";
 
 type PageContentBlock = ContentSection & {
   kind: "editable" | "linked" | "comingSoon";
@@ -61,10 +61,10 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "Rooms",
       slug: "/rooms",
       blocks: [
-        pageBlock("Rooms / Services", "Rooms, packages, and services shown on the Rooms page.", site.services.length > 0 ? "Ready" : "Needs review", {
+        pageBlock("Offers", "Rooms, packages, and services shown on the Rooms page.", site.services.length > 0 ? "Ready" : "Needs review", {
           kind: "linked",
           targetTab: "offers",
-          helper: "Rooms, packages, and services are managed from Offers so pricing, images, and service types stay consistent.",
+          helper: "Rooms, packages, and services are managed as Offers so pricing, images, and offer types stay consistent.",
         }),
         pageBlock("Booking CTA", "Inquiry message used from room and package cards.", "Ready"),
       ],
@@ -95,6 +95,17 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
           kind: "linked",
           targetTab: "reviews",
           helper: "Review content is managed separately so testimonial publishing rules stay clear.",
+        }),
+      ],
+    },
+    {
+      key: "dining",
+      label: "Dining",
+      slug: "/dining",
+      blocks: [
+        pageBlock("Dining", "Restaurant, bar, breakfast, and culinary content.", "Draft", {
+          kind: "comingSoon",
+          helper: "Dining CMS is planned for a later content operations phase.",
         }),
       ],
     },
@@ -142,22 +153,67 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
   ];
 }
 
+function pageKeyFromSlug(slug?: string): ContentPageKey {
+  const normalizedSlug = (slug ?? "/").replace(/^\/+|\/+$/g, "");
+
+  if (!normalizedSlug) {
+    return "home";
+  }
+
+  if (["rooms", "experiences", "gallery", "reviews", "dining", "about", "contact", "promotions", "blog"].includes(normalizedSlug)) {
+    return normalizedSlug as ContentPageKey;
+  }
+
+  return "blog";
+}
+
+function pageLabelFromSlug(slug?: string) {
+  const normalizedSlug = (slug ?? "/").replace(/^\/+|\/+$/g, "");
+
+  if (!normalizedSlug) {
+    return "Home";
+  }
+
+  return normalizedSlug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export function ContentManager({
   site,
   accessToken,
   onSiteUpdate,
   onTabChange,
+  selectedPageSlug,
+  embedded = false,
+  onUnsavedChangesChange,
 }: {
   site: ResortConsoleData;
   accessToken: string | null;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
   onTabChange: (tab: DashboardTab) => void;
+  selectedPageSlug?: string;
+  embedded?: boolean;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
 }) {
   const planType = effectivePlanType(site);
   const isLanding = planConfig[planType].siteType === "landing";
   const pages = pagesForSite(site);
-  const [selectedPageKey, setSelectedPageKey] = useState<ContentPageKey>("home");
-  const selectedPage = pages.find((page) => page.key === selectedPageKey) ?? pages[0];
+  const [selectedPageKey, setSelectedPageKey] = useState<ContentPageKey>(pageKeyFromSlug(selectedPageSlug));
+  const effectivePageKey = embedded ? pageKeyFromSlug(selectedPageSlug) : selectedPageKey;
+  const selectedPage = pages.find((page) => page.key === effectivePageKey && (!embedded || page.slug === (selectedPageSlug ?? page.slug))) ?? {
+    key: effectivePageKey,
+    label: pageLabelFromSlug(selectedPageSlug),
+    slug: selectedPageSlug ?? "/",
+    blocks: [
+      pageBlock("Custom page", "Content editing for this custom page will be added in a later Forest content phase.", "Draft", {
+        kind: "comingSoon",
+        helper: "Custom pages can be published and configured now. Dedicated custom page content fields are not available yet.",
+      }),
+    ],
+  };
   const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
   const [heroTitle, setHeroTitle] = useState(site.heroTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(site.heroSubtitle);
@@ -172,6 +228,19 @@ export function ContentManager({
   const [bookingMessageTemplate, setBookingMessageTemplate] = useState(site.bookingMessageTemplate);
   const [uploading, setUploading] = useState<"hero" | "gallery" | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const hasEditingChanges = Boolean(editingSection) && (
+    heroTitle !== site.heroTitle ||
+    heroSubtitle !== site.heroSubtitle ||
+    heroImageUrl !== site.heroImageUrl ||
+    heroCta !== site.heroCta ||
+    footerName !== site.name ||
+    footerLocation !== site.location ||
+    about !== site.about ||
+    features.join("\n") !== site.features.join("\n") ||
+    gallery !== site.gallery.join("\n") ||
+    experiences !== site.experiences.join("\n") ||
+    bookingMessageTemplate !== site.bookingMessageTemplate
+  );
 
   useEffect(() => {
     setHeroTitle(site.heroTitle);
@@ -189,8 +258,18 @@ export function ContentManager({
 
   useEffect(() => {
     setEditingSection(null);
-    setSelectedPageKey("home");
-  }, [site.id]);
+    setSelectedPageKey(pageKeyFromSlug(selectedPageSlug));
+  }, [selectedPageSlug, site.id]);
+
+  useEffect(() => {
+    onUnsavedChangesChange?.({
+      isDirty: hasEditingChanges,
+      title: "Discard content changes?",
+      description: "You have content edits that have not been saved. Continue without saving them?",
+    });
+
+    return () => onUnsavedChangesChange?.({ isDirty: false, title: "", description: "" });
+  }, [hasEditingChanges, onUnsavedChangesChange]);
 
   function startEditing(section: EditableSection) {
     setEditingSection(section);
@@ -317,6 +396,7 @@ export function ContentManager({
 
   return (
     <div className="grid gap-6">
+      {!embedded ? (
       <Panel>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -331,8 +411,9 @@ export function ContentManager({
           <Badge tone={isLanding ? "sand" : "green"}>{isLanding ? "One-page" : "Page-based"}</Badge>
         </div>
       </Panel>
+      ) : null}
 
-      {!isLanding ? (
+      {!isLanding && !embedded ? (
         <Panel>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -419,7 +500,7 @@ export function ContentManager({
         </Panel>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className={embedded ? "grid gap-4" : "grid gap-4 xl:grid-cols-2"}>
         {(isLanding ? landingBlocks() : selectedPage.blocks).map((section) => (
           <Panel key={section.title}>
             <div className="flex items-start justify-between gap-4">
@@ -476,7 +557,7 @@ export function ContentManager({
                 ))}
               </div>
             ) : null}
-            {section.title === "Rooms / Services" ? (
+            {section.title === "Offers" ? (
               <div className="mt-5 grid gap-3">
                 {site.services.length > 0 ? site.services.slice(0, 3).map((service) => (
                   <div key={service.id} className="rounded-2xl bg-[#fbfaf7] p-4">

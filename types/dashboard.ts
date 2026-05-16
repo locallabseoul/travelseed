@@ -1,6 +1,8 @@
 export type DashboardTab =
   | "dashboard"
   | "setup"
+  | "import"
+  | "aiCopy"
   | "content"
   | "offers"
   | "structure"
@@ -13,9 +15,46 @@ export type DashboardTab =
   | "plan"
   | "settings";
 
+export type DashboardConfirmOptions = {
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  tone?: "default" | "danger";
+};
+
+export type DashboardUnsavedChanges = {
+  isDirty: boolean;
+  title: string;
+  description: string;
+};
+
+export type DashboardNotificationItem = {
+  id: string;
+  tab: DashboardTab;
+  label: string;
+  count: number;
+};
+
+export type DashboardNotificationSummary = {
+  total: number;
+  items: DashboardNotificationItem[];
+  byTab: Partial<Record<DashboardTab, number>>;
+};
+
 export type PlanType = "freeTrial" | "seed" | "tree" | "forest";
 export type SiteType = "landing" | "multipage" | "custom";
 export type SitePageType = "Standard" | "Landing" | "Event" | "Wedding" | "Tour" | "Membership";
+export type SitePageSettings = {
+  title?: string;
+  intro?: string;
+  items?: string[];
+  ctaLabel?: string;
+  campaignNote?: string;
+  openingHours?: string;
+  breakfastInfo?: string;
+  privateDiningNote?: string;
+};
 
 export type ResortConsoleData = {
   id: string;
@@ -46,6 +85,7 @@ export type ResortConsoleData = {
     fontStyle: string;
     buttonStyle: string;
     imageStyle: string;
+    templateCatalogName: string;
   };
   whatsappNumber: string;
   heroTitle: string;
@@ -54,7 +94,7 @@ export type ResortConsoleData = {
   heroCta: string;
   about: string;
   features: string[];
-  services: ResortServiceData[];
+  services: ResortOfferData[];
   gallery: string[];
   experiences: string[];
   bookingMessageTemplate: string;
@@ -87,7 +127,7 @@ export type BookingInquiry = {
   updatedAt: string;
 };
 
-export type ResortServiceData = {
+export type ResortOfferData = {
   id: string;
   kind: "room" | "service" | "package";
   title: string;
@@ -99,9 +139,17 @@ export type ResortServiceData = {
   duration: string;
   included: string[];
   ctaLabel: string;
+  bedType: string;
+  roomSize: string;
+  viewType: string;
+  bathroomInfo: string;
+  maxGuests: string;
+  roomAmenities: string[];
   sortOrder: number;
   isActive: boolean;
 };
+
+export type ResortServiceData = ResortOfferData;
 
 export type SiteAnalyticsEvent = {
   eventType: string;
@@ -185,6 +233,7 @@ export type SiteStructurePage = {
   heroImageUrl?: string;
   seoTitle?: string;
   seoDescription?: string;
+  settings?: SitePageSettings;
   locked?: boolean;
 };
 

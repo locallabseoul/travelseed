@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { AICopyManager } from "@/components/dashboard/AICopyManager";
 import { AnalyticsView } from "@/components/dashboard/AnalyticsView";
 import { ContentManager } from "@/components/dashboard/ContentManager";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { DesignManager } from "@/components/dashboard/DesignManager";
 import { DomainManager } from "@/components/dashboard/DomainManager";
+import { ImportManager } from "@/components/dashboard/ImportManager";
 import { InquiriesManager } from "@/components/dashboard/InquiriesManager";
 import { OffersManager } from "@/components/dashboard/OffersManager";
 import { PlanBillingView } from "@/components/dashboard/PlanBillingView";
@@ -20,9 +22,17 @@ import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { WhatsAppManager } from "@/components/dashboard/WhatsAppManager";
 import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
+import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
+import { ConfirmDialog } from "@/components/dashboard/ui";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
-import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
+import type { DashboardConfirmOptions, DashboardNotificationSummary, DashboardTab, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 import type { ResortWithMetrics } from "@/types/resort";
+
+const emptyNotifications: DashboardNotificationSummary = {
+  total: 0,
+  items: [],
+  byTab: {},
+};
 
 function renderTab(
   activeTab: DashboardTab,
@@ -31,32 +41,42 @@ function renderTab(
   onTabChange: (tab: DashboardTab) => void,
   accessToken: string | null,
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>,
+  onUnsavedChangesChange: (state: DashboardUnsavedChanges) => void,
+  requestConfirmation: (options: DashboardConfirmOptions, onConfirm: () => void) => void,
+  onNotificationsRefresh: () => void,
 ) {
   switch (activeTab) {
     case "setup":
-      return <SetupWizard />;
+      return <SetupWizard site={selectedSite} onTabChange={onTabChange} />;
+    case "import":
+      return <ImportManager site={selectedSite} operatorFetch={operatorFetch} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
+    case "aiCopy":
+      return <AICopyManager site={selectedSite} operatorFetch={operatorFetch} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "content":
-      return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} onTabChange={onTabChange} />;
+      if (planConfig[effectivePlanType(selectedSite)].siteType !== "landing") {
+        return <SiteStructureManager site={selectedSite} accessToken={accessToken} operatorFetch={operatorFetch} onSiteUpdate={onSiteUpdate} onTabChange={onTabChange} onUnsavedChangesChange={onUnsavedChangesChange} requestConfirmation={requestConfirmation} />;
+      }
+      return <ContentManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} onTabChange={onTabChange} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "offers":
-      return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} />;
+      return <OffersManager site={selectedSite} accessToken={accessToken} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "structure":
-      return <SiteStructureManager site={selectedSite} accessToken={accessToken} operatorFetch={operatorFetch} onTabChange={onTabChange} />;
+      return <SiteStructureManager site={selectedSite} accessToken={accessToken} operatorFetch={operatorFetch} onSiteUpdate={onSiteUpdate} onTabChange={onTabChange} onUnsavedChangesChange={onUnsavedChangesChange} requestConfirmation={requestConfirmation} />;
     case "design":
-      return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+      return <DesignManager site={selectedSite} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "whatsapp":
-      return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+      return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "inquiries":
-      return <InquiriesManager site={selectedSite} operatorFetch={operatorFetch} />;
+      return <InquiriesManager site={selectedSite} operatorFetch={operatorFetch} onNotificationsRefresh={onNotificationsRefresh} />;
     case "domain":
-      return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} />;
+      return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "analytics":
       return <AnalyticsView site={selectedSite} />;
     case "reviews":
       return <ReviewsView site={selectedSite} accessToken={accessToken} />;
     case "plan":
-      return <PlanBillingView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+      return <PlanBillingView site={selectedSite} onSiteUpdate={onSiteUpdate} requestConfirmation={requestConfirmation} />;
     case "settings":
-      return <SettingsView site={selectedSite} onSiteUpdate={onSiteUpdate} />;
+      return <SettingsView site={selectedSite} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} requestConfirmation={requestConfirmation} />;
     case "dashboard":
     default:
       return <DashboardOverview site={selectedSite} onTabChange={onTabChange} />;
@@ -70,7 +90,42 @@ export function DashboardShell({ siteId }: { siteId: string }) {
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [status, setStatus] = useState("Loading sites from database...");
+  const [notifications, setNotifications] = useState<DashboardNotificationSummary>(emptyNotifications);
+  const [unsavedChanges, setUnsavedChanges] = useState<DashboardUnsavedChanges>({ isDirty: false, title: "", description: "" });
+  const [confirmRequest, setConfirmRequest] = useState<(DashboardConfirmOptions & { onConfirm: () => void }) | null>(null);
   const selectedSite = sites.find((site) => site.id === siteId) ?? null;
+
+  const requestConfirmation = useCallback((options: DashboardConfirmOptions, onConfirm: () => void) => {
+    setConfirmRequest({ ...options, onConfirm });
+  }, []);
+
+  const runWithUnsavedGuard = useCallback((onConfirm: () => void) => {
+    if (!unsavedChanges.isDirty) {
+      onConfirm();
+      return;
+    }
+
+    requestConfirmation({
+      title: unsavedChanges.title || "Discard unsaved changes?",
+      description: unsavedChanges.description || "You have unsaved changes. Continue without saving?",
+      confirmLabel: "Discard changes",
+      cancelLabel: "Keep editing",
+      tone: "danger",
+    }, () => {
+      setUnsavedChanges({ isDirty: false, title: "", description: "" });
+      onConfirm();
+    });
+  }, [requestConfirmation, unsavedChanges]);
+
+  const handleTabChange = useCallback((tab: DashboardTab) => {
+    const nextTab = tab === "content" && selectedSite && planConfig[effectivePlanType(selectedSite)].siteType !== "landing" ? "structure" : tab;
+
+    if (nextTab === activeTab) {
+      return;
+    }
+
+    runWithUnsavedGuard(() => setActiveTab(nextTab));
+  }, [activeTab, runWithUnsavedGuard, selectedSite]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -114,6 +169,15 @@ export function DashboardShell({ siteId }: { siteId: string }) {
     return data;
   }, [accessToken]);
 
+  const loadNotifications = useCallback(async (nextSiteId: string) => {
+    try {
+      const data = await operatorFetch(`/api/operator/resorts/${nextSiteId}/notifications`) as { notifications?: DashboardNotificationSummary };
+      setNotifications(normalizeNotifications(data.notifications));
+    } catch {
+      setNotifications(emptyNotifications);
+    }
+  }, [operatorFetch]);
+
   async function loadSites(token: string) {
     setStatus("Loading sites from database...");
     try {
@@ -145,6 +209,34 @@ export function DashboardShell({ siteId }: { siteId: string }) {
     }
   }, [accessToken, authReady]);
 
+  useEffect(() => {
+    if (selectedSite) {
+      void loadNotifications(selectedSite.id);
+    } else {
+      setNotifications(emptyNotifications);
+    }
+  }, [loadNotifications, selectedSite]);
+
+  useEffect(() => {
+    if (activeTab === "content" && selectedSite && planConfig[effectivePlanType(selectedSite)].siteType !== "landing") {
+      setActiveTab("structure");
+    }
+  }, [activeTab, selectedSite]);
+
+  useEffect(() => {
+    if (!unsavedChanges.isDirty) {
+      return;
+    }
+
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [unsavedChanges.isDirty]);
+
   async function updateSelectedSite(nextSite: ResortConsoleData) {
     setStatus("Saving site to database...");
     try {
@@ -167,22 +259,36 @@ export function DashboardShell({ siteId }: { siteId: string }) {
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
-      <DashboardHeader />
+      <DashboardHeader notificationCount={notifications.total} />
       <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-8">
-        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <Sidebar activeTab={activeTab} site={selectedSite} notificationsByTab={notifications.byTab} onTabChange={handleTabChange} />
         <section className="grid min-w-0 gap-5 pb-10">
           {!authReady ? <DashboardMessage text="Checking account session..." /> : null}
           {authReady && !accessToken ? <DashboardMessage text={status} actionHref="/login?next=/dashboard" actionLabel="Sign in" /> : null}
           {authReady && accessToken && !selectedSite ? <DashboardMessage text={status} actionHref="/dashboard" actionLabel="Back to sites" /> : null}
           {authReady && accessToken && selectedSite ? (
             <>
-              <SiteSwitcher sites={sites} selectedSiteId={selectedSite.id} onSiteChange={(nextSiteId) => router.push(`/dashboard/${nextSiteId}`)} />
+              <SiteSwitcher
+                sites={sites}
+                selectedSiteId={selectedSite.id}
+                onSiteChange={(nextSiteId) => runWithUnsavedGuard(() => router.push(`/dashboard/${nextSiteId}`))}
+              />
               {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
-              {renderTab(activeTab, selectedSite, updateSelectedSite, setActiveTab, accessToken, operatorFetch)}
+              {renderTab(activeTab, selectedSite, updateSelectedSite, handleTabChange, accessToken, operatorFetch, setUnsavedChanges, requestConfirmation, () => void loadNotifications(selectedSite.id))}
             </>
           ) : null}
         </section>
       </div>
+      <ConfirmDialog
+        open={Boolean(confirmRequest)}
+        options={confirmRequest}
+        onCancel={() => setConfirmRequest(null)}
+        onConfirm={() => {
+          const action = confirmRequest?.onConfirm;
+          setConfirmRequest(null);
+          action?.();
+        }}
+      />
     </main>
   );
 }
@@ -200,4 +306,17 @@ function DashboardMessage({ text, actionHref, actionLabel }: { text: string; act
       </div>
     </section>
   );
+}
+
+function normalizeNotifications(notifications?: DashboardNotificationSummary): DashboardNotificationSummary {
+  if (!notifications) {
+    return emptyNotifications;
+  }
+
+  const total = Number.isFinite(notifications.total) ? Math.max(0, notifications.total) : 0;
+  return {
+    total,
+    items: Array.isArray(notifications.items) ? notifications.items : [],
+    byTab: notifications.byTab ?? {},
+  };
 }

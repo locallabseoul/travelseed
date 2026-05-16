@@ -1,16 +1,18 @@
 import { planOptions } from "@/components/dashboard/mockData";
 import { planConfig, planNameToType } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
-import type { ResortConsoleData } from "@/types/dashboard";
+import type { DashboardConfirmOptions, ResortConsoleData } from "@/types/dashboard";
 
 const planOrder: Array<ResortConsoleData["plan"]> = ["Seed Trial", "Seed", "Tree", "Forest"];
 
 export function PlanBillingView({
   site,
   onSiteUpdate,
+  requestConfirmation,
 }: {
   site: ResortConsoleData;
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+  requestConfirmation?: (options: DashboardConfirmOptions, onConfirm: () => void) => void;
 }) {
   const usageRows = [
     {
@@ -42,6 +44,30 @@ export function PlanBillingView({
   async function selectPlan(plan: ResortConsoleData["plan"]) {
     const planType = planNameToType[plan];
     await onSiteUpdate({ ...site, plan, planType, siteType: planConfig[planType].siteType });
+  }
+
+  function confirmPlanChange(plan: ResortConsoleData["plan"]) {
+    if (plan === site.plan) {
+      return;
+    }
+
+    const downgrade = isDowngrade(site.plan, plan);
+    const applyChange = () => void selectPlan(plan);
+
+    if (!requestConfirmation) {
+      applyChange();
+      return;
+    }
+
+    requestConfirmation({
+      title: downgrade ? `Downgrade to ${plan}?` : `Change plan to ${plan}?`,
+      description: downgrade
+        ? "Content will not be deleted, but higher-plan pages, navigation, images, SEO, reviews, and custom structures may become locked or hidden until you upgrade again."
+        : "This will update the site plan and unlock the matching site structure features.",
+      confirmLabel: downgrade ? "Apply downgrade" : "Change plan",
+      cancelLabel: "Cancel",
+      tone: downgrade ? "danger" : "default",
+    }, applyChange);
   }
 
   const downgradeTargets = planOptions.filter((plan) => isDowngrade(site.plan, plan.name));
@@ -126,7 +152,7 @@ export function PlanBillingView({
               <button
                 type="button"
                 disabled={plan.name === site.plan}
-                onClick={() => void selectPlan(plan.name)}
+                onClick={() => confirmPlanChange(plan.name)}
                 className={`min-h-11 rounded-full px-5 text-sm font-semibold ${
                   plan.name === site.plan
                     ? "bg-white text-[#18352f] ring-1 ring-[#d8cebb]"
