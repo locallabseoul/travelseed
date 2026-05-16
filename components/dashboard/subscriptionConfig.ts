@@ -1,4 +1,8 @@
 import type { PlanType, ResortConsoleData, SiteStructurePage, SiteStructureSection, SiteType } from "@/types/dashboard";
+import { canUsePlan, templateCatalog } from "@/lib/template-catalog";
+import { sectionPresets } from "@/lib/section-presets";
+
+export { canUsePlan, templateCatalog };
 
 export const currentPlanPreviewOverride: PlanType | null = null;
 
@@ -80,33 +84,23 @@ export const treePages: SiteStructurePage[] = [
   { name: "Experiences", slug: "/experiences", pageType: "Standard", isPublished: true },
   { name: "Gallery", slug: "/gallery", pageType: "Standard", isPublished: true },
   { name: "Reviews", slug: "/reviews", pageType: "Standard", isPublished: true },
-  { name: "Dining", slug: "/dining", pageType: "Standard", isPublished: false },
-  { name: "Promotions", slug: "/promotions", pageType: "Landing", isPublished: true },
   { name: "Blog", slug: "/blog", pageType: "Standard", isPublished: false },
   { name: "About", slug: "/about", pageType: "Standard", isPublished: true },
   { name: "Contact", slug: "/contact", pageType: "Standard", isPublished: true },
+  ...sectionPresets
+    .filter((preset) => canUsePlan("tree", preset.requiredPlan))
+    .map((preset) => ({ name: preset.label, slug: preset.slug, pageType: preset.pageType, isPublished: preset.isPublished, settings: preset.settings })),
 ];
 
 export const forestCustomPages: SiteStructurePage[] = [
   ...treePages,
-  { name: "Wedding Packages", slug: "/weddings", pageType: "Wedding", isPublished: false },
   { name: "Island Tours", slug: "/tours", pageType: "Tour", isPublished: false },
   { name: "Member Offers", slug: "/membership", pageType: "Membership", isPublished: false },
-];
-
-export const templateCatalog = [
-  { name: "Sunset Landing", description: "A fast one-page direct booking site for small properties.", planType: "seed" as const, siteType: "landing" as const, templateId: "minimal-stay", tags: ["Landing", "Seed"] },
-  { name: "Tropical Villa Landing", description: "Premium one-page villa presentation with booking CTA.", planType: "seed" as const, siteType: "landing" as const, templateId: "boutique-villa", tags: ["Landing", "Seed"] },
-  { name: "Boutique Resort Multi-page", description: "Multi-page resort brand structure for rooms, dining, blog, and SEO.", planType: "tree" as const, siteType: "multipage" as const, templateId: "boutique-villa", tags: ["Multi-page", "Tree"] },
-  { name: "Surf Camp Multi-page", description: "Activity-led multi-page site for camps, packages, and experiences.", planType: "tree" as const, siteType: "multipage" as const, templateId: "surf-camp", tags: ["Multi-page", "Tree"] },
-  { name: "Luxury Resort Platform", description: "Custom platform structure for premium resort campaigns and special pages.", planType: "forest" as const, siteType: "custom" as const, templateId: "boutique-villa", tags: ["Custom", "Forest"] },
+  ...sectionPresets
+    .filter((preset) => preset.requiredPlan === "forest" && !treePages.some((page) => page.slug === preset.slug))
+    .map((preset) => ({ name: preset.label, slug: preset.slug, pageType: preset.pageType, isPublished: preset.isPublished, settings: preset.settings })),
 ];
 
 export function effectivePlanType(site: ResortConsoleData) {
   return currentPlanPreviewOverride ?? site.planType ?? planNameToType[site.plan];
-}
-
-export function canUsePlan(current: PlanType, required: PlanType) {
-  const order: PlanType[] = ["freeTrial", "seed", "tree", "forest"];
-  return order.indexOf(current) >= order.indexOf(required);
 }

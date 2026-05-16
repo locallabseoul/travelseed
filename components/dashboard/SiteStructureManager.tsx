@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ContentManager } from "@/components/dashboard/ContentManager";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { effectivePlanType, forestCustomPages, landingSections, planConfig, treePages } from "@/components/dashboard/subscriptionConfig";
-import type { DashboardTab, PlanType, ResortConsoleData, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
+import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
+import type { DashboardConfirmOptions, DashboardTab, DashboardUnsavedChanges, PlanType, ResortConsoleData, SitePageSettings, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
 
 type StructureResponse = {
   sections?: RawSection[];
@@ -27,6 +29,7 @@ type RawPage = {
   seo_title: string | null;
   seo_description: string | null;
   sort_order: number;
+  settings?: SitePageSettings;
 };
 
 const structureCopy = {
@@ -39,12 +42,18 @@ export function SiteStructureManager({
   site,
   accessToken,
   operatorFetch,
+  onSiteUpdate,
   onTabChange,
+  onUnsavedChangesChange,
+  requestConfirmation,
 }: {
   site: ResortConsoleData;
   accessToken: string | null;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
   onTabChange: (tab: DashboardTab) => void;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
+  requestConfirmation?: (options: DashboardConfirmOptions, onConfirm: () => void) => void;
 }) {
   const planType = effectivePlanType(site);
   const config = planConfig[planType];
@@ -105,9 +114,26 @@ export function SiteStructureManager({
   }
 
   function togglePage(page: SiteStructurePage) {
-    const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, isPublished: !item.isPublished } : item));
-    setPages(nextPages);
-    void saveStructure(sections, nextPages);
+    const applyToggle = () => {
+      const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, isPublished: !item.isPublished } : item));
+      setPages(nextPages);
+      void saveStructure(sections, nextPages);
+    };
+
+    if (requestConfirmation) {
+      requestConfirmation({
+      title: page.isPublished ? `Unpublish ${page.name}?` : `Publish ${page.name}?`,
+      description: page.isPublished
+        ? "This page will be hidden from the public website, but its content and settings will remain saved."
+        : "This page will become available on the public website.",
+      confirmLabel: page.isPublished ? "Unpublish page" : "Publish page",
+      cancelLabel: "Cancel",
+      tone: page.isPublished ? "danger" : "default",
+      }, applyToggle);
+      return;
+    }
+
+    applyToggle();
   }
 
   function addCustomPage() {
@@ -148,7 +174,7 @@ export function SiteStructureManager({
         <PlanStructureCard title="Upgrade path" value={config.upgradeTarget ? `Upgrade to ${config.upgradeTarget}` : "Fully unlocked"} helper={config.upgradeTarget ? "Unlock the next site structure tier." : "All site structure controls are available."} />
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.42fr]">
+      <div className="grid gap-6">
         {isLanding ? (
           <LandingSectionsView sections={sections} onToggle={toggleSection} />
         ) : (
@@ -157,16 +183,18 @@ export function SiteStructureManager({
             accessToken={accessToken}
             planType={planType}
             pages={pages}
+            onSiteUpdate={onSiteUpdate}
             onToggle={togglePage}
             onAddCustomPage={addCustomPage}
             onTabChange={onTabChange}
+            onUnsavedChangesChange={onUnsavedChangesChange}
             onPagesChange={(nextPages) => {
               setPages(nextPages);
               void saveStructure(sections, nextPages);
             }}
           />
         )}
-        <FeatureAccessPanel planType={planType} />
+        <FeatureAccessDisclosure planType={planType} />
       </div>
     </div>
   );
@@ -224,18 +252,22 @@ function PagesView({
   accessToken,
   planType,
   pages,
+  onSiteUpdate,
   onToggle,
   onAddCustomPage,
   onTabChange,
+  onUnsavedChangesChange,
   onPagesChange,
 }: {
   site: ResortConsoleData;
   accessToken: string | null;
   planType: PlanType;
   pages: SiteStructurePage[];
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
   onToggle: (page: SiteStructurePage) => void;
   onAddCustomPage: () => void;
   onTabChange: (tab: DashboardTab) => void;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
   onPagesChange: (pages: SiteStructurePage[]) => void;
 }) {
   const isForest = planType === "forest";
@@ -252,6 +284,11 @@ function PagesView({
   }, [pages, selectedSlug]);
 
   async function uploadPageHero(page: SiteStructurePage, file: File) {
+    if (isHomePage(page)) {
+      setUploadStatus("Home hero image is managed in Page content > Hero.");
+      return;
+    }
+
     if (!accessToken) {
       setUploadStatus("Sign in before uploading page images.");
       return;
@@ -292,6 +329,11 @@ function PagesView({
 
   function updatePageSeo(page: SiteStructurePage, seoTitle: string, seoDescription: string) {
     const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, seoTitle, seoDescription } : item));
+    onPagesChange(nextPages);
+  }
+
+  function updatePageSettings(page: SiteStructurePage, settings: SitePageSettings) {
+    const nextPages = pages.map((item) => (item.slug === page.slug ? { ...item, settings } : item));
     onPagesChange(nextPages);
   }
 
@@ -337,14 +379,13 @@ function PagesView({
             isForest={isForest}
             uploading={uploadingSlug === selectedPage.slug}
             uploadStatus={uploadStatus}
+            accessToken={accessToken}
+            onSiteUpdate={onSiteUpdate}
+            onTabChange={onTabChange}
+            onUnsavedChangesChange={onUnsavedChangesChange}
             onUpload={(file) => uploadPageHero(selectedPage, file)}
             onSaveSeo={(seoTitle, seoDescription) => updatePageSeo(selectedPage, seoTitle, seoDescription)}
-            onEditContent={() => {
-              const targetTab = contentTabForPage(selectedPage);
-              if (targetTab) {
-                onTabChange(targetTab);
-              }
-            }}
+            onSaveSettings={(settings) => updatePageSettings(selectedPage, settings)}
             onToggle={() => onToggle(selectedPage)}
           />
         ) : null}
@@ -354,31 +395,52 @@ function PagesView({
   );
 }
 
-function FeatureAccessPanel({ planType }: { planType: PlanType }) {
+function FeatureAccessDisclosure({ planType }: { planType: PlanType }) {
   const config = planConfig[planType];
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <aside className="grid content-start gap-6">
-      <Panel>
-        <h2 className="text-xl font-semibold text-[#18352f]">Available now</h2>
-        <div className="mt-4 grid gap-2">
-          {config.unlocked.map((feature) => (
-            <FeaturePill key={feature} feature={feature} locked={false} />
-          ))}
+    <Panel className="bg-[#fbfaf7] shadow-none">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">Plan feature access</p>
+          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+            {config.unlocked.length} available now · {config.locked.length > 0 ? `${config.locked.length} locked on ${config.label}` : "Everything unlocked"}
+          </p>
         </div>
-      </Panel>
-      <Panel>
-        <h2 className="text-xl font-semibold text-[#18352f]">Locked features</h2>
-        <div className="mt-4 grid gap-2">
-          {config.locked.length > 0 ? config.locked.map((feature) => <FeaturePill key={feature} feature={feature} locked />) : <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">Everything is unlocked on Forest.</p>}
-        </div>
-        {config.upgradeTarget ? (
-          <button type="button" className="mt-5 min-h-11 w-full rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-            Upgrade to {config.upgradeTarget}
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="green">{config.label}</Badge>
+          <button type="button" onClick={() => setExpanded((current) => !current)} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            {expanded ? "Hide features" : "View plan features"}
           </button>
-        ) : null}
-      </Panel>
-    </aside>
+        </div>
+      </div>
+      {expanded ? (
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+            <h3 className="text-sm font-semibold text-[#18352f]">Available now</h3>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {config.unlocked.map((feature) => (
+                <FeaturePill key={feature} feature={feature} locked={false} />
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h3 className="text-sm font-semibold text-[#18352f]">Locked features</h3>
+              {config.upgradeTarget ? (
+                <button type="button" className="min-h-9 rounded-full bg-[#18352f] px-4 text-xs font-semibold text-white">
+                  Upgrade to {config.upgradeTarget}
+                </button>
+              ) : null}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {config.locked.length > 0 ? config.locked.map((feature) => <FeaturePill key={feature} feature={feature} locked />) : <p className="rounded-2xl bg-[#fbfaf7] px-4 py-3 text-sm text-[#6f7b74]">Everything is unlocked on Forest.</p>}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </Panel>
   );
 }
 
@@ -416,9 +478,13 @@ function PageDetail({
   isForest,
   uploading,
   uploadStatus,
+  accessToken,
+  onSiteUpdate,
+  onTabChange,
+  onUnsavedChangesChange,
   onUpload,
   onSaveSeo,
-  onEditContent,
+  onSaveSettings,
   onToggle,
 }: {
   site: ResortConsoleData;
@@ -426,27 +492,51 @@ function PageDetail({
   isForest: boolean;
   uploading: boolean;
   uploadStatus: string;
+  accessToken: string | null;
+  onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
+  onTabChange: (tab: DashboardTab) => void;
+  onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
   onUpload: (file: File) => void;
   onSaveSeo: (seoTitle: string, seoDescription: string) => void;
-  onEditContent: () => void;
+  onSaveSettings: (settings: SitePageSettings) => void;
   onToggle: () => void;
 }) {
   const customOnly = ["Wedding", "Tour", "Membership", "Event"].includes(page.pageType);
   const locked = customOnly && !isForest;
   const publicPath = publicPathForPage(site, page);
-  const heroImageUrl = page.heroImageUrl || site.heroImageUrl;
+  const isHome = isHomePage(page);
+  const heroImageUrl = isHome ? site.heroImageUrl : page.heroImageUrl || site.heroImageUrl;
   const [seoTitle, setSeoTitle] = useState(page.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(page.seoDescription ?? "");
   const [showSeoForm, setShowSeoForm] = useState(false);
-  const contentTarget = contentTabForPage(page);
   const seoPreview = seoPreviewForPage(site, page);
   const hasCustomSeo = Boolean((page.seoTitle ?? "").trim() || (page.seoDescription ?? "").trim());
+  const preset = presetForSlug(page.slug);
+  const presetSettings = useMemo(() => preset ? presetSettingsFrom(page.settings, preset) : null, [page.settings, preset]);
+  const [presetTitle, setPresetTitle] = useState(presetSettings?.title ?? "");
+  const [presetIntro, setPresetIntro] = useState(presetSettings?.intro ?? "");
+  const [presetItems, setPresetItems] = useState(presetSettings?.items.join("\n") ?? "");
+  const [presetCtaLabel, setPresetCtaLabel] = useState(presetSettings?.ctaLabel ?? "");
+  const [presetCampaignNote, setPresetCampaignNote] = useState(presetSettings?.campaignNote ?? "");
+  const [presetOpeningHours, setPresetOpeningHours] = useState(presetSettings?.openingHours ?? "");
+  const [presetBreakfastInfo, setPresetBreakfastInfo] = useState(presetSettings?.breakfastInfo ?? "");
+  const [presetPrivateDiningNote, setPresetPrivateDiningNote] = useState(presetSettings?.privateDiningNote ?? "");
 
   useEffect(() => {
     setSeoTitle(page.seoTitle ?? "");
     setSeoDescription(page.seoDescription ?? "");
     setShowSeoForm(false);
-  }, [page.seoDescription, page.seoTitle, page.slug]);
+    if (presetSettings) {
+      setPresetTitle(presetSettings.title);
+      setPresetIntro(presetSettings.intro);
+      setPresetItems(presetSettings.items.join("\n"));
+      setPresetCtaLabel(presetSettings.ctaLabel);
+      setPresetCampaignNote(presetSettings.campaignNote ?? "");
+      setPresetOpeningHours(presetSettings.openingHours ?? "");
+      setPresetBreakfastInfo(presetSettings.breakfastInfo ?? "");
+      setPresetPrivateDiningNote(presetSettings.privateDiningNote ?? "");
+    }
+  }, [page.seoDescription, page.seoTitle, page.slug, presetSettings]);
 
   return (
     <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
@@ -473,35 +563,48 @@ function PageDetail({
       <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#18352f]">Page hero image</p>
+            <p className="text-sm font-semibold text-[#18352f]">{isHome ? "Home hero image" : "Page hero image"}</p>
             <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
-              {page.heroImageUrl ? "Using a custom hero image for this page." : "Using main site hero image as fallback."}
+              {isHome
+                ? "Home uses the site hero from Page content > Hero."
+                : page.heroImageUrl
+                  ? "Using a custom hero image for this page."
+                  : "Using main site hero image as fallback."}
             </p>
           </div>
-          <label className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
-            {uploading ? "Uploading..." : "Upload page hero"}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              disabled={uploading}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                event.currentTarget.value = "";
-                if (file) {
-                  onUpload(file);
-                }
-              }}
-              className="sr-only"
-            />
-          </label>
+          {isHome ? (
+            <Badge tone="green">Site hero</Badge>
+          ) : (
+            <label className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+              {uploading ? "Uploading..." : "Upload page hero"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                disabled={uploading}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.currentTarget.value = "";
+                  if (file) {
+                    onUpload(file);
+                  }
+                }}
+                className="sr-only"
+              />
+            </label>
+          )}
         </div>
         {heroImageUrl ? (
-          <div className="aspect-[16/7] rounded-2xl bg-cover bg-center shadow-sm" style={{ backgroundImage: `linear-gradient(rgba(24, 53, 47, 0.35), rgba(24, 53, 47, 0.35)), url(${heroImageUrl})` }} />
+          <div className="aspect-video w-full max-w-md rounded-xl bg-cover bg-center shadow-sm" style={{ backgroundImage: `linear-gradient(rgba(24, 53, 47, 0.35), rgba(24, 53, 47, 0.35)), url(${heroImageUrl})` }} />
         ) : (
-          <div className="flex min-h-44 items-center justify-center rounded-2xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] text-sm text-[#6f7b74]">
-            No page or main hero image selected
+          <div className="flex aspect-video w-full max-w-md items-center justify-center rounded-xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] text-sm text-[#6f7b74]">
+            {isHome ? "No home hero image selected" : "No page or main hero image selected"}
           </div>
         )}
+        {isHome ? (
+          <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">
+            Edit the Home hero image, title, subtitle, and CTA in the Hero section below.
+          </p>
+        ) : null}
         {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
       </div>
 
@@ -542,15 +645,103 @@ function PageDetail({
       </div>
 
       <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+        {preset && presetSettings ? (
+          <div className="grid gap-4 rounded-2xl bg-[#fbfaf7] p-4 ring-1 ring-[#eadfce]">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-[#18352f]">Preset content</p>
+                  <Badge tone="sand">{preset.label}</Badge>
+                </div>
+                <p className="mt-1 text-sm leading-6 text-[#6f7b74]">{preset.description}</p>
+              </div>
+            </div>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              {preset.editor.titleLabel}
+              <input value={presetTitle} onChange={(event) => setPresetTitle(event.target.value)} placeholder={preset.settings.title} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              {preset.editor.introLabel}
+              <textarea value={presetIntro} rows={3} onChange={(event) => setPresetIntro(event.target.value)} placeholder={preset.settings.intro} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              {preset.editor.itemsLabel}
+              <textarea value={presetItems} rows={4} onChange={(event) => setPresetItems(event.target.value)} placeholder={preset.settings.items.join("\n")} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+              <span className="text-xs font-normal leading-5 text-[#6f7b74]">{preset.editor.itemsHelp}</span>
+            </label>
+            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              {preset.editor.ctaLabel}
+              <input value={presetCtaLabel} onChange={(event) => setPresetCtaLabel(event.target.value)} placeholder={preset.settings.ctaLabel} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+            </label>
+            {preset.layout === "promotions" ? (
+              <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                Campaign note
+                <textarea value={presetCampaignNote} rows={3} onChange={(event) => setPresetCampaignNote(event.target.value)} placeholder={preset.settings.campaignNote} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                <span className="text-xs font-normal leading-5 text-[#6f7b74]">Shown near the Promotions CTA as campaign terms, availability notes, or booking guidance.</span>
+              </label>
+            ) : null}
+            {preset.layout === "dining" ? (
+              <div className="grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+                <div>
+                  <p className="text-sm font-semibold text-[#18352f]">Dining details</p>
+                  <p className="mt-1 text-xs leading-5 text-[#6f7b74]">Use these fields for structured dining information on the public Dining page.</p>
+                </div>
+                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                  Opening hours
+                  <input value={presetOpeningHours} onChange={(event) => setPresetOpeningHours(event.target.value)} placeholder={preset.settings.openingHours} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+                </label>
+                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                  Breakfast info
+                  <textarea value={presetBreakfastInfo} rows={3} onChange={(event) => setPresetBreakfastInfo(event.target.value)} placeholder={preset.settings.breakfastInfo} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                </label>
+                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                  Private dining note
+                  <textarea value={presetPrivateDiningNote} rows={3} onChange={(event) => setPresetPrivateDiningNote(event.target.value)} placeholder={preset.settings.privateDiningNote} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                </label>
+              </div>
+            ) : null}
+            <div>
+              <button
+                type="button"
+                disabled={locked}
+                onClick={() => onSaveSettings({
+                  title: presetTitle,
+                  intro: presetIntro,
+                  items: presetItems.split("\n").map((item) => item.trim()).filter(Boolean),
+                  ctaLabel: presetCtaLabel,
+                  campaignNote: presetCampaignNote,
+                  openingHours: presetOpeningHours,
+                  breakfastInfo: presetBreakfastInfo,
+                  privateDiningNote: presetPrivateDiningNote,
+                })}
+                className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]"
+              >
+                Save preset content
+              </button>
+            </div>
+          </div>
+        ) : null}
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">Content workflow</p>
+          <p className="text-sm font-semibold text-[#18352f]">Page content</p>
           <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
-            Edit this page&apos;s visible content from the relevant content area. Pages controls stay focused on structure, URL, SEO, and publishing.
+            Edit this page&apos;s visible content here. Content with a dedicated operations area opens the relevant manager.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <SmallButton disabled={locked || !contentTarget} onClick={onEditContent}>{contentTarget ? "Edit Content" : "Content coming soon"}</SmallButton>
-          <a href={publicPath} target="_blank" rel="noreferrer" className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+        {locked ? (
+          <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Upgrade to Forest to edit this custom page.</p>
+        ) : (
+          <ContentManager
+            site={site}
+            accessToken={accessToken}
+            onSiteUpdate={onSiteUpdate}
+            onTabChange={onTabChange}
+            onUnsavedChangesChange={onUnsavedChangesChange}
+            selectedPageSlug={page.slug}
+            embedded
+          />
+        )}
+        <div>
+          <a href={publicPath} target="_blank" rel="noreferrer" className="inline-flex rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
             Preview Page
           </a>
         </div>
@@ -595,6 +786,10 @@ function publicPathForPage(site: ResortConsoleData, page: SiteStructurePage) {
   return page.slug === "/" ? `/${site.slug}` : `/${site.slug}${page.slug}`;
 }
 
+function isHomePage(page: SiteStructurePage) {
+  return page.slug === "/";
+}
+
 function seoPreviewForPage(site: ResortConsoleData, page: SiteStructurePage) {
   const autoTitle = page.slug === "/" ? `${site.name} | Direct Booking` : `${page.name} | ${site.name}`;
   const autoDescription = site.heroSubtitle || site.about || `${page.name} at ${site.name} in ${site.location}.`;
@@ -609,42 +804,12 @@ function seoPreviewForPage(site: ResortConsoleData, page: SiteStructurePage) {
   };
 }
 
-function contentTabForPage(page: SiteStructurePage): DashboardTab | null {
-  const slug = page.slug.replace(/^\/+|\/+$/g, "");
-
-  if (["rooms", "promotions"].includes(slug)) {
-    return "offers";
-  }
-
-  if (slug === "reviews") {
-    return "reviews";
-  }
-
-  if (slug === "contact") {
-    return "whatsapp";
-  }
-
-  if (["", "about", "experiences", "gallery"].includes(slug)) {
-    return "content";
-  }
-
-  return null;
-}
-
 function FeaturePill({ feature, locked }: { feature: string; locked: boolean }) {
   return (
-    <div className={`rounded-2xl px-4 py-3 text-sm font-semibold ${locked ? "bg-[#f4f0e7] text-[#7b5b24]" : "bg-[#e6f0e7] text-[#1f5a45]"}`}>
+    <div className={`rounded-full px-3 py-2 text-xs font-semibold ${locked ? "bg-[#f4f0e7] text-[#7b5b24]" : "bg-[#e6f0e7] text-[#1f5a45]"}`}>
       {locked ? "Locked · " : "Open · "}
       {feature}
     </div>
-  );
-}
-
-function SmallButton({ children, disabled, onClick }: { children: string; disabled?: boolean; onClick?: () => void }) {
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
-      {children}
-    </button>
   );
 }
 
@@ -683,6 +848,7 @@ function pageFromApi(page: RawPage): SiteStructurePage {
     heroImageUrl: page.hero_image_url ?? "",
     seoTitle: page.seo_title ?? "",
     seoDescription: page.seo_description ?? "",
+    settings: page.settings ?? presetForSlug(page.slug)?.settings,
   };
 }
 
@@ -692,9 +858,10 @@ function pageToApi(page: SiteStructurePage, index: number) {
     slug: page.slug,
     page_type: page.pageType,
     is_published: page.isPublished,
-    hero_image_url: page.heroImageUrl || null,
+    hero_image_url: isHomePage(page) ? null : page.heroImageUrl || null,
     seo_title: page.seoTitle || null,
     seo_description: page.seoDescription || null,
     sort_order: index,
+    settings: page.settings ?? {},
   };
 }

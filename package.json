@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "smoke:preset-routes": "node scripts/check-preset-routes.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",

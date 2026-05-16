@@ -1,4 +1,5 @@
 import type { Resort, ResortNavigationItem, ResortSitePage, ResortSiteSection } from "@/types/resort";
+import { sectionPresets } from "@/lib/section-presets";
 
 type PublicNavigationLink = {
   href: string;
@@ -19,11 +20,16 @@ const defaultMultipagePages = [
   { title: "Experiences", slug: "/experiences", page_type: "Standard" as const, is_published: true },
   { title: "Gallery", slug: "/gallery", page_type: "Standard" as const, is_published: true },
   { title: "Reviews", slug: "/reviews", page_type: "Standard" as const, is_published: true },
-  { title: "Dining", slug: "/dining", page_type: "Standard" as const, is_published: false },
-  { title: "Promotions", slug: "/promotions", page_type: "Landing" as const, is_published: true },
   { title: "Blog", slug: "/blog", page_type: "Standard" as const, is_published: false },
   { title: "About", slug: "/about", page_type: "Standard" as const, is_published: true },
   { title: "Contact", slug: "/contact", page_type: "Standard" as const, is_published: true },
+  ...sectionPresets.map((preset) => ({
+    title: preset.label,
+    slug: preset.slug,
+    page_type: preset.pageType,
+    is_published: preset.isPublished,
+    settings: preset.settings,
+  })),
 ];
 
 function sortByOrder<T extends { sort_order: number }>(items: T[] | undefined) {
@@ -78,6 +84,7 @@ export function publishedSitePages(resort: Resort) {
     seo_title: null,
     seo_description: null,
     sort_order: index,
+    settings: "settings" in page ? page.settings : {},
   }));
   const mergedDefaults = defaults.map((page) => savedBySlug.get(normalizeSlug(page.slug)) ?? page);
   const defaultSlugs = new Set(defaults.map((page) => normalizeSlug(page.slug)));

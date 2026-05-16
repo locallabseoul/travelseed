@@ -75,7 +75,7 @@ function sanitizePages(pages: ResortSitePageInput[], resortId: string) {
       seo_title: page.seo_title ? String(page.seo_title).trim() : null,
       seo_description: page.seo_description ? String(page.seo_description).trim() : null,
       sort_order: page.sort_order ?? index,
-      settings: page.settings ?? {},
+      settings: page.settings && typeof page.settings === "object" ? page.settings : {},
       updated_at: new Date().toISOString(),
     }))
     .filter((page) => page.title && page.slug);
