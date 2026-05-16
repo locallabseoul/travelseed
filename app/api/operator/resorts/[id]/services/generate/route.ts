@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient, verifyAuthenticatedRequest } from "@/lib/server/supabase-admin";
-import type { Resort, ResortServiceInput } from "@/types/resort";
+import type { Resort, ResortOfferInput } from "@/types/resort";
 
 type RouteContext = {
   params: Promise<{
@@ -8,8 +8,8 @@ type RouteContext = {
   }>;
 };
 
-type GeneratedService = Required<Pick<ResortServiceInput, "kind" | "title">> &
-  Pick<ResortServiceInput, "description" | "price_label" | "capacity" | "image_url" | "highlight" | "duration" | "included" | "cta_label">;
+type GeneratedOffer = Required<Pick<ResortOfferInput, "kind" | "title">> &
+  Pick<ResortOfferInput, "description" | "price_label" | "capacity" | "image_url" | "highlight" | "duration" | "included" | "cta_label" | "bed_type" | "room_size" | "view_type" | "bathroom_info" | "max_guests" | "room_amenities">;
 
 const openAiModel = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 
@@ -35,7 +35,7 @@ function imageFor(images: string[], index: number) {
   return images.length > 0 ? images[index % images.length] : null;
 }
 
-function fallbackServices(resort: Resort): GeneratedService[] {
+function fallbackServices(resort: Resort): GeneratedOffer[] {
   const images = [resort.hero_image_url, ...resort.gallery].filter(Boolean) as string[];
   const businessType = `${resort.type ?? ""} ${resort.template_id}`.toLowerCase();
   const isSurf = businessType.includes("surf");
@@ -95,6 +95,12 @@ function fallbackServices(resort: Resort): GeneratedService[] {
         duration: "Per night",
         included: ["Private villa access", "Guest support", "Direct booking on WhatsApp"],
         cta_label: "Ask availability",
+        bed_type: resort.bedrooms ? `${resort.bedrooms} bedroom villa` : "Private villa",
+        room_size: null,
+        view_type: "Garden and pool view",
+        bathroom_info: resort.bathrooms ? `${resort.bathrooms} bathrooms` : null,
+        max_guests: resort.capacity,
+        room_amenities: ["Private pool", "Kitchen", "WiFi"],
       },
       {
         kind: "package",
@@ -151,23 +157,34 @@ function fallbackServices(resort: Resort): GeneratedService[] {
   ];
 }
 
-function normalizeGeneratedServices(services: GeneratedService[], resort: Resort) {
+function normalizeGeneratedServices(services: GeneratedOffer[], resort: Resort) {
   const images = [resort.hero_image_url, ...resort.gallery].filter(Boolean) as string[];
 
-  return services.slice(0, 6).map((service, index) => ({
-    kind: ["room", "package", "service"].includes(service.kind) ? service.kind : "service",
-    title: String(service.title ?? "").trim(),
-    description: service.description ? String(service.description).trim() : null,
-    price_label: service.price_label ? String(service.price_label).trim() : null,
-    capacity: typeof service.capacity === "number" && Number.isFinite(service.capacity) ? service.capacity : null,
-    image_url: service.image_url ? String(service.image_url).trim() : imageFor(images, index),
-    highlight: service.highlight ? String(service.highlight).trim() : null,
-    duration: service.duration ? String(service.duration).trim() : null,
-    included: Array.isArray(service.included) ? service.included.map(String).map((item) => item.trim()).filter(Boolean).slice(0, 6) : [],
-    cta_label: service.cta_label ? String(service.cta_label).trim() : "Ask availability",
-    sort_order: index,
-    is_active: true,
-  })).filter((service) => service.title);
+  return services.slice(0, 6).map((service, index) => {
+    const kind = ["room", "package", "service"].includes(service.kind) ? service.kind : "service";
+    const isRoom = kind === "room";
+
+    return {
+      kind,
+      title: String(service.title ?? "").trim(),
+      description: service.description ? String(service.description).trim() : null,
+      price_label: service.price_label ? String(service.price_label).trim() : null,
+      capacity: typeof service.capacity === "number" && Number.isFinite(service.capacity) ? service.capacity : null,
+      image_url: service.image_url ? String(service.image_url).trim() : imageFor(images, index),
+      highlight: service.highlight ? String(service.highlight).trim() : null,
+      duration: service.duration ? String(service.duration).trim() : null,
+      included: Array.isArray(service.included) ? service.included.map(String).map((item) => item.trim()).filter(Boolean).slice(0, 6) : [],
+      cta_label: service.cta_label ? String(service.cta_label).trim() : "Ask availability",
+      bed_type: isRoom ? service.bed_type ? String(service.bed_type).trim() : null : null,
+      room_size: isRoom ? service.room_size ? String(service.room_size).trim() : null : null,
+      view_type: isRoom ? service.view_type ? String(service.view_type).trim() : null : null,
+      bathroom_info: isRoom ? service.bathroom_info ? String(service.bathroom_info).trim() : null : null,
+      max_guests: isRoom && typeof service.max_guests === "number" && Number.isFinite(service.max_guests) ? service.max_guests : null,
+      room_amenities: isRoom && Array.isArray(service.room_amenities) ? service.room_amenities.map(String).map((item) => item.trim()).filter(Boolean).slice(0, 8) : [],
+      sort_order: index,
+      is_active: true,
+    };
+  }).filter((service) => service.title);
 }
 
 function extractOutputText(response: unknown) {
@@ -180,7 +197,7 @@ function extractOutputText(response: unknown) {
   return output?.flatMap((item) => item.content ?? []).map((item) => item.text).filter(Boolean).join("\n") ?? "";
 }
 
-async function generateWithOpenAi(resort: Resort): Promise<GeneratedService[] | null> {
+async function generateWithOpenAi(resort: Resort): Promise<GeneratedOffer[] | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return null;
@@ -229,6 +246,12 @@ async function generateWithOpenAi(resort: Resort): Promise<GeneratedService[] | 
                   duration: "short duration label",
                   included: ["3-5 concise included items"],
                   cta_label: "short CTA label",
+                  bed_type: "room-only bed setup or null",
+                  room_size: "room-only size label or null",
+                  view_type: "room-only view label or null",
+                  bathroom_info: "room-only bathroom label or null",
+                  max_guests: "room-only number or null",
+                  room_amenities: ["room-only amenities"],
                 },
               ],
             },
@@ -245,7 +268,7 @@ async function generateWithOpenAi(resort: Resort): Promise<GeneratedService[] | 
 
   const data = await response.json().catch(() => null);
   const outputText = extractOutputText(data);
-  const parsed = JSON.parse(outputText) as { services?: GeneratedService[] };
+  const parsed = JSON.parse(outputText) as { services?: GeneratedOffer[] };
 
   return Array.isArray(parsed.services) ? parsed.services : null;
 }

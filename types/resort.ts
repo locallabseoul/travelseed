@@ -4,7 +4,7 @@ export type ResortPlanType = "freeTrial" | "seed" | "tree" | "forest";
 export type ResortSiteType = "landing" | "multipage" | "custom";
 export type DomainStatus = "not_connected" | "pending" | "verified" | "active" | "error";
 export type SslStatus = "pending" | "active" | "error";
-export type ResortServiceKind = "room" | "service" | "package";
+export type ResortOfferKind = "room" | "service" | "package";
 export type ResortReviewSourceLabel = "Manual" | "Google" | "Guest Message";
 
 export type ResortDesignSettings = {
@@ -13,6 +13,7 @@ export type ResortDesignSettings = {
   fontStyle?: string;
   buttonStyle?: string;
   imageStyle?: string;
+  templateCatalogName?: string;
 };
 
 export type Resort = {
@@ -45,7 +46,7 @@ export type Resort = {
   domain_status?: DomainStatus;
   ssl_status?: SslStatus;
   domain_verified_at?: string | null;
-  services?: ResortService[];
+  services?: ResortOffer[];
   reviews?: ResortWebsiteReview[];
   pages?: ResortSitePage[];
   sections?: ResortSiteSection[];
@@ -54,10 +55,10 @@ export type Resort = {
   updated_at?: string | null;
 };
 
-export type ResortService = {
+export type ResortOffer = {
   id: string;
   resort_id: string;
-  kind: ResortServiceKind;
+  kind: ResortOfferKind;
   title: string;
   description: string | null;
   price_label: string | null;
@@ -67,15 +68,21 @@ export type ResortService = {
   duration?: string | null;
   included?: string[];
   cta_label?: string | null;
+  bed_type?: string | null;
+  room_size?: string | null;
+  view_type?: string | null;
+  bathroom_info?: string | null;
+  max_guests?: number | null;
+  room_amenities?: string[];
   sort_order: number;
   is_active: boolean;
   created_at?: string | null;
   updated_at?: string | null;
 };
 
-export type ResortServiceInput = {
+export type ResortOfferInput = {
   id?: string;
-  kind: ResortServiceKind;
+  kind: ResortOfferKind;
   title: string;
   description?: string | null;
   price_label?: string | null;
@@ -85,9 +92,19 @@ export type ResortServiceInput = {
   duration?: string | null;
   included?: string[];
   cta_label?: string | null;
+  bed_type?: string | null;
+  room_size?: string | null;
+  view_type?: string | null;
+  bathroom_info?: string | null;
+  max_guests?: number | null;
+  room_amenities?: string[];
   sort_order?: number;
   is_active?: boolean;
 };
+
+export type ResortServiceKind = ResortOfferKind;
+export type ResortService = ResortOffer;
+export type ResortServiceInput = ResortOfferInput;
 
 export type ResortSiteSectionInput = {
   id?: string;

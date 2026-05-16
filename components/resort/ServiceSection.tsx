@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useRef } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { designTokensFor } from "@/lib/design-settings";
-import type { Resort, ResortServiceKind } from "@/types/resort";
+import type { Resort, ResortOfferKind } from "@/types/resort";
 
 type ServiceSectionProps = {
   resort: Resort;
@@ -37,7 +38,7 @@ const sectionCopy = {
   },
 };
 
-const groupCopy: Record<ResortServiceKind, { eyebrow: string; title: string }> = {
+const groupCopy: Record<ResortOfferKind, { eyebrow: string; title: string }> = {
   room: {
     eyebrow: "Rooms",
     title: "Stay options",
@@ -52,7 +53,7 @@ const groupCopy: Record<ResortServiceKind, { eyebrow: string; title: string }> =
   },
 };
 
-const groupOrder: ResortServiceKind[] = ["room", "package", "service"];
+const groupOrder: ResortOfferKind[] = ["room", "package", "service"];
 
 function servicesByKind(services: NonNullable<Resort["services"]>) {
   return groupOrder
@@ -77,7 +78,7 @@ export function ServiceSection({ resort, variant = "boutique" }: ServiceSectionP
     <section id="services" className={`${copy.sectionClassName} px-5 py-16 sm:px-6 lg:py-24`} style={{ backgroundColor: design.colors.section }}>
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6f7f57]">{copy.eyebrow}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{copy.eyebrow}</p>
           <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{copy.title}</h2>
         </div>
         <div className="mt-10 grid gap-12">
@@ -115,19 +116,19 @@ function ServiceRail({
 
   return (
     <div>
-      <div className="flex flex-col justify-between gap-3 border-t border-[#d8cebb] pt-6 sm:flex-row sm:items-end">
+      <div className="flex flex-col justify-between gap-3 border-t pt-6 sm:flex-row sm:items-end" style={{ borderColor: design.colors.accent }}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6f7f57]">{groupCopy[group.kind].eyebrow}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{groupCopy[group.kind].eyebrow}</p>
           <h3 className={`mt-2 text-2xl font-semibold ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{groupCopy[group.kind].title}</h3>
         </div>
         <div className="flex items-center gap-3">
-          <p className="text-sm text-[#6b6a5f]">{group.services.length} option{group.services.length === 1 ? "" : "s"}</p>
+          <p className="text-sm" style={{ color: design.colors.muted }}>{group.services.length} option{group.services.length === 1 ? "" : "s"}</p>
           {group.services.length > 3 ? (
             <div className="flex gap-2">
-              <button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg font-semibold text-[#18352f] shadow-sm ring-1 ring-[#d8cebb]">
+              <button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
                 {"<"}
               </button>
-              <button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg font-semibold text-[#18352f] shadow-sm ring-1 ring-[#d8cebb]">
+              <button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
                 {">"}
               </button>
             </div>
@@ -136,31 +137,45 @@ function ServiceRail({
       </div>
       <div ref={railRef} className="mt-5 flex snap-x gap-5 overflow-x-auto scroll-smooth pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {group.services.map((service) => (
-          <article key={service.id} className={`w-[82vw] flex-none snap-start overflow-hidden sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)] ${copy.cardClassName} ${design.imageStyle === "Postcard" ? "p-2" : ""}`}>
+          <article key={service.id} className={`w-[82vw] flex-none snap-start overflow-hidden sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)] ${copy.cardClassName} ${design.imageStyle === "Postcard" ? "p-2" : ""}`} style={{ borderColor: design.colors.accent }}>
             {service.image_url ? (
-              <div className={`relative aspect-[4/3] bg-[#e8ddc8] ${design.imageClassName}`}>
+              <div className={`relative aspect-[4/3] ${design.imageClassName}`} style={{ backgroundColor: design.colors.accent }}>
                 <Image src={service.image_url} alt={service.title} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 82vw" className="object-cover" />
               </div>
             ) : null}
             <div className="p-5">
               <div className="flex flex-wrap items-center gap-2">
                 {service.highlight ? <span className="rounded-full px-3 py-1 text-xs font-semibold text-white" style={{ backgroundColor: design.colors.primary }}>{service.highlight}</span> : null}
-                {service.capacity ? <span className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#18352f]">{service.capacity} guests</span> : null}
-                {service.duration ? <span className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#18352f]">{service.duration}</span> : null}
+                {(service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity) ? <OfferPill design={design}>{service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity} guests</OfferPill> : null}
+                {service.duration ? <OfferPill design={design}>{service.duration}</OfferPill> : null}
+                {service.kind === "room" && service.bed_type ? <OfferPill design={design}>{service.bed_type}</OfferPill> : null}
+                {service.kind === "room" && service.room_size ? <OfferPill design={design}>{service.room_size}</OfferPill> : null}
+                {service.kind === "room" && service.view_type ? <OfferPill design={design}>{service.view_type}</OfferPill> : null}
+                {service.kind === "room" && service.bathroom_info ? <OfferPill design={design}>{service.bathroom_info}</OfferPill> : null}
               </div>
               <h3 className={`mt-4 text-xl font-semibold ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{service.title}</h3>
               {service.description ? <p className={`mt-3 text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{service.description}</p> : null}
               {service.included && service.included.length > 0 ? (
-                <ul className="mt-4 grid gap-2 text-sm text-[#536159]">
+                <ul className="mt-4 grid gap-2 text-sm" style={{ color: design.colors.muted }}>
                   {service.included.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#6f7f57]" />
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: design.colors.accent }} />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               ) : null}
-              {service.price_label ? <p className="mt-5 text-sm font-semibold text-[#18352f]">{service.price_label}</p> : null}
+              {service.kind === "room" && service.room_amenities && service.room_amenities.length > 0 ? (
+                <div className="mt-4 rounded-2xl p-4" style={{ backgroundColor: design.colors.section }}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: design.colors.accent }}>Room amenities</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {service.room_amenities.map((amenity) => (
+                      <span key={amenity} className="rounded-full px-3 py-1 text-xs font-semibold ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.muted, "--tw-ring-color": design.colors.accent } as CSSProperties}>{amenity}</span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+              {service.price_label ? <p className="mt-5 text-sm font-semibold" style={{ color: design.colors.text }}>{service.price_label}</p> : null}
               <a href="#booking" className={`mt-5 inline-flex min-h-10 items-center px-4 text-sm font-semibold ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
                 {service.cta_label || "Ask availability"}
               </a>
@@ -169,5 +184,13 @@ function ServiceRail({
         ))}
       </div>
     </div>
+  );
+}
+
+function OfferPill({ design, children }: { design: ReturnType<typeof designTokensFor>; children: ReactNode }) {
+  return (
+    <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: design.colors.section, color: design.colors.text }}>
+      {children}
+    </span>
   );
 }
