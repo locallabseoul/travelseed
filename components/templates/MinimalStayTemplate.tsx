@@ -31,49 +31,49 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
   ].filter(Boolean);
 
   return (
-    <main className="text-[#202724]" style={{ backgroundColor: design.colors.page }}>
+    <main style={{ backgroundColor: design.colors.page, color: design.colors.text }}>
       <ResortNavigation resort={resort} variant="minimal" />
 
       <section className="px-5 pb-16 pt-8 sm:px-6 lg:pb-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">{resort.location}</p>
-            <h1 className={`mt-5 text-5xl font-semibold leading-[1.02] sm:text-6xl ${design.headingClassName}`}>{resort.hero_title}</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{resort.location}</p>
+            <h1 className={`mt-5 text-5xl font-semibold leading-[1.02] sm:text-6xl ${design.headingClassName}`} style={{ color: design.colors.text }}>{resort.hero_title}</h1>
             {resort.hero_subtitle ? (
-              <p className={`mt-6 text-lg leading-8 text-[#5b625e] ${design.bodyClassName}`}>{resort.hero_subtitle}</p>
+              <p className={`mt-6 text-lg leading-8 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{resort.hero_subtitle}</p>
             ) : null}
             {stayDetails.length > 0 ? (
               <div className="mt-8 flex flex-wrap gap-2">
                 {stayDetails.map((detail) => (
-                  <span key={detail} className="rounded-full border border-[#d8cebb] px-4 py-2 text-sm text-[#4f564f]">
+                  <span key={detail} className="rounded-full border px-4 py-2 text-sm" style={{ borderColor: design.colors.accent, color: design.colors.muted }}>
                     {detail}
                   </span>
                 ))}
               </div>
             ) : null}
           </div>
-          <div className={`relative min-h-[520px] overflow-hidden bg-[#ded7c9] ${design.imageClassName}`}>
+          <div className={`relative min-h-[520px] overflow-hidden ${design.imageClassName}`} style={{ backgroundColor: design.colors.accent }}>
             {heroImage ? (
               <Image src={heroImage} alt={resort.name} fill priority sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover" />
             ) : (
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,#ded7c9,#9a8f78)]" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${design.colors.section}, ${design.colors.accent})` }} />
             )}
           </div>
         </div>
       </section>
 
       {showAbout || showFacilities ? (
-        <section id="about" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+        <section id="about" className="px-5 py-16 sm:px-6 lg:py-24" style={{ backgroundColor: design.colors.page }}>
           <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>
                 {resort.type ?? "Minimal stay"}
               </p>
-              <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">A slower way to arrive.</h2>
+              <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>A slower way to arrive.</h2>
             </div>
             <div>
               {showAbout ? (
-                <p className="text-lg leading-9 text-[#555d58]">
+                <p className={`text-lg leading-9 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
                   {resort.description ??
                     `${resort.name} is a quiet direct-booking stay for guests who care about calm spaces, practical comfort, and a more personal reservation experience.`}
                 </p>
@@ -81,7 +81,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
               {showFacilities ? (
                 <div id="features" className="mt-10 grid gap-3 sm:grid-cols-2">
                   {resort.features.map((feature) => (
-                    <div key={feature} className="border-t border-[#ddd6c9] py-5 text-base font-medium">
+                    <div key={feature} className="border-t py-5 text-base font-medium" style={{ borderColor: design.colors.accent, color: design.colors.text }}>
                       {feature}
                     </div>
                   ))}
@@ -97,8 +97,8 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
           <div className="mx-auto max-w-6xl">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Gallery</p>
-                <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">Rooms, light, and simple details.</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>Gallery</p>
+                <h2 className={`mt-4 text-3xl font-semibold sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>Rooms, light, and simple details.</h2>
               </div>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
@@ -116,13 +116,13 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
       {showReviews ? <ReviewSection resort={resort} variant="minimal" /> : null}
 
       {showExperiences && resort.experiences.length > 0 ? (
-        <section id="experiences" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+        <section id="experiences" className="px-5 py-16 sm:px-6 lg:py-24" style={{ backgroundColor: design.colors.page }}>
           <div className="mx-auto max-w-6xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Nearby</p>
-            <h2 className="mt-4 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">A quiet base with everything close enough.</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>Nearby</p>
+            <h2 className={`mt-4 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>A quiet base with everything close enough.</h2>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {resort.experiences.map((experience) => (
-                <div key={experience} className="rounded-md bg-[#f8f6f0] p-6 text-base font-medium text-[#202724]">
+                <div key={experience} className="rounded-md p-6 text-base font-medium" style={{ backgroundColor: design.colors.section, color: design.colors.text }}>
                   {experience}
                 </div>
               ))}
@@ -133,11 +133,11 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
 
       {showContact ? (
         <section id="booking" className="px-5 py-16 sm:px-6 lg:py-24">
-          <div className="mx-auto grid max-w-6xl gap-8 border-y border-[#d8cebb] py-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+          <div className="mx-auto grid max-w-6xl gap-8 border-y py-12 lg:grid-cols-[1fr_0.8fr] lg:items-center" style={{ borderColor: design.colors.accent }}>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7a715d]">Direct booking</p>
-              <h2 className="mt-4 text-4xl font-semibold">Book Direct & Save</h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#555d58]">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>Direct booking</p>
+              <h2 className={`mt-4 text-4xl font-semibold ${design.headingClassName}`} style={{ color: design.colors.text }}>Book Direct & Save</h2>
+              <p className={`mt-4 max-w-2xl text-base leading-7 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
                 Send a clear WhatsApp inquiry and reserve directly with the host.
               </p>
             </div>

@@ -34,10 +34,11 @@ export function usageMetricsFor(site: ResortConsoleData): UsageMetric[] {
 }
 
 export const quickActions = [
-  "Edit Hero Section",
+  "Continue Setup",
+  "Edit Home Hero",
   "Update Gallery",
-  "Manage Rooms & Services",
-  "Change WhatsApp Number",
+  "Manage Offers",
+  "Edit WhatsApp Booking",
   "Connect Domain",
   "Upgrade Plan",
 ];

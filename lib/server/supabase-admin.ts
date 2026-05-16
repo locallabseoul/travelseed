@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { validatePublicSlug } from "@/lib/slugs";
+import { siteTypeForPlanType } from "@/lib/template-catalog";
 import type { Resort, ResortUpsert } from "@/types/resort";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -147,18 +148,6 @@ function planTypeFor(plan: ResortUpsert["plan"]) {
   }
 
   return "tree";
-}
-
-function siteTypeForPlanType(planType: NonNullable<ResortUpsert["plan_type"]>) {
-  if (planType === "freeTrial" || planType === "seed") {
-    return "landing";
-  }
-
-  if (planType === "forest") {
-    return "custom";
-  }
-
-  return "multipage";
 }
 
 export function validateResortPayload(payload: ResortUpsert) {

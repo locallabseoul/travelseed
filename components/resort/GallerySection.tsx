@@ -19,7 +19,7 @@ export function GallerySection({ resort }: GallerySectionProps) {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6f7f57]">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>
               Gallery
             </p>
             <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>
@@ -34,13 +34,14 @@ export function GallerySection({ resort }: GallerySectionProps) {
           {resort.gallery.map((imageUrl, index) => (
             <div
               key={imageUrl}
-              className={`relative overflow-hidden bg-[#e8ddc8] shadow-[0_24px_80px_rgba(52,43,31,0.08)] ${design.imageClassName} ${
+              className={`relative overflow-hidden shadow-[0_24px_80px_rgba(52,43,31,0.08)] ${design.imageClassName} ${
                 index === 0
                   ? "sm:col-span-2 sm:row-span-2"
                   : index === 3
                     ? "lg:col-span-2"
                     : ""
               }`}
+              style={{ backgroundColor: design.colors.accent }}
             >
               <Image
                 src={imageUrl}

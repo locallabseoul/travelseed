@@ -31,7 +31,7 @@ export function ReviewSection({ resort, variant = "boutique" }: { resort: Resort
   }[variant];
 
   return (
-    <section id="reviews" className={`${copy.section} px-5 py-16 sm:px-6 lg:py-24`}>
+    <section id="reviews" className={`${copy.section} px-5 py-16 sm:px-6 lg:py-24`} style={{ backgroundColor: variant === "minimal" ? design.colors.section : design.colors.page }}>
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
@@ -41,14 +41,14 @@ export function ReviewSection({ resort, variant = "boutique" }: { resort: Resort
         </div>
         <div className="mt-10 grid gap-4 lg:grid-cols-3">
           {reviews.map((review) => (
-            <article key={review.id} className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-6 shadow-sm">
-              <p className="text-sm font-semibold tracking-[0.12em] text-[#d29735]" aria-label={`${review.rating} star rating`}>
+            <article key={review.id} className="rounded-2xl border p-6 shadow-sm" style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}>
+              <p className="text-sm font-semibold tracking-[0.12em]" style={{ color: design.colors.accent }} aria-label={`${review.rating} star rating`}>
                 {ratingStars(review.rating)}
               </p>
-              <p className="mt-5 text-base leading-7 text-[#31443d]">{`"${review.review_text}"`}</p>
-              <div className="mt-6 border-t border-[#eadfce] pt-4">
-                <p className="text-sm font-semibold text-[#18352f]">{review.guest_name}</p>
-                {review.stay_date ? <p className="mt-1 text-xs font-medium text-[#6f7b74]">{review.stay_date}</p> : null}
+              <p className={`mt-5 text-base leading-7 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{`"${review.review_text}"`}</p>
+              <div className="mt-6 border-t pt-4" style={{ borderColor: design.colors.accent }}>
+                <p className="text-sm font-semibold" style={{ color: design.colors.text }}>{review.guest_name}</p>
+                {review.stay_date ? <p className="mt-1 text-xs font-medium" style={{ color: design.colors.muted }}>{review.stay_date}</p> : null}
               </div>
             </article>
           ))}

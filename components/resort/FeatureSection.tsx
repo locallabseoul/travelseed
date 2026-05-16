@@ -1,4 +1,5 @@
 import type { Resort } from "@/types/resort";
+import { designTokensFor } from "@/lib/design-settings";
 
 type FeatureSectionProps = {
   resort: Resort;
@@ -6,14 +7,16 @@ type FeatureSectionProps = {
 
 // Summarizes key stay details and amenities for quick scanning.
 export function FeatureSection({ resort }: FeatureSectionProps) {
+  const design = designTokensFor(resort.design_settings);
+
   return (
-    <section id="features" className="bg-white px-5 py-16 sm:px-6 lg:py-24">
+    <section id="features" className="px-5 py-16 sm:px-6 lg:py-24" style={{ backgroundColor: design.colors.page }}>
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6f7f57]">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>
             {resort.type ?? "Stay features"}
           </p>
-          <h2 className="mt-4 text-3xl font-semibold leading-tight text-[#18352f] sm:text-4xl">
+          <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>
             Everything you need, nothing that gets in the way.
           </h2>
         </div>
@@ -21,10 +24,11 @@ export function FeatureSection({ resort }: FeatureSectionProps) {
           {resort.features.map((feature) => (
             <div
               key={feature}
-              className="rounded-md border border-[#e9dfcf] bg-[#fbf8f1] p-5 shadow-[0_18px_50px_rgba(52,43,31,0.06)]"
+              className="rounded-md border p-5 shadow-[0_18px_50px_rgba(52,43,31,0.06)]"
+              style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}
             >
-              <div className="mb-8 h-1.5 w-10 rounded-full bg-[#9e7d4d]" />
-              <p className="text-base font-medium text-[#18352f]">{feature}</p>
+              <div className="mb-8 h-1.5 w-10 rounded-full" style={{ backgroundColor: design.colors.accent }} />
+              <p className="text-base font-medium" style={{ color: design.colors.text }}>{feature}</p>
             </div>
           ))}
         </div>

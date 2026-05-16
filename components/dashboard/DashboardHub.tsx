@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
-import { Badge } from "@/components/dashboard/ui";
+import { Badge, ConfirmDialog } from "@/components/dashboard/ui";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { ResortConsoleData } from "@/types/dashboard";
 import type { ResortWithMetrics } from "@/types/resort";
@@ -15,6 +15,7 @@ export function DashboardHub() {
   const [sites, setSites] = useState<ResortConsoleData[]>([]);
   const [status, setStatus] = useState("Loading sites from database...");
   const [workingSiteId, setWorkingSiteId] = useState<string | null>(null);
+  const [sitePendingDelete, setSitePendingDelete] = useState<ResortConsoleData | null>(null);
 
   const publishedCount = useMemo(() => sites.filter((site) => site.status === "Published").length, [sites]);
   const pausedCount = useMemo(() => sites.filter((site) => site.status === "Paused").length, [sites]);
@@ -110,11 +111,6 @@ export function DashboardHub() {
       return;
     }
 
-    const confirmed = window.confirm(`Delete ${site.name}? This removes the site and its uploaded images.`);
-    if (!confirmed) {
-      return;
-    }
-
     setWorkingSiteId(site.id);
     setStatus("Deleting site...");
     try {
@@ -137,6 +133,10 @@ export function DashboardHub() {
     } finally {
       setWorkingSiteId(null);
     }
+  }
+
+  function requestDeleteSite(site: ResortConsoleData) {
+    setSitePendingDelete(site);
   }
 
   useEffect(() => {
@@ -186,7 +186,7 @@ export function DashboardHub() {
                       key={site.id}
                       site={site}
                       isWorking={workingSiteId === site.id}
-                      onDelete={deleteSite}
+                      onDelete={requestDeleteSite}
                       onStatusChange={updateSiteStatus}
                     />
                   ))}
@@ -198,6 +198,24 @@ export function DashboardHub() {
           ) : null}
         </div>
       </section>
+      <ConfirmDialog
+        open={Boolean(sitePendingDelete)}
+        options={sitePendingDelete ? {
+          title: `Delete ${sitePendingDelete.name}?`,
+          description: "This removes the site and its uploaded images. This cannot be undone.",
+          confirmLabel: "Delete site",
+          cancelLabel: "Cancel",
+          tone: "danger",
+        } : null}
+        onCancel={() => setSitePendingDelete(null)}
+        onConfirm={() => {
+          const site = sitePendingDelete;
+          setSitePendingDelete(null);
+          if (site) {
+            void deleteSite(site);
+          }
+        }}
+      />
     </main>
   );
 }

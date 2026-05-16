@@ -6,6 +6,7 @@ import {
   validateResortPayload,
   verifyAuthenticatedRequest,
 } from "@/lib/server/supabase-admin";
+import { validateTemplateEntitlement } from "@/lib/template-catalog";
 import type { Resort } from "@/types/resort";
 
 type RouteContext = {
@@ -56,6 +57,12 @@ export async function PUT(request: Request, { params }: RouteContext) {
 
   if (!canManageResort(existingResort as Resort, user)) {
     return NextResponse.json({ error: "You can only manage sites connected to your account." }, { status: 403 });
+  }
+
+  const entitlementError = validateTemplateEntitlement(payload, existingResort as Resort);
+
+  if (entitlementError) {
+    return NextResponse.json({ error: entitlementError }, { status: 400 });
   }
 
   const existingDomain = (existingResort as Resort).domain ?? null;

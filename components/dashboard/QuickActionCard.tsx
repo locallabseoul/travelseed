@@ -2,10 +2,11 @@ import { Panel } from "@/components/dashboard/ui";
 import type { DashboardTab } from "@/types/dashboard";
 
 const actionTargets: Record<string, DashboardTab> = {
-  "Edit Hero Section": "content",
+  "Continue Setup": "setup",
+  "Edit Home Hero": "content",
   "Update Gallery": "content",
-  "Manage Rooms & Services": "offers",
-  "Change WhatsApp Number": "whatsapp",
+  "Manage Offers": "offers",
+  "Edit WhatsApp Booking": "whatsapp",
   "Connect Domain": "domain",
   "Upgrade Plan": "plan",
 };

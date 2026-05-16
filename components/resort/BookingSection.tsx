@@ -8,7 +8,7 @@ type BookingSectionProps = {
 };
 
 // Creates the primary direct-booking call to action through WhatsApp.
-export function BookingSection({ resort, buttonClassName = "bg-forest text-white" }: BookingSectionProps) {
+export function BookingSection({ resort, buttonClassName = "" }: BookingSectionProps) {
   const design = designTokensFor(resort.design_settings);
 
   return (

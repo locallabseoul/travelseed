@@ -28,7 +28,7 @@ export function BoutiqueVillaTemplate({ resort }: TemplateProps) {
   const showContact = isSiteSectionEnabled(resort, "contact");
 
   return (
-    <main style={{ backgroundColor: design.colors.page }}>
+    <main style={{ backgroundColor: design.colors.page, color: design.colors.text }}>
       <HeroSection resort={resort} accentClassName="bg-forest" />
       {showAbout ? <AboutSection resort={resort} /> : null}
       {showFacilities ? <FeatureSection resort={resort} /> : null}
@@ -36,7 +36,7 @@ export function BoutiqueVillaTemplate({ resort }: TemplateProps) {
       {showReviews ? <ReviewSection resort={resort} variant="boutique" /> : null}
       {showGallery ? <GallerySection resort={resort} /> : null}
       {showExperiences ? <ExperienceSection resort={resort} /> : null}
-      {showContact ? <BookingSection resort={resort} buttonClassName="bg-[#d9c49e] text-[#18352f]" /> : null}
+      {showContact ? <BookingSection resort={resort} /> : null}
       <FooterSection resort={resort} />
       <FloatingWhatsAppButton resort={resort} />
     </main>

@@ -5,6 +5,7 @@ import {
   validateResortPayload,
   verifyAuthenticatedRequest,
 } from "@/lib/server/supabase-admin";
+import { validateTemplateEntitlement } from "@/lib/template-catalog";
 import type { Resort, ResortWithMetrics } from "@/types/resort";
 
 type SiteEventRow = {
@@ -185,6 +186,12 @@ export async function POST(request: Request) {
 
   if (validationError) {
     return NextResponse.json({ error: validationError }, { status: 400 });
+  }
+
+  const entitlementError = validateTemplateEntitlement(payload);
+
+  if (entitlementError) {
+    return NextResponse.json({ error: entitlementError }, { status: 400 });
   }
 
   const supabase = createServiceRoleClient();
