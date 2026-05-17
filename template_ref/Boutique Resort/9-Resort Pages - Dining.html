@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .dining-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dining-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(249, 115, 22, 0.15); }
+        .section-divider { height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="hover:text-white transition-colors">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="hover:text-white transition-colors">Reviews</a>
+            <a href="#" class="hover:text-white transition-colors">Promotions</a>
+            <a href="#" class="text-brand-orange font-semibold">Dining</a>
+            <a href="#" class="hover:text-white transition-colors">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="dining-hero" class="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="text-center max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                <i class="fa-solid fa-utensils text-brand-orange"></i>
+                <span class="text-sm text-white font-medium">Culinary Excellence</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">Dining Experience</h1>
+            <p class="text-xl text-stone-300 leading-relaxed">Savor the finest coastal cuisine crafted with locally sourced ingredients, paired with breathtaking ocean views and impeccable service in an intimate setting.</p>
+        </div>
+    </section>
+
+    <section id="restaurant-overview" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="order-2 lg:order-1">
+                <div class="mb-8">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-leaf text-brand-orange text-xl"></i>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-serif text-white">The Horizon Restaurant</h2>
+                    </div>
+                    <p class="text-stone-300 text-lg leading-relaxed mb-6">
+                        Experience the perfect harmony of contemporary cuisine and traditional coastal flavors. Our award-winning restaurant showcases the bounty of the ocean and local farms through innovative dishes that celebrate seasonality and sustainability.
+                    </p>
+                    <p class="text-stone-300 leading-relaxed mb-6">
+                        Set against panoramic ocean views, The Horizon offers an intimate dining atmosphere where every meal becomes a memorable occasion. Our open kitchen design allows guests to witness the artistry of our culinary team as they prepare each dish with precision and passion.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border border-white/10 mb-6">
+                    <h3 class="text-white font-semibold text-xl mb-4 flex items-center gap-3">
+                        <i class="fa-solid fa-star text-yellow-400"></i>
+                        Culinary Concept
+                    </h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        Farm-to-table philosophy meets coastal refinement. We partner with local fishermen, organic farmers, and artisan producers to bring you the freshest ingredients, transformed into contemporary dishes that honor tradition while embracing innovation.
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xs"></i>
+                            <span>Locally Sourced Seafood</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xs"></i>
+                            <span>Organic Produce</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xs"></i>
+                            <span>Sustainable Practices</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xs"></i>
+                            <span>Seasonal Menus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border border-white/10">
+                    <h3 class="text-white font-semibold text-xl mb-4 flex items-center gap-3">
+                        <i class="fa-solid fa-award text-brand-orange"></i>
+                        Signature Dishes
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-fish text-brand-orange mt-1"></i>
+                            <div>
+                                <p class="text-white font-medium">Grilled Mahi-Mahi with Coconut Lime Sauce</p>
+                                <p class="text-stone-400 text-sm">Fresh catch of the day with tropical citrus notes</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-drumstick-bite text-brand-orange mt-1"></i>
+                            <div>
+                                <p class="text-white font-medium">Herb-Crusted Rack of Lamb</p>
+                                <p class="text-stone-400 text-sm">Local lamb with rosemary jus and seasonal vegetables</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-shrimp text-brand-orange mt-1"></i>
+                            <div>
+                                <p class="text-white font-medium">Lobster Thermidor</p>
+                                <p class="text-stone-400 text-sm">Classic French preparation with a modern twist</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <div class="rounded-3xl overflow-hidden shadow-2xl">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dining-restaurant-interior.png" alt="elegant fine dining restaurant interior ocean view sunset ambiance contemporary design luxury setting" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="opening-hours" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12 text-center">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-clock text-blue-400 text-xl"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif text-white">Opening Hours</h2>
+            </div>
+            <p class="text-stone-300 text-lg">Serving breakfast, lunch, and dinner daily</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl p-8 border border-white/10 dining-card text-center">
+                <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-sunrise text-yellow-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-serif text-2xl mb-3">Breakfast</h3>
+                <p class="text-brand-orange font-semibold text-xl mb-4">7:00 AM - 11:00 AM</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Start your day with a sumptuous breakfast buffet featuring international favorites, fresh tropical fruits, and made-to-order specialties.
+                </p>
+                <div class="space-y-2 text-sm text-stone-300">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Continental & À la carte</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Fresh Juices & Pastries</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 border border-white/10 dining-card text-center">
+                <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-sun text-orange-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-serif text-2xl mb-3">Lunch</h3>
+                <p class="text-brand-orange font-semibold text-xl mb-4">12:00 PM - 3:00 PM</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Light and refreshing lunch options featuring grilled seafood, fresh salads, and Mediterranean-inspired dishes perfect for a midday meal.
+                </p>
+                <div class="space-y-2 text-sm text-stone-300">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Poolside Service Available</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Light Bites & Cocktails</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 border border-white/10 dining-card text-center">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-moon text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-serif text-2xl mb-3">Dinner</h3>
+                <p class="text-brand-orange font-semibold text-xl mb-4">6:00 PM - 10:30 PM</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    An exquisite evening dining experience with our carefully curated menu, premium wines, and impeccable service under the stars.
+                </p>
+                <div class="space-y-2 text-sm text-stone-300">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Reservations Recommended</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                        <span>Wine Pairing Available</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border border-white/10 mt-8 text-center">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-info-circle text-brand-orange text-xl"></i>
+                    <p class="text-stone-300">
+                        <span class="text-white font-semibold">Note:</span> Hours may vary during holidays and special events
+                    </p>
+                </div>
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                    Reserve a Table
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="breakfast-info" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="rounded-3xl overflow-hidden shadow-2xl">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/breakfast-buffet-spread.png" alt="luxury breakfast buffet spread fresh pastries fruits tropical resort morning dining elegant presentation" />
+                </div>
+            </div>
+
+            <div>
+                <div class="mb-8">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-coffee text-green-400 text-xl"></i>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-serif text-white">Breakfast Service</h2>
+                    </div>
+                    <p class="text-stone-300 text-lg leading-relaxed">
+                        Wake up to a delightful breakfast experience designed to energize your day. Our extensive breakfast offering caters to all preferences and dietary requirements.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-2">Included in Room Rate</h3>
+                                <p class="text-stone-300 text-sm leading-relaxed">
+                                    Complimentary breakfast is included for all guests staying at The Haven. Enjoy unlimited access to our breakfast buffet throughout your stay.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-location-dot text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-2">Dining Location</h3>
+                                <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                                    Breakfast is served at The Horizon Restaurant with both indoor and outdoor terrace seating options. Enjoy your morning meal with stunning ocean views.
+                                </p>
+                                <div class="flex items-center gap-2 text-sm text-stone-400">
+                                    <i class="fa-solid fa-map-marker-alt text-brand-orange text-xs"></i>
+                                    <span>Main Building, Ground Floor</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-shirt text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-2">Dress Code</h3>
+                                <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                                    Smart casual attire requested. Resort wear is perfectly acceptable for breakfast service.
+                                </p>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-check text-green-400"></i>
+                                        <span>Resort Casual</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-check text-green-400"></i>
+                                        <span>Beachwear Cover-ups</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-red-400">
+                                        <i class="fa-solid fa-times text-red-400"></i>
+                                        <span>Swimwear Only</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-red-400">
+                                        <i class="fa-solid fa-times text-red-400"></i>
+                                        <span>Sleeveless Shirts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10 bg-gradient-to-br from-slate-800/40 to-slate-900/40">
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-utensils text-brand-orange"></i>
+                            What's Included
+                        </h3>
+                        <div class="grid sm:grid-cols-2 gap-3">
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>International Buffet</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>Made-to-Order Omelets</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>Fresh Tropical Fruits</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>Artisan Breads & Pastries</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>Premium Coffee & Teas</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-brand-orange" style="font-size: 6px;"></i>
+                                <span>Healthy Options Available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="private-dining" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="order-2 lg:order-1">
+                <div class="mb-8">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-heart text-pink-400 text-xl"></i>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-serif text-white">Private Dining</h2>
+                    </div>
+                    <p class="text-stone-300 text-lg leading-relaxed mb-6">
+                        Elevate your celebration with an exclusive private dining experience. Whether it's a romantic dinner for two, an intimate family gathering, or a special occasion, our private dining service offers unparalleled privacy and personalized attention.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-calendar-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-2">Advance Reservation Required</h3>
+                                <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                                    Private dining experiences must be booked at least 48 hours in advance to ensure proper preparation and menu customization. Our concierge team will work with you to create the perfect experience.
+                                </p>
+                                <button class="bg-brand-orange hover:bg-orange-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)] inline-flex items-center gap-2">
+                                    <i class="fa-solid fa-phone"></i>
+                                    Request Private Dining
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-map-location-dot text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-3">Exclusive Locations</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-slate-800/30 rounded-xl p-4">
+                                        <p class="text-white font-medium mb-1">Beachfront Pavilion</p>
+                                        <p class="text-stone-400 text-sm">Candlelit dinner on the sand with ocean waves as your soundtrack</p>
+                                    </div>
+                                    <div class="bg-slate-800/30 rounded-xl p-4">
+                                        <p class="text-white font-medium mb-1">Sunset Terrace</p>
+                                        <p class="text-stone-400 text-sm">Elevated platform with panoramic ocean and sunset views</p>
+                                    </div>
+                                    <div class="bg-slate-800/30 rounded-xl p-4">
+                                        <p class="text-white font-medium mb-1">Garden Gazebo</p>
+                                        <p class="text-stone-400 text-sm">Intimate tropical setting surrounded by lush landscaping</p>
+                                    </div>
+                                    <div class="bg-slate-800/30 rounded-xl p-4">
+                                        <p class="text-white font-medium mb-1">Chef's Table</p>
+                                        <p class="text-stone-400 text-sm">Exclusive kitchen-side experience with the chef</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-users text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold text-lg mb-2">Minimum Party Size</h3>
+                                <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                                    Private dining experiences accommodate parties of 2 to 12 guests. For larger groups, please contact our events team for customized arrangements.
+                                </p>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-user-group text-brand-orange"></i>
+                                        <span>2-4 Guests: Intimate</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-user-group text-brand-orange"></i>
+                                        <span>5-8 Guests: Small Group</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-user-group text-brand-orange"></i>
+                                        <span>9-12 Guests: Party</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-stone-300">
+                                        <i class="fa-solid fa-user-group text-brand-orange"></i>
+                                        <span>12+ Guests: Custom</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border border-white/10 bg-gradient-to-br from-pink-900/20 to-purple-900/20">
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-sparkles text-pink-400"></i>
+                            Special Touches Available
+                        </h3>
+                        <div class="grid sm:grid-cols-2 gap-3">
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Personalized Menus</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Floral Arrangements</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Live Music</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Wine Pairings</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Photography Service</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-circle text-pink-400" style="font-size: 6px;"></i>
+                                <span>Custom Decorations</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <div class="rounded-3xl overflow-hidden shadow-2xl">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/private-beach-dinner.png" alt="romantic private beach dinner candlelit table setup sunset ocean view luxury dining experience tropical paradise" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="menu-highlights" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12 text-center">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-book-open text-red-400 text-xl"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif text-white">Menu Highlights</h2>
+            </div>
+            <p class="text-stone-300 text-lg">A curated selection from our seasonal menu</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 dining-card">
+                <div class="relative h-64">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/appetizer-platter.png" alt="gourmet appetizer platter fine dining presentation seafood elegant plating luxury restaurant" />
+                    <div class="absolute top-4 left-4">
+                        <div class="bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-semibold">
+                            Appetizers
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Starters</h3>
+                    <div class="space-y-4">
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Seared Scallops</p>
+                                <p class="text-brand-orange font-semibold">$28</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Cauliflower purée, crispy pancetta, microgreens</p>
+                        </div>
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Tuna Tartare</p>
+                                <p class="text-brand-orange font-semibold">$24</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Avocado, sesame, soy ginger dressing</p>
+                        </div>
+                        <div class="pb-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Burrata & Heirloom Tomatoes</p>
+                                <p class="text-brand-orange font-semibold">$22</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Basil pesto, aged balsamic, sourdough crisps</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 dining-card">
+                <div class="relative h-64">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/main-course-seafood.png" alt="gourmet seafood main course fine dining plating grilled fish elegant presentation luxury cuisine" />
+                    <div class="absolute top-4 left-4">
+                        <div class="bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-semibold">
+                            Main Courses
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Entrées</h3>
+                    <div class="space-y-4">
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Pan-Seared Sea Bass</p>
+                                <p class="text-brand-orange font-semibold">$48</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Saffron risotto, asparagus, lemon beurre blanc</p>
+                        </div>
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Wagyu Beef Tenderloin</p>
+                                <p class="text-brand-orange font-semibold">$62</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Truffle mash, roasted vegetables, red wine jus</p>
+                        </div>
+                        <div class="pb-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Wild Mushroom Risotto</p>
+                                <p class="text-brand-orange font-semibold">$36</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Parmesan, white truffle oil, arugula (V)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 dining-card">
+                <div class="relative h-64">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dessert-plating.png" alt="elegant dessert plating fine dining chocolate presentation luxury restaurant sweet course artistry" />
+                    <div class="absolute top-4 left-4">
+                        <div class="bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-semibold">
+                            Desserts
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Sweet Endings</h3>
+                    <div class="space-y-4">
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Chocolate Lava Cake</p>
+                                <p class="text-brand-orange font-semibold">$16</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Vanilla bean ice cream, berry compote</p>
+                        </div>
+                        <div class="border-b border-white/10 pb-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Crème Brûlée</p>
+                                <p class="text-brand-orange font-semibold">$14</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Classic vanilla with caramelized sugar crust</p>
+                        </div>
+                        <div class="pb-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-white font-medium">Tropical Fruit Pavlova</p>
+                                <p class="text-brand-orange font-semibold">$15</p>
+                            </div>
+                            <p class="text-stone-400 text-sm">Passion fruit, mango, coconut cream</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 border border-white/10 mt-8 text-center">
+            <p class="text-stone-300 mb-4">
+                <i class="fa-solid fa-info-circle text-brand-orange mr-2"></i>
+                Menu items and prices are subject to change based on seasonal availability. Full menu available upon request.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="glass-card hover:bg-slate-800 text-white px-6 py-3 rounded-full text-sm font-medium transition-all border border-white/20 inline-flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-brand-orange"></i>
+                    Download Full Menu
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-6 py-3 rounded-full text-sm font-medium transition-all border border-white/20 inline-flex items-center gap-2">
+                    <i class="fa-solid fa-wine-glass text-brand-orange"></i>
+                    View Wine List
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="dining-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="relative rounded-3xl overflow-hidden">
+            <div class="absolute inset-0">
+                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/restaurant-sunset-ambiance.png" alt="luxury restaurant sunset ambiance romantic dining atmosphere ocean view candlelight elegant setting" />
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/60"></div>
+            <div class="relative z-10 py-20 px-8 md:px-16">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                        <i class="fa-solid fa-concierge-bell text-brand-orange"></i>
+                        <span class="text-sm text-white font-medium">Reservations Open</span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Reserve Your Table</h2>
+                    <p class="text-stone-200 text-lg mb-8 leading-relaxed">
+                        Experience culinary excellence in an unforgettable setting. Book your table now to secure your preferred dining time and ensure a seamless gastronomic journey.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Priority Seating</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Special Requests Welcome</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Dietary Accommodations</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Celebration Packages</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start gap-4">
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto inline-flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            Reserve a Table
+                        </button>
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto inline-flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-heart"></i>
+                            Request Private Dining
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="dining-info" class="px-6 md:px-12 max-w-5xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-10 border border-white/10">
+            <h3 class="text-white font-serif text-3xl mb-8 text-center">Dining Information</h3>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-utensils text-brand-orange"></i>
+                        Dietary Requirements
+                    </h4>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        We cater to all dietary preferences and restrictions including vegetarian, vegan, gluten-free, dairy-free, and allergen-specific requirements. Please inform us at the time of booking.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-leaf text-green-400 text-xs"></i>
+                            <span>Vegetarian & Vegan Options</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-wheat-awn-circle-exclamation text-yellow-400 text-xs"></i>
+                            <span>Gluten-Free Available</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-heart-pulse text-red-400 text-xs"></i>
+                            <span>Allergen Information Provided</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-shirt text-brand-orange"></i>
+                        Dress Code Policy
+                    </h4>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        We maintain a smart casual dress code for dinner service to preserve the elegant ambiance. Lunch and breakfast are more relaxed with resort casual attire.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                            <span>Smart Casual for Dinner</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                            <span>Resort Wear for Lunch</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-red-400">
+                            <i class="fa-solid fa-times text-xs"></i>
+                            <span>No Swimwear in Restaurant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-child text-brand-orange"></i>
+                        Children's Menu
+                    </h4>
+                    <p class="text-stone-300 text-sm leading-relaxed">
+                        A dedicated children's menu is available featuring kid-friendly favorites prepared with the same quality ingredients. High chairs and booster seats available upon request.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-phone text-brand-orange"></i>
+                        Contact & Reservations
+                    </h4>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                        For reservations, special requests, or inquiries about our dining services, please contact our restaurant team.
+                    </p>
+                    <div class="space-y-2 text-sm text-stone-300">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-brand-orange text-xs"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-brand-orange text-xs"></i>
+                            <span>dining@thehaven.com</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Savor Every Moment</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Join us for an unforgettable dining experience where culinary artistry meets coastal beauty.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    Make a Reservation
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

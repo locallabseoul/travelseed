@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .campaign-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .campaign-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(249, 115, 22, 0.2); }
+        .badge-shine { position: relative; overflow: hidden; }
+        .badge-shine::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shine 3s infinite; }
+        @keyframes shine { to { left: 100%; } }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-active .accordion-content { max-height: 500px; }
+        .accordion-active .accordion-icon { transform: rotate(180deg); }
+        .accordion-icon { transition: transform 0.3s ease; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="hover:text-white transition-colors">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="hover:text-white transition-colors">Reviews</a>
+            <a href="#" class="text-brand-orange font-semibold">Promotions</a>
+            <a href="#" class="hover:text-white transition-colors">Dining</a>
+            <a href="#" class="hover:text-white transition-colors">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="promotions-hero" class="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="text-center max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                <i class="fa-solid fa-tags text-brand-orange"></i>
+                <span class="text-sm text-white font-medium">Exclusive Offers</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">Special Promotions</h1>
+            <p class="text-xl text-stone-300 leading-relaxed">Discover our curated collection of limited-time offers, seasonal packages, and exclusive campaigns designed to make your stay extraordinary while delivering exceptional value.</p>
+        </div>
+    </section>
+
+    <section id="featured-campaigns" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-fire text-brand-orange text-xl"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif text-white">Featured Campaigns</h2>
+            </div>
+            <p class="text-stone-300 text-lg">Limited-time offers with exclusive benefits and special perks</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10 campaign-card">
+                <div class="relative h-80">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/70103bf78f-5e7ba100e51149a53b64.png" alt="luxury beachfront resort sunset romantic dinner setup on private beach, elegant table setting, tropical paradise" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge-shine bg-gradient-to-r from-pink-500 to-rose-600 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-heart"></i>
+                            ROMANCE SPECIAL
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        Save 30%
+                    </div>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-white font-serif text-3xl mb-4">Honeymoon Paradise Package</h3>
+                    <p class="text-stone-300 mb-6 leading-relaxed">Celebrate your love story with complimentary champagne, couples spa treatment, private beach dinner, and daily breakfast. Perfect for newlyweds and romantic getaways.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-800/50 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-calendar-check text-brand-orange"></i>
+                                <span class="text-white font-semibold text-sm">Valid Until</span>
+                            </div>
+                            <p class="text-stone-300 text-sm">Dec 31, 2026</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-moon text-brand-orange"></i>
+                                <span class="text-white font-semibold text-sm">Min. Stay</span>
+                            </div>
+                            <p class="text-stone-300 text-sm">3 Nights</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-gift text-brand-orange"></i>
+                            Package Includes
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Champagne on Arrival</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Couples Spa (90min)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Private Beach Dinner</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Daily Breakfast</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Room Upgrade</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Late Check-out</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-6 py-3.5 rounded-full text-sm font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                            Book Package
+                        </button>
+                        <button class="flex-1 glass-card hover:bg-slate-800 text-white px-6 py-3.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10 campaign-card">
+                <div class="relative h-80">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/45c149a945-594b0f8f8e2b24bf8d41.png" alt="luxury family resort pool area with kids playing, waterslides, family activities, tropical setting" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge-shine bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-users"></i>
+                            FAMILY GETAWAY
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        Kids Stay Free
+                    </div>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-white font-serif text-3xl mb-4">Family Adventure Package</h3>
+                    <p class="text-stone-300 mb-6 leading-relaxed">Create unforgettable memories with kids' club access, family activities, complimentary meals for children under 12, and special welcome amenities for the little ones.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-slate-800/50 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-calendar-check text-brand-orange"></i>
+                                <span class="text-white font-semibold text-sm">Valid Until</span>
+                            </div>
+                            <p class="text-stone-300 text-sm">Aug 31, 2026</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-moon text-brand-orange"></i>
+                                <span class="text-white font-semibold text-sm">Min. Stay</span>
+                            </div>
+                            <p class="text-stone-300 text-sm">4 Nights</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-gift text-brand-orange"></i>
+                            Package Includes
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Kids Club Access</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Free Kids Meals</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Family Activities</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Welcome Toys</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Pool Access</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-stone-300">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Beach Equipment</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-6 py-3.5 rounded-full text-sm font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                            Book Package
+                        </button>
+                        <button class="flex-1 glass-card hover:bg-slate-800 text-white px-6 py-3.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 campaign-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/b3e52dab89-7c4c364a5f460467556d.png" alt="luxury wellness spa retreat yoga meditation peaceful zen garden tropical setting" />
+                    <div class="absolute top-3 left-3">
+                        <div class="badge-shine bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-spa"></i>
+                            WELLNESS
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Wellness Retreat</h3>
+                    <p class="text-stone-300 text-sm mb-4 leading-relaxed">Daily yoga, spa credits, healthy cuisine, and mindfulness sessions.</p>
+                    
+                    <div class="flex items-center gap-4 mb-4 text-xs">
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-calendar text-brand-orange"></i>
+                            <span>Valid: Jun 30, 2026</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-moon text-brand-orange"></i>
+                            <span>5 Nights Min</span>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-brand-orange hover:bg-orange-600 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                        Explore Offer
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 campaign-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/12cdbe65d8-b6b4dd60a89edd1e0ba7.png" alt="luxury adventure activities scuba diving snorkeling water sports tropical ocean" />
+                    <div class="absolute top-3 left-3">
+                        <div class="badge-shine bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-water"></i>
+                            ADVENTURE
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Ocean Explorer</h3>
+                    <p class="text-stone-300 text-sm mb-4 leading-relaxed">Diving lessons, snorkeling tours, kayaking, and marine adventures.</p>
+                    
+                    <div class="flex items-center gap-4 mb-4 text-xs">
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-calendar text-brand-orange"></i>
+                            <span>Valid: Sep 30, 2026</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-moon text-brand-orange"></i>
+                            <span>3 Nights Min</span>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-brand-orange hover:bg-orange-600 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                        Explore Offer
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden border border-white/10 campaign-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6b118946c9-4c15af19d43995cf6dc8.png" alt="luxury culinary dining experience gourmet food tasting chef cooking class" />
+                    <div class="absolute top-3 left-3">
+                        <div class="badge-shine bg-gradient-to-r from-yellow-500 to-amber-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-utensils"></i>
+                            CULINARY
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Gourmet Experience</h3>
+                    <p class="text-stone-300 text-sm mb-4 leading-relaxed">Chef's table, cooking classes, wine tasting, and farm-to-table tours.</p>
+                    
+                    <div class="flex items-center gap-4 mb-4 text-xs">
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-calendar text-brand-orange"></i>
+                            <span>Valid: Nov 30, 2026</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-stone-300">
+                            <i class="fa-solid fa-moon text-brand-orange"></i>
+                            <span>2 Nights Min</span>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-brand-orange hover:bg-orange-600 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                        Explore Offer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="seasonal-ideas" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-sparkles text-purple-400 text-xl"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif text-white">Seasonal Ideas</h2>
+            </div>
+            <p class="text-stone-300 text-lg">Curated experiences perfect for every season and occasion</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer group">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
+                    <i class="fa-solid fa-umbrella-beach text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-3">Summer Escape</h3>
+                <p class="text-stone-300 text-sm mb-4 leading-relaxed">Beat the heat with unlimited beach access, water sports, and refreshing poolside service.</p>
+                <div class="flex items-center gap-2 text-brand-orange text-sm font-medium">
+                    <span>Learn More</span>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer group">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
+                    <i class="fa-solid fa-champagne-glasses text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-3">Holiday Celebration</h3>
+                <p class="text-stone-300 text-sm mb-4 leading-relaxed">Festive decorations, special menus, live entertainment, and exclusive holiday events.</p>
+                <div class="flex items-center gap-2 text-brand-orange text-sm font-medium">
+                    <span>Learn More</span>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer group">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
+                    <i class="fa-solid fa-leaf text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-3">Spring Renewal</h3>
+                <p class="text-stone-300 text-sm mb-4 leading-relaxed">Garden tours, outdoor yoga, nature walks, and fresh seasonal cuisine experiences.</p>
+                <div class="flex items-center gap-2 text-brand-orange text-sm font-medium">
+                    <span>Learn More</span>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer group">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
+                    <i class="fa-solid fa-mug-hot text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-3">Cozy Retreat</h3>
+                <p class="text-stone-300 text-sm mb-4 leading-relaxed">Fireside lounging, comfort cuisine, spa indulgence, and peaceful relaxation.</p>
+                <div class="flex items-center gap-2 text-brand-orange text-sm font-medium">
+                    <span>Learn More</span>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="offer-terms" class="px-6 md:px-12 max-w-5xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-10 border border-white/10">
+            <h2 class="text-3xl md:text-4xl font-serif text-white mb-8 text-center">Important Information</h2>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-white/10 rounded-2xl overflow-hidden">
+                    <button class="accordion-trigger w-full flex items-center justify-between p-6 bg-slate-800/30 hover:bg-slate-800/50 transition-all" onclick="toggleAccordion(this)">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-file-contract text-brand-orange text-xl"></i>
+                            <h3 class="text-white font-semibold text-lg">Terms & Conditions</h3>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-white accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/20">
+                        <div class="p-6 space-y-3 text-stone-300 text-sm leading-relaxed">
+                            <p><strong class="text-white">Booking Requirements:</strong> All promotional packages must be booked directly through our official website or reservation team. Third-party bookings are not eligible for campaign benefits.</p>
+                            <p><strong class="text-white">Payment Policy:</strong> Full prepayment required at time of booking for promotional rates. Standard cancellation policies apply unless otherwise specified in the offer details.</p>
+                            <p><strong class="text-white">Validity:</strong> Offers are valid for new bookings only and cannot be combined with other promotions, discounts, or loyalty rewards unless explicitly stated.</p>
+                            <p><strong class="text-white">Modifications:</strong> Date changes subject to availability and may require rate adjustment. Package components are non-transferable and non-refundable.</p>
+                            <p><strong class="text-white">Age Restrictions:</strong> Some packages may have minimum age requirements. Please verify eligibility before booking.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-white/10 rounded-2xl overflow-hidden">
+                    <button class="accordion-trigger w-full flex items-center justify-between p-6 bg-slate-800/30 hover:bg-slate-800/50 transition-all" onclick="toggleAccordion(this)">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-calendar-xmark text-brand-orange text-xl"></i>
+                            <h3 class="text-white font-semibold text-lg">Blackout Dates</h3>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-white accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/20">
+                        <div class="p-6 space-y-4 text-stone-300 text-sm leading-relaxed">
+                            <div>
+                                <p class="text-white font-semibold mb-2">Peak Season Exclusions (All Packages):</p>
+                                <ul class="list-disc list-inside space-y-1 ml-2">
+                                    <li>December 20 - January 5 (Holiday Season)</li>
+                                    <li>February 10-20 (Valentine's Week)</li>
+                                    <li>July 1-15 (Summer Peak)</li>
+                                    <li>All public holidays and long weekends</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold mb-2">Package-Specific Blackouts:</p>
+                                <ul class="list-disc list-inside space-y-1 ml-2">
+                                    <li>Honeymoon Package: Not available during school holidays</li>
+                                    <li>Family Package: Limited availability during conference season (March, September)</li>
+                                    <li>Wellness Retreat: Blackout during resort maintenance (January 15-31)</li>
+                                </ul>
+                            </div>
+                            <p class="text-stone-400 text-xs mt-4">* Blackout dates are subject to change. Please verify availability at time of booking.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-white/10 rounded-2xl overflow-hidden">
+                    <button class="accordion-trigger w-full flex items-center justify-between p-6 bg-slate-800/30 hover:bg-slate-800/50 transition-all" onclick="toggleAccordion(this)">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-ban text-brand-orange text-xl"></i>
+                            <h3 class="text-white font-semibold text-lg">Cancellation Policy</h3>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-white accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/20">
+                        <div class="p-6 space-y-3 text-stone-300 text-sm leading-relaxed">
+                            <p><strong class="text-white">Standard Packages (Honeymoon, Family, Wellness):</strong></p>
+                            <ul class="list-disc list-inside space-y-1 ml-2 mb-4">
+                                <li>Free cancellation up to 14 days before arrival - full refund</li>
+                                <li>7-14 days before arrival - 50% refund</li>
+                                <li>Less than 7 days - non-refundable</li>
+                            </ul>
+                            <p><strong class="text-white">Premium Packages (Ocean Explorer, Gourmet Experience):</strong></p>
+                            <ul class="list-disc list-inside space-y-1 ml-2 mb-4">
+                                <li>Free cancellation up to 21 days before arrival</li>
+                                <li>14-21 days - 25% cancellation fee</li>
+                                <li>Less than 14 days - non-refundable</li>
+                            </ul>
+                            <p class="text-stone-400 text-xs">All cancellations must be submitted in writing via email. Refunds processed within 7-10 business days.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-white/10 rounded-2xl overflow-hidden">
+                    <button class="accordion-trigger w-full flex items-center justify-between p-6 bg-slate-800/30 hover:bg-slate-800/50 transition-all" onclick="toggleAccordion(this)">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-info text-brand-orange text-xl"></i>
+                            <h3 class="text-white font-semibold text-lg">Additional Details</h3>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-white accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content bg-slate-800/20">
+                        <div class="p-6 space-y-3 text-stone-300 text-sm leading-relaxed">
+                            <p><strong class="text-white">Check-in/Check-out:</strong> Standard times apply (3 PM check-in, 11 AM check-out). Early check-in/late check-out subject to availability and may incur additional charges.</p>
+                            <p><strong class="text-white">Inclusions:</strong> All package inclusions must be used during the stay and cannot be exchanged for cash value or transferred to future bookings.</p>
+                            <p><strong class="text-white">Gratuities:</strong> Service charges and taxes are included in package rates. Additional gratuities are at guest's discretion.</p>
+                            <p><strong class="text-white">Weather:</strong> Outdoor activities are weather-dependent. Alternative indoor experiences will be offered in case of inclement weather.</p>
+                            <p><strong class="text-white">Special Requests:</strong> Dietary requirements, accessibility needs, and special occasions should be communicated at least 72 hours before arrival.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="booking-benefits" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-12 border border-white/10">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Why Book Direct?</h2>
+                <p class="text-stone-300 text-lg">Exclusive perks reserved for guests who book through our official channels</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-badge-percent text-brand-orange text-3xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg mb-2">Best Rate Guarantee</h3>
+                    <p class="text-stone-300 text-sm">Lowest prices guaranteed plus exclusive direct booking discounts</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-gift text-brand-orange text-3xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg mb-2">Complimentary Upgrades</h3>
+                    <p class="text-stone-300 text-sm">Room upgrades subject to availability at check-in</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-clock text-brand-orange text-3xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg mb-2">Flexible Booking</h3>
+                    <p class="text-stone-300 text-sm">Free cancellation and easy date modifications</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-concierge-bell text-brand-orange text-3xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg mb-2">VIP Treatment</h3>
+                    <p class="text-stone-300 text-sm">Priority check-in and dedicated concierge service</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="promotions-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="relative rounded-3xl overflow-hidden">
+            <div class="absolute inset-0">
+                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/9d1093f3e8-11cb1a218b65a0d38977.png" alt="luxury resort infinity pool sunset ocean view paradise destination romantic atmosphere" />
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/60"></div>
+            <div class="relative z-10 py-20 px-8 md:px-16">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                        <i class="fa-solid fa-clock text-brand-orange"></i>
+                        <span class="text-sm text-white font-medium">Limited Time Offers</span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Don't Miss Out</h2>
+                    <p class="text-stone-200 text-lg mb-8 leading-relaxed">
+                        These exclusive promotions won't last forever. Secure your preferred dates now and take advantage of our best rates, complimentary upgrades, and special perks designed to make your stay unforgettable.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Instant Confirmation</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">No Hidden Fees</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Secure Payment</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">24/7 Support</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start gap-4">
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto inline-flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            Browse All Offers
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-8 py-4 rounded-full text-base font-medium transition-all w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20">
+                            <i class="fa-brands fa-whatsapp text-green-400"></i>
+                            Ask a Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact-support" class="px-6 md:px-12 max-w-4xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-10 border border-white/10 text-center">
+            <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-headset text-brand-orange text-2xl"></i>
+            </div>
+            <h3 class="text-white font-serif text-3xl mb-4">Need Help Choosing?</h3>
+            <p class="text-stone-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Our reservation specialists are available 24/7 to help you find the perfect package, answer questions about our promotions, and customize your stay to match your preferences.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all border border-white/20 inline-flex items-center gap-2">
+                    <i class="fa-solid fa-phone text-brand-orange"></i>
+                    Call: +1 (555) 123-4567
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all border border-white/20 inline-flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-brand-orange"></i>
+                    Email Us
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Begin Your Journey</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Explore our exclusive promotions and book your dream getaway with confidence.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    View All Promotions
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleAccordion(button) {
+            const item = button.closest('.accordion-item');
+            const wasActive = item.classList.contains('accordion-active');
+            
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('accordion-active');
+            });
+            
+            if (!wasActive) {
+                item.classList.add('accordion-active');
+            }
+        }
+    </script>
+
+</body>
+</html>

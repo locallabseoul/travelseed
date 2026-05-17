@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .filter-chip-active { background: #F97316; color: #fff; }
+        .star-filled { color: #F97316; }
+        .star-empty { color: rgba(255, 255, 255, 0.2); }
+        .rating-bar { background: rgba(255, 255, 255, 0.1); height: 8px; border-radius: 999px; overflow: hidden; }
+        .rating-bar-fill { background: linear-gradient(to right, #F97316, #fb923c); height: 100%; transition: width 0.6s ease; }
+        .verified-badge { background: linear-gradient(135deg, #10b981, #059669); }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="hover:text-white transition-colors">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="text-brand-orange font-semibold">Reviews</a>
+            <a href="#" class="hover:text-white transition-colors">Promotions</a>
+            <a href="#" class="hover:text-white transition-colors">Dining</a>
+            <a href="#" class="hover:text-white transition-colors">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="reviews-hero" class="pt-32 pb-12 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl md:text-6xl font-serif text-white mb-4">Guest Stories</h1>
+            <p class="text-lg text-stone-300 max-w-2xl mx-auto">Discover what our guests say about their unforgettable experiences at The Haven.</p>
+        </div>
+    </section>
+
+    <section id="overall-rating" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-12">
+        <div class="glass-card rounded-3xl p-8 md:p-12">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="text-center md:text-left">
+                    <div class="inline-flex items-baseline gap-4 mb-4">
+                        <span class="text-7xl md:text-8xl font-serif font-bold text-white">4.9</span>
+                        <span class="text-2xl text-stone-400">/ 5</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start gap-2 mb-4">
+                        <i class="fa-solid fa-star star-filled text-2xl"></i>
+                        <i class="fa-solid fa-star star-filled text-2xl"></i>
+                        <i class="fa-solid fa-star star-filled text-2xl"></i>
+                        <i class="fa-solid fa-star star-filled text-2xl"></i>
+                        <i class="fa-solid fa-star star-filled text-2xl"></i>
+                    </div>
+                    <p class="text-stone-300 text-lg mb-6">Based on <span class="text-white font-semibold">847 verified reviews</span></p>
+                    <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                        <div class="verified-badge px-4 py-2 rounded-full flex items-center gap-2">
+                            <i class="fa-solid fa-shield-check text-white"></i>
+                            <span class="text-white text-sm font-medium">100% Verified Stays</span>
+                        </div>
+                        <div class="glass-card px-4 py-2 rounded-full border border-white/20">
+                            <span class="text-stone-200 text-sm font-medium">97% Recommend</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-stone-300 w-16">5 stars</span>
+                        <div class="flex-1 rating-bar">
+                            <div class="rating-bar-fill" style="width: 78%"></div>
+                        </div>
+                        <span class="text-sm text-stone-400 w-12 text-right">78%</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-stone-300 w-16">4 stars</span>
+                        <div class="flex-1 rating-bar">
+                            <div class="rating-bar-fill" style="width: 16%"></div>
+                        </div>
+                        <span class="text-sm text-stone-400 w-12 text-right">16%</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-stone-300 w-16">3 stars</span>
+                        <div class="flex-1 rating-bar">
+                            <div class="rating-bar-fill" style="width: 4%"></div>
+                        </div>
+                        <span class="text-sm text-stone-400 w-12 text-right">4%</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-stone-300 w-16">2 stars</span>
+                        <div class="flex-1 rating-bar">
+                            <div class="rating-bar-fill" style="width: 1%"></div>
+                        </div>
+                        <span class="text-sm text-stone-400 w-12 text-right">1%</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-stone-300 w-16">1 star</span>
+                        <div class="flex-1 rating-bar">
+                            <div class="rating-bar-fill" style="width: 1%"></div>
+                        </div>
+                        <span class="text-sm text-stone-400 w-12 text-right">1%</span>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-white/10">
+                        <p class="text-sm text-stone-400 mb-3">Average Ratings by Category</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="glass-card p-4 rounded-xl border border-white/10">
+                                <p class="text-xs text-stone-400 mb-1">Location</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-semibold text-white">4.9</span>
+                                    <i class="fa-solid fa-star star-filled text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl border border-white/10">
+                                <p class="text-xs text-stone-400 mb-1">Service</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-semibold text-white">4.9</span>
+                                    <i class="fa-solid fa-star star-filled text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl border border-white/10">
+                                <p class="text-xs text-stone-400 mb-1">Cleanliness</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-semibold text-white">5.0</span>
+                                    <i class="fa-solid fa-star star-filled text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl border border-white/10">
+                                <p class="text-xs text-stone-400 mb-1">Value</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl font-semibold text-white">4.8</span>
+                                    <i class="fa-solid fa-star star-filled text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="review-filters" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-8">
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+                <div class="flex-1">
+                    <p class="text-xs text-stone-400 mb-3 uppercase tracking-wider">Sort By</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="filter-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10 filter-chip-active" data-sort="recent">
+                            Most Recent
+                        </button>
+                        <button class="filter-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-sort="highest">
+                            Highest Rated
+                        </button>
+                        <button class="filter-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-sort="lowest">
+                            Lowest Rated
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:border-l lg:border-white/10 lg:pl-6">
+                    <p class="text-xs text-stone-400 mb-3 uppercase tracking-wider">Source</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="source-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-source="all">
+                            All Sources
+                        </button>
+                        <button class="source-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-source="google">
+                            <i class="fa-brands fa-google mr-1.5"></i>Google
+                        </button>
+                        <button class="source-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-source="tripadvisor">
+                            <i class="fa-brands fa-tripadvisor mr-1.5"></i>Tripadvisor
+                        </button>
+                        <button class="source-chip px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10" data-source="booking">
+                            Booking.com
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-white/10">
+                <p class="text-xs text-stone-400 mb-3 uppercase tracking-wider">Popular Topics</p>
+                <div class="flex flex-wrap gap-2">
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Ocean View
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Exceptional Service
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Romantic
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Breakfast
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Peaceful
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Clean
+                    </button>
+                    <button class="tag-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:text-white hover:bg-brand-orange/20 transition-all border border-white/10">
+                        Pool
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="reviews-list" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="space-y-6">
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">Sarah M.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · December 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <i class="fa-brands fa-google text-sm"></i>
+                            <span class="text-xs text-stone-300">Google</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"An absolute paradise. The attention to detail is remarkable."</p>
+                    <p class="text-stone-300 leading-relaxed">We spent our anniversary here and it exceeded every expectation. The ocean suite was stunning, the staff anticipated our every need, and the sunset views from our private terrace were simply breathtaking. The breakfast was exceptional, and the concierge helped us plan the most romantic experiences. We can't wait to return!</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Ocean View</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Romantic</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Exceptional Service</span>
+                </div>
+            </article>
+
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">James T.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · December 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <i class="fa-brands fa-tripadvisor text-sm"></i>
+                            <span class="text-xs text-stone-300">Tripadvisor</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"The perfect blend of luxury and tranquility."</p>
+                    <p class="text-stone-300 leading-relaxed">From the moment we arrived, we felt completely at ease. The resort is impeccably maintained, the pool area is stunning, and the staff went above and beyond to make our stay memorable. The yoga sessions at sunrise were a highlight, and the local market tour gave us wonderful insights into the culture. Highly recommend booking direct for the extra perks!</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Peaceful</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Pool</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Experiences</span>
+                </div>
+            </article>
+
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">Emma L.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · November 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <span class="text-xs text-stone-300">Booking.com</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"Every moment felt like a dream."</p>
+                    <p class="text-stone-300 leading-relaxed">The Haven truly lives up to its name. Our room was spotless, beautifully designed, and the ocean views were incredible. The dining experience was world-class - every meal was a culinary delight. The spa treatments were divine, and the infinity pool is the most beautiful I've ever seen. The staff remembered our names and preferences throughout our stay. Worth every penny!</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Clean</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Breakfast</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Ocean View</span>
+                </div>
+            </article>
+
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">Michael R.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · November 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <i class="fa-brands fa-google text-sm"></i>
+                            <span class="text-xs text-stone-300">Google</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"Outstanding in every way."</p>
+                    <p class="text-stone-300 leading-relaxed">This was our third visit to The Haven, and it just keeps getting better. The location is unbeatable, the facilities are pristine, and the level of personalized service is exceptional. They arranged a private sailing trip for us which was absolutely magical. The sunset cocktails by the pool, the gourmet dinners, and the peaceful atmosphere make this our favorite retreat. Already booked our next stay!</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Exceptional Service</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Experiences</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Repeat Guest</span>
+                </div>
+            </article>
+
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">Olivia K.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · October 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <i class="fa-brands fa-tripadvisor text-sm"></i>
+                            <span class="text-xs text-stone-300">Tripadvisor</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"A hidden gem worth discovering."</p>
+                    <p class="text-stone-300 leading-relaxed">We discovered The Haven through a friend's recommendation and I'm so glad we did. The boutique nature of the resort means you get personalized attention without feeling crowded. The architecture and design are stunning, blending modern luxury with local charm. Every staff member was friendly and helpful. The beach access is perfect, and the on-site dining exceeded our expectations. This is luxury done right.</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Peaceful</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Beach Access</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Design</span>
+                </div>
+            </article>
+
+            <article class="review-card glass-card rounded-2xl p-8 border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <div class="flex items-start gap-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="Guest" class="w-14 h-14 rounded-full object-cover border-2 border-white/20">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-1">David P.</h3>
+                            <p class="text-stone-400 text-sm mb-2">Verified Stay · October 2025</p>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                                <i class="fa-solid fa-star star-filled text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="verified-badge px-3 py-1.5 rounded-full text-xs font-medium text-white">
+                            <i class="fa-solid fa-shield-check mr-1"></i>Verified
+                        </div>
+                        <div class="glass-card px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+                            <span class="text-xs text-stone-300">Booking.com</span>
+                        </div>
+                    </div>
+                </div>
+                <blockquote class="mb-6">
+                    <p class="text-2xl md:text-3xl font-serif italic text-white mb-4 leading-relaxed">"Perfection from start to finish."</p>
+                    <p class="text-stone-300 leading-relaxed">Everything about our stay was flawless. The check-in process was smooth, our suite was ready early, and the welcome amenities were a lovely touch. The attention to detail in the room design, the quality of the linens, and the thoughtful touches like the turndown service made us feel truly pampered. The concierge team helped us plan amazing day trips. We'll definitely be back!</p>
+                </blockquote>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Exceptional Service</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Clean</span>
+                    <span class="px-3 py-1.5 glass-card rounded-full text-xs text-stone-300 border border-white/10">Concierge</span>
+                </div>
+            </article>
+        </div>
+
+        <div class="text-center mt-12">
+            <button id="load-more-reviews" class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all border border-white/20">
+                Load More Reviews <i class="fa-solid fa-chevron-down ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <section id="verified-policy" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-8 md:p-12 border border-white/10">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 verified-badge rounded-full mb-4">
+                    <i class="fa-solid fa-shield-check text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-serif text-white mb-4">Our Verified Review Policy</h2>
+                <p class="text-stone-300 max-w-2xl mx-auto">We believe in transparency and authenticity. Every review you see here is from a verified guest who has stayed with us.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-user-check text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">Verified Guests Only</h3>
+                    <p class="text-stone-400 text-sm">All reviews are from confirmed bookings and actual stays at The Haven.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-ban text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">No Fake Reviews</h3>
+                    <p class="text-stone-400 text-sm">We never post fake reviews or incentivize positive feedback.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-comments text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">Honest Feedback</h3>
+                    <p class="text-stone-400 text-sm">We display all reviews, positive and constructive, to help you make informed decisions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="social-proof" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Trusted Across Platforms</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">See what guests are saying about us on the world's leading travel platforms.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <i class="fa-brands fa-google text-5xl text-white mb-4"></i>
+                <h3 class="text-white font-semibold text-xl mb-2">Google Reviews</h3>
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <span class="text-4xl font-serif font-bold text-white">4.9</span>
+                    <div class="flex gap-1">
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                    </div>
+                </div>
+                <p class="text-stone-400 text-sm mb-4">Based on 324 reviews</p>
+                <a href="#" class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors">View on Google →</a>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <i class="fa-brands fa-tripadvisor text-5xl text-white mb-4"></i>
+                <h3 class="text-white font-semibold text-xl mb-2">Tripadvisor</h3>
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <span class="text-4xl font-serif font-bold text-white">5.0</span>
+                    <div class="flex gap-1">
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                        <i class="fa-solid fa-star star-filled text-lg"></i>
+                    </div>
+                </div>
+                <p class="text-stone-400 text-sm mb-4">Based on 298 reviews</p>
+                <a href="#" class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors">View on Tripadvisor →</a>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="text-5xl font-bold text-white mb-4">B</div>
+                <h3 class="text-white font-semibold text-xl mb-2">Booking.com</h3>
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <span class="text-4xl font-serif font-bold text-white">9.6</span>
+                    <span class="text-stone-400">/10</span>
+                </div>
+                <p class="text-stone-400 text-sm mb-4">Based on 225 reviews</p>
+                <a href="#" class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors">View on Booking.com →</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="book-direct-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="relative rounded-3xl overflow-hidden">
+            <div class="absolute inset-0" style="background-image: url('https://storage.googleapis.com/uxpilot-auth.appspot.com/1bb9542405-30fc3be7f0cb27152ccf.png');" class="bg-cover bg-center"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent"></div>
+            <div class="relative z-10 py-20 px-8 md:px-16">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                        <i class="fa-solid fa-award text-brand-orange"></i>
+                        <span class="text-sm text-white font-medium">Exclusive Direct Booking Benefits</span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Experience The Haven Difference</h2>
+                    <p class="text-stone-200 text-lg mb-8 leading-relaxed">Join hundreds of satisfied guests who've discovered paradise. Book directly with us for the best rates, exclusive perks, and personalized service that makes every stay unforgettable.</p>
+                    
+                    <div class="grid sm:grid-cols-2 gap-4 mb-10">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">Best Rate Guarantee</p>
+                                <p class="text-stone-300 text-sm">Lowest prices, always</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">Free Cancellation</p>
+                                <p class="text-stone-300 text-sm">Flexible booking terms</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">Welcome Amenities</p>
+                                <p class="text-stone-300 text-sm">Complimentary perks</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-check text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">Priority Support</p>
+                                <p class="text-stone-300 text-sm">24/7 concierge service</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start gap-4">
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto">
+                            Book Your Stay Now
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-8 py-4 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                            <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> Chat with Concierge
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Begin Your Journey</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Connect with our concierge team to design your perfect stay, or book directly for exclusive privileges.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    Check Availability
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function() {
+            const filterChips = document.querySelectorAll('.filter-chip');
+            const sourceChips = document.querySelectorAll('.source-chip');
+            const tagChips = document.querySelectorAll('.tag-chip');
+
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    filterChips.forEach(c => c.classList.remove('filter-chip-active'));
+                    this.classList.add('filter-chip-active');
+                });
+            });
+
+            sourceChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    sourceChips.forEach(c => {
+                        c.classList.remove('filter-chip-active');
+                        c.classList.add('glass-card', 'text-stone-300', 'border-white/10');
+                    });
+                    this.classList.add('filter-chip-active');
+                    this.classList.remove('glass-card', 'text-stone-300', 'border-white/10');
+                });
+            });
+
+            tagChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('filter-chip-active');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

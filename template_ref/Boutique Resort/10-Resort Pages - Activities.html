@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .activity-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .activity-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(249, 115, 22, 0.15); }
+        .section-divider { height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); }
+        .tab-button { transition: all 0.3s ease; }
+        .tab-button.active { background: rgba(249, 115, 22, 0.2); border-color: #F97316; color: #fff; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="hover:text-white transition-colors">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="hover:text-white transition-colors">Reviews</a>
+            <a href="#" class="hover:text-white transition-colors">Promotions</a>
+            <a href="#" class="hover:text-white transition-colors">Dining</a>
+            <a href="#" class="hover:text-white transition-colors">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="activities-hero" class="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="text-center max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                <i class="fa-solid fa-hiking text-brand-orange"></i>
+                <span class="text-sm text-white font-medium">Adventure Awaits</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">Activities & Adventures</h1>
+            <p class="text-xl text-stone-300 leading-relaxed">Discover curated experiences, guided tours, and hands-on classes designed to immerse you in the local culture and natural beauty of our coastal paradise.</p>
+        </div>
+    </section>
+
+    <section id="activity-tabs" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-16">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button class="tab-button active glass-card px-8 py-3 rounded-full text-sm font-medium border border-white/10 w-full sm:w-auto flex items-center justify-center gap-2" data-tab="on-property">
+                <i class="fa-solid fa-hotel"></i>
+                On-Property Activities
+            </button>
+            <button class="tab-button glass-card px-8 py-3 rounded-full text-sm font-medium border border-white/10 w-full sm:w-auto flex items-center justify-center gap-2 text-stone-300" data-tab="off-property">
+                <i class="fa-solid fa-map-location-dot"></i>
+                Off-Property Adventures
+            </button>
+        </div>
+    </section>
+
+    <section id="on-property-activities" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4 text-center">On-Property Experiences</h2>
+            <p class="text-stone-300 text-center max-w-2xl mx-auto">Enjoy a variety of activities without leaving the resort. Perfect for relaxation and wellness.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="activity-yoga" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad62cfe909-c90d35146f485daaab61.png" alt="sunrise yoga class on beach tropical resort peaceful morning meditation wellness activity" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-leaf mr-1"></i> Wellness
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Sunrise Yoga</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Start your day with guided yoga sessions on the beach. Connect with nature and find inner peace as the sun rises over the ocean.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">60 minutes</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Beginner to Intermediate</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily at 6:30 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Join Class
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-cooking" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/cbb7c03fc9-cba5d22510341d7a3edb.png" alt="cooking class culinary workshop chef teaching tropical cuisine hands-on experience luxury resort kitchen" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-yellow-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-utensils mr-1"></i> Culinary
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Coastal Cooking Class</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Learn to prepare authentic coastal dishes with our executive chef. Hands-on experience from market to table.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">3 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">All Levels Welcome</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Tue, Thu, Sat at 10:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Book Class
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-snorkeling" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/bb02db51f5-1e1941e29a0652f5aad4.png" alt="snorkeling activity crystal clear water tropical fish coral reef ocean adventure resort beach" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-blue-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-water mr-1"></i> Water Sports
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Guided Snorkeling</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Explore vibrant coral reefs and tropical marine life with our certified guides. Equipment and instruction provided.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">90 minutes</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Beginner Friendly</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily at 9:00 AM & 2:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Join Tour
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-kayaking" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/c0c3473fee-ccfcdff519533614bf82.png" alt="kayaking ocean adventure calm waters tropical coastline resort water activity sunset paddling" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-cyan-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-sailboat mr-1"></i> Adventure
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Sunset Kayaking</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Paddle along the pristine coastline during golden hour. Perfect for couples and solo adventurers seeking tranquility.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">2 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Moderate</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily at 5:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Reserve Spot
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-painting" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5546d6cbd0-c6b90f148d05be014deb.png" alt="watercolor painting class art workshop tropical scenery outdoor creative activity resort terrace" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-pink-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-palette mr-1"></i> Creative
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Watercolor Workshop</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Capture the beauty of coastal landscapes through watercolor painting. All materials included, no experience necessary.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">2.5 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">All Levels</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Wed & Sun at 3:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Sign Up
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-tennis" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/716b72b013-7b696919726aaa1d347b.png" alt="tennis court luxury resort professional instructor coaching sports activity tropical setting" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-orange-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-person-running mr-1"></i> Sports
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Tennis Lessons</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Improve your game with professional coaching on our championship courts. Private and group sessions available.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">60 minutes</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Beginner to Advanced</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily, by appointment</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Book Lesson
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="off-property-activities" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4 text-center">Off-Property Adventures</h2>
+            <p class="text-stone-300 text-center max-w-2xl mx-auto">Venture beyond the resort to explore local culture, hidden gems, and authentic experiences.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="activity-island-tour" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6cf411956e-3e2a34332232e9fa7548.png" alt="island tour boat excursion tropical islands turquoise water scenic coastal views adventure tourism" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-teal-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-ship mr-1"></i> Excursion
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Island Hopping Tour</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Discover hidden coves and pristine beaches across neighboring islands. Includes lunch, snorkeling gear, and local guide.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Full Day (8 hours)</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Easy to Moderate</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily departure at 8:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Book Tour
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-village-tour" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/509e97506b-4d527e53dc1486fed1cd.png" alt="traditional village tour local culture authentic experience tropical town market cultural immersion" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-amber-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-landmark mr-1"></i> Cultural
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Cultural Village Tour</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Immerse yourself in local traditions, visit artisan workshops, and explore vibrant markets with knowledgeable guides.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">4 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Easy - Walking Tour</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Mon, Wed, Fri at 9:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Join Tour
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-hiking" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e48f77c04c-716fc53da3ba7c2b3a83.png" alt="mountain hiking trail tropical rainforest jungle trek scenic viewpoint adventure nature" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-green-600/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-mountain mr-1"></i> Nature
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Rainforest Hiking</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Trek through lush tropical forests to reach breathtaking viewpoints. Spot exotic wildlife and cascading waterfalls.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">5 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Moderate to Challenging</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Tue, Thu, Sat at 7:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Reserve Spot
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-scuba" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ee5dea4b1b-5aab5dec02fbfb6b5e88.png" alt="scuba diving underwater coral reef colorful fish marine life diving adventure ocean exploration" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-indigo-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-person-swimming mr-1"></i> Diving
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Scuba Diving Experience</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Explore vibrant underwater ecosystems with PADI-certified instructors. Beginner courses and advanced dives available.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">3-4 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Beginner to Advanced</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily at 8:00 AM & 1:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Book Dive
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-fishing" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/fb7c9921b5-bba9a50e1ea0d7420843.png" alt="deep sea fishing charter boat ocean fishing adventure sport fishing tropical waters" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-sky-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-fish mr-1"></i> Fishing
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Deep Sea Fishing</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Charter a boat for an exciting deep sea fishing adventure. All equipment provided, catch and release or keep your prize.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Half Day (4 hours)</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">All Experience Levels</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Daily at 6:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Charter Boat
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="activity-photography" class="glass-card rounded-2xl overflow-hidden border border-white/10 activity-card">
+                <div class="relative h-56">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/2117bda03c-e5620a24f63371be6e71.png" alt="photography tour scenic locations tropical landscape sunset photography workshop camera lesson" />
+                    <div class="absolute top-4 right-4">
+                        <div class="bg-violet-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            <i class="fa-solid fa-camera mr-1"></i> Photography
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-white font-serif text-2xl mb-3">Photography Tour</h3>
+                    <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                        Capture stunning landscapes and cultural moments with a professional photographer. Learn composition and lighting techniques.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-clock text-brand-orange text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">3 hours</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-gauge-simple text-blue-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Beginner to Intermediate</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <div class="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-calendar text-purple-400 text-xs"></i>
+                            </div>
+                            <span class="text-stone-300">Wed & Sat at 4:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-brand-orange hover:bg-orange-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                            Join Tour
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all border border-white/20">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto mb-20"></div>
+
+    <section id="activity-info" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="grid lg:grid-cols-2 gap-12 items-start">
+            <div class="glass-card rounded-3xl p-10 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 bg-brand-orange/20 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-circle-info text-brand-orange text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-serif text-white">Important Information</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-brand-orange"></i>
+                            Booking & Reservations
+                        </h3>
+                        <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                            We recommend booking activities at least 24 hours in advance to secure your preferred time slot. Some popular experiences may require earlier booking during peak season.
+                        </p>
+                        <ul class="space-y-2 text-sm text-stone-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Book through concierge, guest portal, or WhatsApp</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Confirmation email sent within 2 hours</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Free cancellation up to 12 hours before start time</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div>
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-brand-orange"></i>
+                            Age & Health Requirements
+                        </h3>
+                        <p class="text-stone-300 text-sm leading-relaxed mb-3">
+                            Certain activities have age restrictions and health requirements for safety. Please review requirements before booking.
+                        </p>
+                        <ul class="space-y-2 text-sm text-stone-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Water activities: Minimum age 8 years (with adult)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Scuba diving: Medical clearance required</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle text-brand-orange mt-1.5" style="font-size: 6px;"></i>
+                                <span>Hiking: Good physical condition recommended</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div>
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-sun text-brand-orange"></i>
+                            Weather Policy
+                        </h3>
+                        <p class="text-stone-300 text-sm leading-relaxed">
+                            Outdoor activities are subject to weather conditions. In case of unfavorable weather, we will offer rescheduling or full refund. Our team monitors conditions closely to ensure guest safety.
+                        </p>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div>
+                        <h3 class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shirt text-brand-orange"></i>
+                            What to Bring
+                        </h3>
+                        <div class="grid sm:grid-cols-2 gap-3 text-sm text-stone-300">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Sunscreen & Hat</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Comfortable Footwear</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Swimwear & Towel</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Camera (Optional)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Water Bottle</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-check text-green-400 text-xs"></i>
+                                <span>Light Jacket</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="glass-card rounded-3xl p-10 border border-white/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-tags text-green-400 text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-serif text-white">Pricing</h2>
+                    </div>
+
+                    <p class="text-stone-300 text-sm leading-relaxed mb-6">
+                        Activity prices vary based on duration, group size, and equipment requirements. Most activities are complimentary for resort guests, while specialized excursions may incur additional fees.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-800/30 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-white font-medium">Complimentary Activities</p>
+                                <span class="text-green-400 font-semibold text-sm">FREE</span>
+                            </div>
+                            <p class="text-stone-400 text-xs">Yoga, Tennis, Kayaking, Snorkeling</p>
+                        </div>
+
+                        <div class="bg-slate-800/30 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-white font-medium">Premium Classes</p>
+                                <span class="text-brand-orange font-semibold text-sm">$35-75</span>
+                            </div>
+                            <p class="text-stone-400 text-xs">Cooking, Painting, Private Lessons</p>
+                        </div>
+
+                        <div class="bg-slate-800/30 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-white font-medium">Half-Day Excursions</p>
+                                <span class="text-brand-orange font-semibold text-sm">$85-150</span>
+                            </div>
+                            <p class="text-stone-400 text-xs">Village Tour, Fishing, Hiking</p>
+                        </div>
+
+                        <div class="bg-slate-800/30 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-white font-medium">Full-Day Adventures</p>
+                                <span class="text-brand-orange font-semibold text-sm">$180-280</span>
+                            </div>
+                            <p class="text-stone-400 text-xs">Island Hopping, Scuba Diving</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-brand-orange/10 border border-brand-orange/30 rounded-xl">
+                        <p class="text-stone-200 text-sm flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-brand-orange mt-0.5"></i>
+                            <span>Group discounts available for parties of 4 or more. Ask our concierge for special package rates.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-10 border border-white/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-purple-500/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-headset text-purple-400 text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-serif text-white">Need Assistance?</h2>
+                    </div>
+
+                    <p class="text-stone-300 text-sm leading-relaxed mb-6">
+                        Our concierge team is available 24/7 to help you plan the perfect activity schedule, answer questions, or make special arrangements.
+                    </p>
+
+                    <div class="space-y-3">
+                        <a href="#" class="flex items-center gap-3 p-4 glass-card hover:bg-slate-800 rounded-xl transition-all border border-white/10">
+                            <div class="w-10 h-10 bg-brand-orange/20 rounded-full flex items-center justify-center">
+                                <i class="fa-brands fa-whatsapp text-brand-orange"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium text-sm">WhatsApp Concierge</p>
+                                <p class="text-stone-400 text-xs">Instant responses, 24/7</p>
+                            </div>
+                        </a>
+
+                        <a href="#" class="flex items-center gap-3 p-4 glass-card hover:bg-slate-800 rounded-xl transition-all border border-white/10">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-phone text-blue-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium text-sm">Call Concierge</p>
+                                <p class="text-stone-400 text-xs">+1 (555) 123-4567</p>
+                            </div>
+                        </a>
+
+                        <a href="#" class="flex items-center gap-3 p-4 glass-card hover:bg-slate-800 rounded-xl transition-all border border-white/10">
+                            <div class="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-envelope text-green-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium text-sm">Email Inquiries</p>
+                                <p class="text-stone-400 text-xs">activities@thehaven.com</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="activity-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="relative rounded-3xl overflow-hidden">
+            <div class="absolute inset-0">
+                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d63a04f2b5-668fbee5d7156315f4b8.png" alt="tropical paradise adventure activities collage kayaking hiking yoga diving beach resort lifestyle" />
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/60"></div>
+            <div class="relative z-10 py-20 px-8 md:px-16">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                        <i class="fa-solid fa-star text-brand-orange"></i>
+                        <span class="text-sm text-white font-medium">Curated Experiences</span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Create Unforgettable Memories</h2>
+                    <p class="text-stone-200 text-lg mb-8 leading-relaxed">
+                        From serene wellness sessions to thrilling adventures, our activity program is designed to enrich your stay. Let us help you craft the perfect itinerary.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Expert Local Guides</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Small Group Sizes</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Premium Equipment</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-brand-orange text-xl"></i>
+                            <span class="text-white">Flexible Scheduling</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start gap-4">
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto inline-flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                            Plan My Activities
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-8 py-4 rounded-full text-base font-medium transition-all w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20">
+                            <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i>
+                            Chat with Concierge
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Adventure Awaits</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Discover the perfect blend of relaxation and excitement with our curated activity program.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    Book Activities
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const onPropertySection = document.getElementById('on-property-activities');
+            const offPropertySection = document.getElementById('off-property-activities');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.add('text-stone-300');
+                    });
+                    
+                    this.classList.add('active');
+                    this.classList.remove('text-stone-300');
+
+                    const tab = this.getAttribute('data-tab');
+                    
+                    if (tab === 'on-property') {
+                        onPropertySection.style.display = 'block';
+                        offPropertySection.style.display = 'none';
+                    } else {
+                        onPropertySection.style.display = 'none';
+                        offPropertySection.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

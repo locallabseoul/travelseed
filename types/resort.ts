@@ -1,4 +1,4 @@
-export type ResortTemplateId = "boutique-villa" | "surf-camp" | "minimal-stay";
+export type ResortTemplateId = "boutique-villa" | "boutique-resort" | "surf-camp" | "minimal-stay";
 export type ResortPlan = "Seed Trial" | "Seed" | "Tree" | "Forest";
 export type ResortPlanType = "freeTrial" | "seed" | "tree" | "forest";
 export type ResortSiteType = "landing" | "multipage" | "custom";
@@ -6,9 +6,16 @@ export type DomainStatus = "not_connected" | "pending" | "verified" | "active" |
 export type SslStatus = "pending" | "active" | "error";
 export type ResortOfferKind = "room" | "service" | "package";
 export type ResortReviewSourceLabel = "Manual" | "Google" | "Guest Message";
+export type BookingVoucherStatus = "draft" | "issued" | "void";
 
 export type ResortDesignSettings = {
   colorTheme?: string;
+  customColors?: {
+    primary?: string;
+    accent?: string;
+    page?: string;
+    text?: string;
+  };
   logoUrl?: string;
   fontStyle?: string;
   buttonStyle?: string;
@@ -193,6 +200,30 @@ export type ResortNavigationItem = {
   sort_order: number;
   created_at?: string | null;
   updated_at?: string | null;
+};
+
+export type ResortBookingVoucher = {
+  id: string;
+  resort_id: string;
+  inquiry_id: string | null;
+  room_offer_id: string | null;
+  voucher_code: string;
+  public_token: string;
+  guest_name: string;
+  guest_contact: string | null;
+  check_in: string | null;
+  check_out: string | null;
+  guests: number | null;
+  offer_title: string | null;
+  room_label: string | null;
+  amount_note: string | null;
+  included_notes: string | null;
+  policy_notes: string | null;
+  status: BookingVoucherStatus;
+  issued_at: string | null;
+  voided_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ResortInsert = Omit<Resort, "id" | "owner_user_id" | "owner_email"> & {

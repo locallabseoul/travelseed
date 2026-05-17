@@ -1,5 +1,6 @@
 import { AboutSection } from "@/components/resort/AboutSection";
 import { BookingSection } from "@/components/resort/BookingSection";
+import { BoutiqueResortSubPage } from "@/components/resort/BoutiqueResortSubPage";
 import { ExperienceSection } from "@/components/resort/ExperienceSection";
 import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
@@ -22,6 +23,10 @@ function slugKeyFor(page: ResortSitePage) {
 }
 
 export function ResortSubPage({ resort, page }: ResortSubPageProps) {
+  if (resort.template_id === "boutique-resort") {
+    return <BoutiqueResortSubPage resort={resort} page={page} />;
+  }
+
   const design = designTokensFor(resort.design_settings);
   const slugKey = slugKeyFor(page);
   const preset = presetForSlug(page.slug);

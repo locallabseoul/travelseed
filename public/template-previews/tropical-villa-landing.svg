@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Tropical Villa Landing template preview</title>
+  <desc id="desc">Dark tropical villa landing page preview with large editorial hero text, gold accents, villa cards, and direct booking CTA.</desc>
+  <defs>
+    <linearGradient id="jungle" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e1712"/>
+      <stop offset="0.52" stop-color="#1b3627"/>
+      <stop offset="1" stop-color="#8a6d4b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d4af37"/>
+      <stop offset="1" stop-color="#8a6d4b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="900" fill="#1b231d"/>
+  <rect x="0" y="0" width="1200" height="110" fill="#1b231d" opacity="0.86"/>
+  <text x="92" y="68" fill="#f8f7f4" font-family="Georgia, serif" font-size="36" font-weight="500">Villa Jeruk</text>
+  <text x="496" y="64" fill="#f8f7f4" fill-opacity="0.78" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="500" letter-spacing="3">ROOMS</text>
+  <text x="606" y="64" fill="#f8f7f4" fill-opacity="0.78" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="500" letter-spacing="3">EXPERIENCES</text>
+  <text x="790" y="64" fill="#f8f7f4" fill-opacity="0.78" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="500" letter-spacing="3">GALLERY</text>
+  <rect x="944" y="31" width="164" height="50" rx="25" fill="none" stroke="#f8f7f4" stroke-opacity="0.35"/>
+  <text x="976" y="63" fill="#f8f7f4" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">BOOK DIRECT</text>
+  <rect x="0" y="110" width="1200" height="520" fill="url(#jungle)"/>
+  <circle cx="202" cy="245" r="172" fill="#d4af37" opacity="0.08"/>
+  <circle cx="972" cy="384" r="242" fill="#f8f7f4" opacity="0.07"/>
+  <path d="M0 630 C178 504 309 588 462 460 C642 310 765 441 930 328 C1045 250 1132 232 1200 218 L1200 630 Z" fill="#000000" opacity="0.34"/>
+  <text x="92" y="198" fill="#d4af37" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="5">SELONG BELANAK, LOMBOK</text>
+  <line x1="92" y1="218" x2="420" y2="218" stroke="#d4af37" stroke-width="3"/>
+  <text x="86" y="352" fill="#f8f7f4" font-family="Georgia, serif" font-size="118" font-weight="600">Private Tropical</text>
+  <text x="86" y="474" fill="#f8f7f4" fill-opacity="0.9" font-family="Georgia, serif" font-size="118" font-style="italic" font-weight="500">Escape</text>
+  <text x="94" y="538" fill="#f8f7f4" fill-opacity="0.76" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="300">Premium villa presentation with private pool and booking CTA.</text>
+  <rect x="92" y="574" width="238" height="58" rx="29" fill="#25d366" filter="url(#shadow)"/>
+  <text x="132" y="611" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2">WHATSAPP BOOKING</text>
+  <rect x="0" y="630" width="1200" height="270" fill="#f8f7f4"/>
+  <text x="92" y="724" fill="#1b231d" font-family="Georgia, serif" font-size="58" font-weight="500">Choose your retreat</text>
+  <text x="92" y="764" fill="#7a7a6c" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="300">Expansive spaces, natural textures, and direct booking.</text>
+  <g filter="url(#shadow)">
+    <rect x="92" y="796" width="310" height="74" fill="#222b24"/>
+    <rect x="92" y="796" width="96" height="74" fill="url(#gold)" opacity="0.72"/>
+    <text x="212" y="828" fill="#f8f7f4" font-family="Georgia, serif" font-size="26">Pool Villa</text>
+    <text x="212" y="854" fill="#d4af37" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" letter-spacing="2">VIEW DETAILS</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="446" y="796" width="310" height="74" fill="#222b24"/>
+    <rect x="446" y="796" width="96" height="74" fill="#151b17"/>
+    <text x="566" y="828" fill="#f8f7f4" font-family="Georgia, serif" font-size="26">Garden Suite</text>
+    <text x="566" y="854" fill="#d4af37" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" letter-spacing="2">VIEW DETAILS</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="800" y="796" width="310" height="74" fill="#222b24"/>
+    <rect x="800" y="796" width="96" height="74" fill="#8a6d4b" opacity="0.78"/>
+    <text x="920" y="828" fill="#f8f7f4" font-family="Georgia, serif" font-size="26">Family Villa</text>
+    <text x="920" y="854" fill="#d4af37" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" letter-spacing="2">VIEW DETAILS</text>
+  </g>
+</svg>

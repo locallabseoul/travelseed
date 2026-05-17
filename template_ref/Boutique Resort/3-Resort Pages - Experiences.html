@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiences</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .category-tab-active { background: rgba(249, 115, 22, 0.2); border-color: #F97316; color: #fff; }
+        .filter-chip-active { background: #F97316; color: #fff; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="text-brand-orange font-semibold">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="hover:text-white transition-colors">Reviews</a>
+            <a href="#" class="hover:text-white transition-colors">Promotions</a>
+            <a href="#" class="hover:text-white transition-colors">Dining</a>
+            <a href="#" class="hover:text-white transition-colors">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="hero-experiences" class="relative pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-serif text-white mb-6">Curated Experiences</h1>
+            <p class="text-lg text-stone-300 max-w-2xl mx-auto">Discover handpicked adventures, cultural immersions, and local treasures that transform your stay into an unforgettable journey.</p>
+        </div>
+
+        <div id="editorial-curation" class="glass-card rounded-3xl overflow-hidden mb-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                <div class="relative h-[400px] overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/curated-day-experience.png" alt="Curated day experience at boutique resort featuring sunrise yoga, local market tour, and sunset sailing">
+                </div>
+                <div class="p-10 flex flex-col justify-center">
+                    <div class="inline-block px-4 py-1 bg-brand-orange/20 text-brand-orange text-xs font-semibold rounded-full mb-4 w-fit">
+                        RESORT CURATED
+                    </div>
+                    <h2 class="text-3xl font-serif text-white mb-4">A Perfect Day at The Haven</h2>
+                    <p class="text-stone-300 mb-6 leading-relaxed">Begin with sunrise yoga on the clifftop, explore vibrant local markets with our cultural guide, savor a farm-to-table lunch, unwind with a signature spa treatment, and end your day sailing into the golden hour.</p>
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-clock text-brand-orange"></i>
+                            <span>Full Day (8hrs)</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-users text-brand-orange"></i>
+                            <span>2-6 Guests</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-stone-300">
+                            <i class="fa-solid fa-tag text-brand-orange"></i>
+                            <span>$420/person</span>
+                        </div>
+                    </div>
+                    <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3 rounded-full text-sm font-semibold transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)] w-fit">
+                        Reserve This Experience
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="filter-tabs" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-12">
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex flex-col lg:flex-row gap-6">
+                <div class="flex-1">
+                    <p class="text-xs text-stone-400 mb-3 uppercase tracking-wider">Categories</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10 category-tab-active">
+                            All Experiences
+                        </button>
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10">
+                            Nature
+                        </button>
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10">
+                            Culture
+                        </button>
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10">
+                            Adventure
+                        </button>
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10">
+                            Wellness
+                        </button>
+                        <button class="category-tab px-5 py-2.5 glass-card rounded-full text-sm font-medium text-stone-300 hover:text-white transition-all border border-white/10">
+                            Local Favorites
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="lg:border-l lg:border-white/10 lg:pl-6">
+                    <p class="text-xs text-stone-400 mb-3 uppercase tracking-wider">Filters</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="filter-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:bg-slate-800 transition-all border border-white/10">
+                            <i class="fa-solid fa-heart mr-1.5"></i>For Couples
+                        </button>
+                        <button class="filter-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:bg-slate-800 transition-all border border-white/10">
+                            <i class="fa-solid fa-people-group mr-1.5"></i>Family-Friendly
+                        </button>
+                        <button class="filter-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:bg-slate-800 transition-all border border-white/10">
+                            <i class="fa-solid fa-house mr-1.5"></i>Indoor
+                        </button>
+                        <button class="filter-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:bg-slate-800 transition-all border border-white/10">
+                            <i class="fa-solid fa-sun mr-1.5"></i>Outdoor
+                        </button>
+                        <button class="filter-chip px-4 py-2 glass-card rounded-full text-xs font-medium text-stone-300 hover:bg-slate-800 transition-all border border-white/10">
+                            <i class="fa-solid fa-moon mr-1.5"></i>Evening
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="nature-experiences" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-serif text-white mb-2">Nature & Outdoors</h2>
+                <p class="text-stone-400 text-sm">Connect with the natural beauty surrounding The Haven</p>
+            </div>
+            <button class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors hidden lg:block">
+                View All <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/clifftop-sunrise-yoga.png" alt="Clifftop sunrise yoga session with ocean views, peaceful meditation, wellness retreat">
+                    <div class="absolute top-4 right-4 bg-brand-orange/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-white">
+                        Popular
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                        <span class="text-xs text-stone-400">• 90 min</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Clifftop Sunrise Yoga</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Greet the day with guided yoga and meditation as the sun rises over the ocean. Includes healthy smoothie bowl.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$45<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/guided-coastal-hike.png" alt="Guided coastal hiking trail with scenic ocean cliffs, nature exploration, adventure tour">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full">Moderate</span>
+                        <span class="text-xs text-stone-400">• 3 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Guided Coastal Hike</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Explore hidden coves and dramatic cliffs with our naturalist guide. Includes refreshments and photography stops.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$65<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/sunset-sailing.png" alt="Sunset sailing cruise with champagne, romantic ocean experience, luxury yacht">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                        <span class="text-xs text-stone-400">• 2 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Sunset Sailing</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Sail into golden hour aboard our luxury yacht. Champagne, canapés, and unforgettable ocean views included.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$180<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="culture-experiences" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-serif text-white mb-2">Cultural Immersion</h2>
+                <p class="text-stone-400 text-sm">Authentic local traditions and artisan encounters</p>
+            </div>
+            <button class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors hidden lg:block">
+                View All <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/local-market-tour.png" alt="Local market tour with cultural guide, traditional food tasting, authentic shopping experience">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                        <span class="text-xs text-stone-400">• 2.5 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Local Market Discovery</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Explore vibrant markets with our cultural guide. Taste exotic fruits, meet artisans, and learn local customs.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$55<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/pottery-workshop.png" alt="Traditional pottery workshop class, hands-on ceramic making, artisan experience">
+                    <div class="absolute top-4 right-4 bg-brand-orange/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-white">
+                        New
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                        <span class="text-xs text-stone-400">• 3 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Traditional Pottery Workshop</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Create your own ceramic masterpiece with a master potter. Take home your handmade creation.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$85<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/cooking-class.png" alt="Local cooking class with traditional recipes, culinary workshop, authentic cuisine">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                        <span class="text-xs text-stone-400">• 4 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Farm-to-Table Cooking Class</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Learn authentic recipes from our chef. Market visit, hands-on cooking, and feast on your creations.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$120<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="adventure-experiences" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-serif text-white mb-2">Adventure & Thrills</h2>
+                <p class="text-stone-400 text-sm">Adrenaline-pumping activities for the adventurous soul</p>
+            </div>
+            <button class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors hidden lg:block">
+                View All <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/kayaking-adventure.png" alt="Sea kayaking adventure through coastal caves, ocean exploration, water sports">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full">Moderate</span>
+                        <span class="text-xs text-stone-400">• 2.5 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Sea Kayaking Adventure</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Paddle through hidden caves and crystal waters. Equipment, guide, and snorkeling gear included.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$75<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/rock-climbing.png" alt="Guided rock climbing on coastal cliffs, adventure sports, outdoor climbing">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded-full">Challenging</span>
+                        <span class="text-xs text-stone-400">• 4 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Coastal Rock Climbing</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Scale dramatic cliff faces with certified guides. All skill levels welcome, equipment provided.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$95<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/scuba-diving.png" alt="Scuba diving expedition, underwater coral reef exploration, marine life adventure">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full">Moderate</span>
+                        <span class="text-xs text-stone-400">• 3 hours</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Scuba Diving Expedition</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Explore vibrant coral reefs and marine life. PADI-certified instructors, equipment, and certification courses available.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$140<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Inquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="wellness-experiences" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-serif text-white mb-2">Wellness & Rejuvenation</h2>
+                <p class="text-stone-400 text-sm">Nurture mind, body, and spirit with holistic experiences</p>
+            </div>
+            <button class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors hidden lg:block">
+                View All <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/spa-ritual.png" alt="Signature spa ritual treatment, luxury massage, holistic wellness therapy">
+                    <div class="absolute top-4 right-4 bg-brand-orange/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-white">
+                        Signature
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Relaxing</span>
+                        <span class="text-xs text-stone-400">• 120 min</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Haven Signature Spa Ritual</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Our exclusive treatment combining aromatherapy massage, body scrub, and facial using organic botanicals.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$220<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/meditation-session.png" alt="Private meditation session, mindfulness practice, peaceful retreat">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Peaceful</span>
+                        <span class="text-xs text-stone-400">• 60 min</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Private Meditation Session</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">One-on-one guided meditation in our clifftop pavilion. Learn techniques for mindfulness and inner peace.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$60<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="relative h-56 overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/sound-healing.png" alt="Sound healing therapy session, crystal bowls, holistic wellness">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Restorative</span>
+                        <span class="text-xs text-stone-400">• 75 min</span>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Sound Healing Journey</h3>
+                    <p class="text-sm text-stone-300 mb-4 leading-relaxed">Immersive sound bath with crystal bowls, gongs, and chimes. Release tension and restore energy balance.</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <p class="text-xs text-stone-400">From</p>
+                            <p class="text-2xl font-serif text-white">$85<span class="text-sm text-stone-400">/person</span></p>
+                        </div>
+                        <button class="bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all border border-brand-orange/30">
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="local-favorites" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-serif text-white mb-2">Local Favorites</h2>
+                <p class="text-stone-400 text-sm">Hidden gems and insider recommendations from our team</p>
+            </div>
+            <button class="text-brand-orange hover:text-orange-400 text-sm font-medium transition-colors hidden lg:block">
+                View All <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    <div class="relative h-64 md:h-auto overflow-hidden">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/hidden-beach.png" alt="Secret hidden beach cove, pristine sand, secluded paradise">
+                    </div>
+                    <div class="p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Easy</span>
+                            <span class="text-xs text-stone-400">• 15 min walk</span>
+                        </div>
+                        <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Secret Beach Cove</h3>
+                        <p class="text-sm text-stone-300 mb-4 leading-relaxed">Discover our private beach accessible only to guests. Perfect for sunrise swims and peaceful solitude.</p>
+                        <div class="flex items-center gap-4 text-xs text-stone-400">
+                            <span><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i>0.8 km</span>
+                            <span><i class="fa-solid fa-star text-brand-orange mr-1.5"></i>Complimentary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    <div class="relative h-64 md:h-auto overflow-hidden">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/viewpoint-hike.png" alt="Panoramic viewpoint overlook, scenic hiking trail, breathtaking vista">
+                    </div>
+                    <div class="p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full">Moderate</span>
+                            <span class="text-xs text-stone-400">• 45 min hike</span>
+                        </div>
+                        <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Eagle's Nest Viewpoint</h3>
+                        <p class="text-sm text-stone-300 mb-4 leading-relaxed">Breathtaking 360° panorama from the highest point. Best at sunrise or sunset. Trail map available.</p>
+                        <div class="flex items-center gap-4 text-xs text-stone-400">
+                            <span><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i>2.5 km</span>
+                            <span><i class="fa-solid fa-star text-brand-orange mr-1.5"></i>Complimentary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    <div class="relative h-64 md:h-auto overflow-hidden">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/artisan-cafe.png" alt="Charming artisan cafe, local coffee roastery, cozy atmosphere">
+                    </div>
+                    <div class="p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Casual</span>
+                            <span class="text-xs text-stone-400">• Daily 7AM-6PM</span>
+                        </div>
+                        <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">The Roastery Café</h3>
+                        <p class="text-sm text-stone-300 mb-4 leading-relaxed">Family-run café with the best coffee in town. Try their signature pastries and local honey.</p>
+                        <div class="flex items-center gap-4 text-xs text-stone-400">
+                            <span><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i>1.2 km</span>
+                            <span><i class="fa-solid fa-utensils text-brand-orange mr-1.5"></i>$8-15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden group hover:border-brand-orange/30 transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    <div class="relative h-64 md:h-auto overflow-hidden">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/art-gallery.png" alt="Contemporary art gallery, local artist exhibition, cultural space">
+                    </div>
+                    <div class="p-6 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">Indoor</span>
+                            <span class="text-xs text-stone-400">• Tue-Sun 10AM-7PM</span>
+                        </div>
+                        <h3 class="text-xl font-serif text-white mb-2 group-hover:text-brand-orange transition-colors">Coastal Arts Collective</h3>
+                        <p class="text-sm text-stone-300 mb-4 leading-relaxed">Contemporary gallery featuring local artists. Rotating exhibitions and artisan workshops available.</p>
+                        <div class="flex items-center gap-4 text-xs text-stone-400">
+                            <span><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i>3.0 km</span>
+                            <span><i class="fa-solid fa-ticket text-brand-orange mr-1.5"></i>Free entry</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-12 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10" style="background-image: url('https://storage.googleapis.com/uxpilot-auth.appspot.com/experience-background-pattern.png'); background-size: cover; background-position: center;"></div>
+            <div class="relative z-10">
+                <h2 class="text-4xl font-serif text-white mb-4">Design Your Perfect Day</h2>
+                <p class="text-stone-300 max-w-2xl mx-auto mb-8">Our concierge team can craft a personalized itinerary combining multiple experiences, arrange private tours, or recommend hidden gems based on your interests.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                        <i class="fa-brands fa-whatsapp mr-2"></i>Chat with Concierge
+                    </button>
+                    <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all border border-white/20">
+                        Download Experience Guide
+                    </button>
+                </div>
+                <div class="mt-8 pt-8 border-t border-white/10">
+                    <p class="text-sm text-stone-400 mb-4">Need something specific?</p>
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <span class="glass-card px-4 py-2 rounded-full text-xs text-stone-300">Private Events</span>
+                        <span class="glass-card px-4 py-2 rounded-full text-xs text-stone-300">Wedding Experiences</span>
+                        <span class="glass-card px-4 py-2 rounded-full text-xs text-stone-300">Corporate Retreats</span>
+                        <span class="glass-card px-4 py-2 rounded-full text-xs text-stone-300">Wellness Programs</span>
+                        <span class="glass-card px-4 py-2 rounded-full text-xs text-stone-300">Photography Tours</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Begin Your Journey</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Connect with our concierge team to design your perfect stay, or book directly for exclusive privileges.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    Check Availability
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function() {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const filterChips = document.querySelectorAll('.filter-chip');
+
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    categoryTabs.forEach(t => t.classList.remove('category-tab-active'));
+                    this.classList.add('category-tab-active');
+                });
+            });
+
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('filter-chip-active');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

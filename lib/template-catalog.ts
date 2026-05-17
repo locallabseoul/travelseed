@@ -6,13 +6,14 @@ export type TemplateCatalogEntry = {
   planType: ResortPlanType;
   siteType: ResortSiteType;
   templateId: string;
+  previewImageUrl?: string;
   tags: [string, string];
 };
 
 export const templateCatalog: TemplateCatalogEntry[] = [
-  { name: "Sunset Landing", description: "A fast one-page direct booking site for small properties.", planType: "seed", siteType: "landing", templateId: "minimal-stay", tags: ["Landing", "Seed"] },
-  { name: "Tropical Villa Landing", description: "Premium one-page villa presentation with booking CTA.", planType: "seed", siteType: "landing", templateId: "boutique-villa", tags: ["Landing", "Seed"] },
-  { name: "Boutique Resort Multi-page", description: "Multi-page resort brand structure for rooms, dining, blog, and SEO.", planType: "tree", siteType: "multipage", templateId: "boutique-villa", tags: ["Multi-page", "Tree"] },
+  { name: "Sunset Landing", description: "A fast one-page direct booking site for small properties.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
+  { name: "Tropical Villa Landing", description: "Premium one-page villa presentation with booking CTA.", planType: "seed", siteType: "landing", templateId: "boutique-villa", previewImageUrl: "/template-previews/tropical-villa-landing.svg", tags: ["Landing", "Seed"] },
+  { name: "Boutique Resort Multi-page", description: "Multi-page resort brand structure for rooms, dining, blog, and SEO.", planType: "tree", siteType: "multipage", templateId: "boutique-resort", previewImageUrl: "/template-previews/boutique-resort-multipage.svg", tags: ["Multi-page", "Tree"] },
   { name: "Surf Camp Multi-page", description: "Activity-led multi-page site for camps, packages, and experiences.", planType: "tree", siteType: "multipage", templateId: "surf-camp", tags: ["Multi-page", "Tree"] },
   { name: "Luxury Resort Platform", description: "Custom platform structure for premium resort campaigns and special pages.", planType: "forest", siteType: "custom", templateId: "boutique-villa", tags: ["Custom", "Forest"] },
 ];

@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { colorThemes } from "@/components/dashboard/mockData";
-import { canUsePlan, effectivePlanType, forestCustomPages, templateCatalog, treePages } from "@/components/dashboard/subscriptionConfig";
+import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { canUsePlan, effectivePlanType, templateCatalog } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
-import { designTokensFor } from "@/lib/design-settings";
-import type { DesignTokens } from "@/lib/design-settings";
-import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
+import { savePreviewResort } from "@/components/create/preview-storage";
+import { defaultEditableColorsForTemplate } from "@/lib/design-settings";
 import type { DashboardUnsavedChanges, PlanType, ResortConsoleData } from "@/types/dashboard";
+import type { Resort } from "@/types/resort";
 
 const fontOptions = ["Editorial Sans", "Clean Modern", "Warm Serif", "Compact UI"];
 const buttonStyles = ["Rounded", "Pill", "Sharp", "Soft Outline"];
@@ -13,25 +13,24 @@ const imageStyles = ["Soft Corners", "Square Editorial", "Full Bleed", "Postcard
 
 const templateNameById: Record<string, string> = {
   "boutique-villa": "Boutique Villa",
+  "boutique-resort": "Boutique Resort",
   "surf-camp": "Surf Camp",
   "minimal-stay": "Minimal Stay",
 };
 
-const themeSwatches: Record<string, string[]> = {
-  Sand: ["#f8f5ef", "#d9c49e", "#18352f"],
-  "Tropical Green": ["#f8f5ef", "#2d6b50", "#18352f"],
-  "Dark Luxury": ["#11241f", "#d9c49e", "#ffffff"],
-  "Minimal White": ["#ffffff", "#e7e1d6", "#202724"],
-};
+const colorControlLabels = {
+  primary: "Primary",
+  accent: "Accent",
+  page: "Background",
+  text: "Text",
+} satisfies Record<ColorControlKey, string>;
 
-type PreviewMode = "boutique" | "surf" | "minimal" | "luxury";
+type ColorControlKey = "primary" | "accent" | "page" | "text";
+type CustomColors = ResortConsoleData["designSettings"]["customColors"];
 
-type PresetPreviewItem = {
-  label: string;
-  title: string;
-  slug: string;
-  note: string;
-};
+function isHexColor(value: string | undefined) {
+  return !!value && /^#[0-9a-f]{6}$/i.test(value);
+}
 
 function templateLibraryCopy(planType: PlanType) {
   if (planType === "seed") {
@@ -47,22 +46,6 @@ function templateLibraryCopy(planType: PlanType) {
   }
 
   return "Upgrade to Seed to unlock one-page direct booking templates.";
-}
-
-function previewModeFor(templateId: string, catalogName: string): PreviewMode {
-  if (templateId === "surf-camp") {
-    return "surf";
-  }
-
-  if (templateId === "minimal-stay") {
-    return "minimal";
-  }
-
-  if (catalogName.toLowerCase().includes("luxury")) {
-    return "luxury";
-  }
-
-  return "boutique";
 }
 
 function defaultCatalogNameFor(templateId: string, planType: PlanType) {
@@ -81,31 +64,17 @@ function validCatalogNameFor(catalogName: string, templateId: string, planType: 
   return defaultCatalogNameFor(templateId, planType);
 }
 
-function presetPreviewItemsFor(planType: PlanType): PresetPreviewItem[] {
-  const pages = planType === "forest" ? forestCustomPages : treePages;
+function normalizedCustomColors(colors: CustomColors) {
+  return {
+    ...(isHexColor(colors.primary) ? { primary: colors.primary } : {}),
+    ...(isHexColor(colors.accent) ? { accent: colors.accent } : {}),
+    ...(isHexColor(colors.page) ? { page: colors.page } : {}),
+    ...(isHexColor(colors.text) ? { text: colors.text } : {}),
+  };
+}
 
-  return pages
-    .map((page) => {
-      const preset = presetForSlug(page.slug);
-
-      if (!preset) {
-        return null;
-      }
-
-      const settings = presetSettingsFrom(page.settings, preset);
-      return {
-        label: preset.label,
-        title: settings.title,
-        slug: preset.slug,
-        note: preset.layout === "promotions"
-          ? settings.campaignNote ?? "Direct booking campaign page."
-          : preset.layout === "dining"
-            ? settings.openingHours ?? "Dining details and guest meal highlights."
-            : settings.items[0] ?? preset.description,
-      };
-    })
-    .filter((item): item is PresetPreviewItem => Boolean(item))
-    .slice(0, 6);
+function customColorsEqual(left: CustomColors, right: CustomColors) {
+  return JSON.stringify(normalizedCustomColors(left)) === JSON.stringify(normalizedCustomColors(right));
 }
 
 export function DesignManager({
@@ -119,18 +88,19 @@ export function DesignManager({
 }) {
   const [template, setTemplate] = useState(site.template);
   const [templateCatalogName, setTemplateCatalogName] = useState(() => validCatalogNameFor(site.designSettings.templateCatalogName, site.template, effectivePlanType(site)));
-  const [colorTheme, setColorTheme] = useState(site.designSettings.colorTheme);
+  const [customColors, setCustomColors] = useState<CustomColors>(site.designSettings.customColors);
   const [logoUrl, setLogoUrl] = useState(site.designSettings.logoUrl);
   const [fontStyle, setFontStyle] = useState(site.designSettings.fontStyle);
   const [buttonStyle, setButtonStyle] = useState(site.designSettings.buttonStyle);
   const [imageStyle, setImageStyle] = useState(site.designSettings.imageStyle);
   const [status, setStatus] = useState("");
+  const [previewRevision, setPreviewRevision] = useState(0);
   const planType = effectivePlanType(site);
 
   useEffect(() => {
     setTemplate(site.template);
     setTemplateCatalogName(validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType));
-    setColorTheme(site.designSettings.colorTheme);
+    setCustomColors(site.designSettings.customColors);
     setLogoUrl(site.designSettings.logoUrl);
     setFontStyle(site.designSettings.fontStyle);
     setButtonStyle(site.designSettings.buttonStyle);
@@ -139,7 +109,7 @@ export function DesignManager({
 
   const isDirty = template !== site.template ||
     templateCatalogName !== validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType) ||
-    colorTheme !== site.designSettings.colorTheme ||
+    !customColorsEqual(customColors, site.designSettings.customColors) ||
     logoUrl !== site.designSettings.logoUrl ||
     fontStyle !== site.designSettings.fontStyle ||
     buttonStyle !== site.designSettings.buttonStyle ||
@@ -162,7 +132,8 @@ export function DesignManager({
         ...site,
         template,
         designSettings: {
-          colorTheme,
+          colorTheme: site.designSettings.colorTheme || "Tropical Green",
+          customColors: normalizedCustomColors(customColors),
           logoUrl,
           fontStyle,
           buttonStyle,
@@ -177,13 +148,38 @@ export function DesignManager({
   }
 
   const selectedTemplateName = templateNameById[template] ?? template;
-  const previewDesign = designTokensFor({ colorTheme, logoUrl, fontStyle, buttonStyle, imageStyle });
   const availableTemplates = templateCatalog.filter((option) => canUsePlan(planType, option.planType));
   const upgradeTemplates = templateCatalog.filter((option) => !canUsePlan(planType, option.planType));
   const selectedCatalogEntry = templateCatalog.find((option) => option.name === templateCatalogName) ?? templateCatalog.find((option) => option.templateId === template);
   const selectedTemplateUnavailable = selectedCatalogEntry ? !canUsePlan(planType, selectedCatalogEntry.planType) : false;
-  const previewMode = previewModeFor(template, selectedCatalogEntry?.name ?? selectedTemplateName);
-  const presetPreviewItems = presetPreviewItemsFor(planType);
+  const savedColorTheme = site.designSettings.colorTheme || "Tropical Green";
+  const previewResort = useMemo(
+    () => previewResortFromSite(site, {
+      template,
+      colorTheme: savedColorTheme,
+      customColors: normalizedCustomColors(customColors),
+      logoUrl,
+      fontStyle,
+      buttonStyle,
+      imageStyle,
+      templateCatalogName,
+    }),
+    [buttonStyle, customColors, fontStyle, imageStyle, logoUrl, savedColorTheme, site, template, templateCatalogName],
+  );
+
+  const templateDefaultColors = defaultEditableColorsForTemplate(template, { templateCatalogName });
+  const editableColors = {
+    primary: customColors.primary ?? templateDefaultColors.primary,
+    accent: customColors.accent ?? templateDefaultColors.accent,
+    page: customColors.page ?? templateDefaultColors.page,
+    text: customColors.text ?? templateDefaultColors.text,
+  } satisfies Record<ColorControlKey, string>;
+  const isCustomColorMode = Object.keys(normalizedCustomColors(customColors)).length > 0;
+
+  useEffect(() => {
+    savePreviewResort(previewResort);
+    setPreviewRevision((current) => current + 1);
+  }, [previewResort]);
 
   return (
     <div className="grid gap-6">
@@ -226,7 +222,7 @@ export function DesignManager({
               className="text-left"
             >
               <Panel className={selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"}>
-                <TemplatePreview name={option.name} />
+                <TemplatePreview name={option.name} previewImageUrl={option.previewImageUrl} />
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <h2 className="font-semibold text-[#18352f]">{option.name}</h2>
                   {selected ? <Badge>Current</Badge> : null}
@@ -290,23 +286,30 @@ export function DesignManager({
               />
             </label>
 
-            <div>
-              <p className="text-sm font-semibold text-[#18352f]">Color theme</p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {colorThemes.map((theme) => (
-                  <button
-                    key={theme}
-                    type="button"
-                    onClick={() => setColorTheme(theme)}
-                    className={`min-h-16 rounded-xl bg-white p-3 text-left text-sm font-semibold text-[#18352f] ring-1 ${theme === colorTheme ? "ring-2 ring-[#2d6b50]" : "ring-[#eadfce]"}`}
-                  >
-                    <div className="mb-2 flex gap-1">
-                      {(themeSwatches[theme] ?? []).map((swatch) => (
-                        <span key={swatch} className="h-5 w-5 rounded-full ring-1 ring-black/5" style={{ backgroundColor: swatch }} />
-                      ))}
-                    </div>
-                    {theme}
-                  </button>
+            <div className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-[#18352f]">Customize colors</p>
+                  <p className="mt-1 text-xs leading-5 text-[#6f7b74]">
+                    {isCustomColorMode ? "Custom colors override this template's default palette." : "Using this template's default palette."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCustomColors({})}
+                  className="min-h-9 rounded-full bg-white px-3 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]"
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="mt-4 grid gap-3">
+                {(Object.keys(colorControlLabels) as ColorControlKey[]).map((key) => (
+                  <ColorField
+                    key={key}
+                    label={colorControlLabels[key]}
+                    value={editableColors[key]}
+                    onChange={(value) => setCustomColors((current) => ({ ...current, [key]: value }))}
+                  />
                 ))}
               </div>
             </div>
@@ -326,13 +329,13 @@ export function DesignManager({
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
             <div>
               <h2 className="text-xl font-semibold text-[#18352f]">Responsive preview</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{selectedCatalogEntry?.name ?? selectedTemplateName} · {colorTheme} · {fontStyle}</p>
+              <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{selectedCatalogEntry?.name ?? selectedTemplateName} · {isCustomColorMode ? "Custom colors" : "Template default colors"} · {fontStyle}</p>
             </div>
             <Badge>{buttonStyle}</Badge>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.48fr]">
-            <DesktopPreview mode={previewMode} site={site} design={previewDesign} buttonStyle={buttonStyle} logoUrl={logoUrl} presets={presetPreviewItems} />
-            <PhonePreview mode={previewMode} site={site} design={previewDesign} buttonStyle={buttonStyle} templateName={selectedCatalogEntry?.name ?? selectedTemplateName} presets={presetPreviewItems} />
+            <DesktopPreview revision={previewRevision} />
+            <PhonePreview revision={previewRevision} />
           </div>
         </Panel>
       </div>
@@ -340,293 +343,197 @@ export function DesignManager({
   );
 }
 
-function TemplatePreview({ name }: { name: string }) {
-  if (name === "Surf Camp") {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#0b5f6f,#f6d365)]" />;
-  }
+function TemplatePreview({ name, previewImageUrl }: { name: string; previewImageUrl?: string }) {
+  const [imageFailed, setImageFailed] = useState(false);
 
-  if (name === "Minimal Stay") {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#ffffff,#d8cebb)] ring-1 ring-[#eadfce]" />;
-  }
-
-  if (name === "Local Business") {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#f8f5ef,#202724)]" />;
-  }
-
-  return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#eadfce,#f8f5ef,#2d6b50)]" />;
-}
-
-function PreviewButton({
-  design,
-  buttonStyle,
-  label,
-  className = "",
-}: {
-  design: DesignTokens;
-  buttonStyle: string;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <span
-      className={`inline-flex min-h-10 items-center px-4 text-xs font-semibold ${design.buttonClassName} ${className}`}
-      style={{
-        backgroundColor: buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary,
-        borderColor: design.colors.primary,
-        color: buttonStyle === "Soft Outline" ? design.colors.primary : design.colors.buttonText,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function PreviewImage({ site, design, className = "" }: { site: ResortConsoleData; design: DesignTokens; className?: string }) {
-  return (
-    <div
-      className={`bg-cover bg-center ${design.imageClassName} ${className}`}
-      style={site.heroImageUrl ? { backgroundImage: `url(${site.heroImageUrl})` } : { background: `linear-gradient(135deg, ${design.colors.accent}, ${design.colors.section})` }}
-    />
-  );
-}
-
-function DesktopPreview({
-  mode,
-  site,
-  design,
-  buttonStyle,
-  logoUrl,
-  presets,
-}: {
-  mode: PreviewMode;
-  site: ResortConsoleData;
-  design: DesignTokens;
-  buttonStyle: string;
-  logoUrl: string;
-  presets: PresetPreviewItem[];
-}) {
-  if (mode === "surf") {
+  if (previewImageUrl && !imageFailed) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-[#eadfce] shadow-sm" style={{ backgroundColor: design.colors.primary, color: design.colors.buttonText }}>
-        <div className="grid min-h-[360px] gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] opacity-75">{site.location}</p>
-            <h3 className={`mt-3 text-4xl font-black leading-none ${design.headingClassName}`}>{site.heroTitle || site.name}</h3>
-            <p className={`mt-4 text-sm leading-6 opacity-80 ${design.bodyClassName}`}>{site.heroSubtitle || "Active beach stays, packages, and direct booking in one clear flow."}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <PreviewButton design={design} buttonStyle={buttonStyle} label={site.heroCta} />
-              <span className={`inline-flex min-h-10 items-center border border-white/35 px-4 text-xs font-semibold text-white ${design.buttonClassName}`}>Experiences</span>
-            </div>
-          </div>
-          <div>
-            <PreviewImage site={site} design={design} className="h-48 shadow-[0_24px_70px_rgba(0,0,0,0.24)]" />
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {["Rooms", "Lessons", "Pickup"].map((item) => (
-                <div key={item} className="rounded-md bg-white/90 p-3 text-center text-xs font-black" style={{ color: design.colors.primary }}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-2 p-4" style={{ backgroundColor: design.colors.accent }}>
-          {["Surf camp", "Packages", "Local rhythm"].map((item) => (
-            <div key={item} className="rounded-md bg-white/20 px-3 py-2 text-xs font-bold text-white">{item}</div>
-          ))}
-        </div>
-        <PresetPreviewStrip presets={presets} design={design} compact />
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#f8f5ef] ring-1 ring-[#eadfce]">
+        <Image
+          src={previewImageUrl}
+          alt={`${name} template preview`}
+          fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+          className="object-cover"
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
       </div>
     );
   }
 
-  if (mode === "minimal") {
-    return (
-      <div className="overflow-hidden rounded-2xl border border-[#eadfce] shadow-sm" style={{ backgroundColor: design.colors.page }}>
-        <div className="grid min-h-[360px] gap-6 p-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{site.location}</p>
-            <h3 className={`mt-4 text-4xl font-semibold leading-tight ${design.headingClassName}`} style={{ color: design.colors.text }}>{site.heroTitle || site.name}</h3>
-            <p className={`mt-4 text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{site.heroSubtitle || "Quiet rooms, clean details, and direct booking without clutter."}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {["2 guests", "Sea view", "Breakfast"].map((item) => (
-                <span key={item} className="rounded-full border px-3 py-1 text-xs" style={{ borderColor: design.colors.accent, color: design.colors.muted }}>{item}</span>
-              ))}
-            </div>
-          </div>
-          <PreviewImage site={site} design={design} className="h-64" />
-        </div>
-        <div className="grid grid-cols-3 gap-3 border-t p-5" style={{ borderColor: design.colors.accent }}>
-          {["Rooms", "Light", "Nearby"].map((item) => (
-            <div key={item} className="border-t pt-3 text-xs font-medium" style={{ borderColor: design.colors.accent, color: design.colors.text }}>{item}</div>
-          ))}
-        </div>
-        <PresetPreviewStrip presets={presets} design={design} />
-      </div>
-    );
+  if (name.toLowerCase().includes("surf")) {
+    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#0b5f6f,#f6d365)]" aria-label={`${name} template preview`} />;
   }
 
-  if (mode === "luxury") {
-    return (
-      <div className="overflow-hidden rounded-2xl border border-[#eadfce] shadow-sm" style={{ backgroundColor: design.colors.primary, color: design.colors.buttonText }}>
-        <div className="grid min-h-[360px] gap-0 lg:grid-cols-[1fr_0.82fr]">
-          <div className="p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>Custom resort platform</p>
-            <h3 className={`mt-4 text-4xl font-semibold leading-tight ${design.headingClassName}`}>{site.heroTitle || site.name}</h3>
-            <p className={`mt-4 max-w-sm text-sm leading-6 opacity-75 ${design.bodyClassName}`}>{site.heroSubtitle || "Premium campaign pages, direct booking, and editorial resort storytelling."}</p>
-            <div className="mt-6">
-              <PreviewButton design={design} buttonStyle={buttonStyle} label={site.heroCta} />
-            </div>
-          </div>
-          <div className="p-4">
-            <PreviewImage site={site} design={design} className="h-full min-h-72" />
-          </div>
-        </div>
-        <div className="grid grid-cols-4 gap-2 border-t border-white/15 p-4">
-          {["Weddings", "Dining", "Membership", "Offers"].map((item) => (
-            <div key={item} className="rounded-md border border-white/15 p-3 text-xs font-semibold">{item}</div>
-          ))}
-        </div>
-        <PresetPreviewStrip presets={presets} design={design} compact />
-      </div>
-    );
+  if (name.toLowerCase().includes("sunset") || name.toLowerCase().includes("minimal")) {
+    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#fff9f5,#ffb4a2,#e85d75)] ring-1 ring-[#eadfce]" aria-label={`${name} template preview`} />;
   }
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-[#eadfce] bg-white shadow-sm" style={{ backgroundColor: design.colors.page }}>
-      <PreviewImage site={site} design={design} className="h-56" />
-      <div className="p-5">
-        {logoUrl ? <p className="text-xs font-semibold" style={{ color: design.colors.accent }}>Logo connected</p> : <p className="text-xs font-semibold" style={{ color: design.colors.accent }}>{site.type}</p>}
-        <h3 className={`mt-2 text-3xl ${design.headingClassName}`} style={{ color: design.colors.text }}>{site.heroTitle || site.name}</h3>
-        <p className={`mt-2 text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{site.heroSubtitle || site.location}</p>
-        <div className="mt-5">
-          <PreviewButton design={design} buttonStyle={buttonStyle} label={site.heroCta} />
-        </div>
-      </div>
-      <PresetPreviewStrip presets={presets} design={design} />
-    </div>
-  );
+  if (name.toLowerCase().includes("luxury")) {
+    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#151b17,#8a6d4b,#d4af37)]" aria-label={`${name} template preview`} />;
+  }
+
+  if (name.toLowerCase().includes("boutique resort")) {
+    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#0f172a,#1e293b,#f97316)] ring-1 ring-[#eadfce]" aria-label={`${name} template preview`} />;
+  }
+
+  return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#eadfce,#f8f5ef,#2d6b50)]" aria-label={`${name} template preview`} />;
 }
 
-function PresetPreviewStrip({
-  presets,
-  design,
-  compact = false,
-}: {
-  presets: PresetPreviewItem[];
-  design: DesignTokens;
-  compact?: boolean;
-}) {
-  if (presets.length === 0) {
-    return null;
-  }
-
+function DesktopPreview({ revision }: { revision: number }) {
   return (
-    <div className="border-t p-4" style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: design.colors.accent }}>Preset pages</p>
-        <span className="text-[11px] font-semibold" style={{ color: design.colors.muted }}>{presets.length} pages</span>
-      </div>
-      <div className={`mt-3 grid gap-2 ${compact ? "grid-cols-2" : "sm:grid-cols-2"}`}>
-        {presets.slice(0, compact ? 4 : 6).map((preset) => (
-          <div key={preset.slug} className="rounded-xl border px-3 py-2" style={{ backgroundColor: design.colors.page, borderColor: design.colors.accent }}>
-            <p className="truncate text-xs font-semibold" style={{ color: design.colors.text }}>{preset.label}</p>
-            <p className="mt-1 line-clamp-2 text-[11px] leading-4" style={{ color: design.colors.muted }}>{preset.note}</p>
-          </div>
-        ))}
+    <div className="overflow-hidden rounded-2xl border border-[#eadfce] bg-white shadow-sm">
+      <div className="relative h-[585px] overflow-hidden bg-[#f8f5ef]">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[1230px] w-[1440px] origin-top -translate-x-1/2 scale-[0.475] [transform-style:preserve-3d]">
+          <iframe
+            key={`desktop-${revision}`}
+            src={revision > 0 ? `/preview?dashboardPreview=${revision}&viewport=desktop` : "about:blank"}
+            title="Desktop template preview"
+            className="h-full w-full border-0"
+          />
+        </div>
       </div>
     </div>
   );
 }
 
-function PhonePreview({
-  mode,
-  site,
-  design,
-  buttonStyle,
-  templateName,
-  presets,
-}: {
-  mode: PreviewMode;
-  site: ResortConsoleData;
-  design: DesignTokens;
-  buttonStyle: string;
-  templateName: string;
-  presets: PresetPreviewItem[];
-}) {
-  const isSurf = mode === "surf";
-  const isMinimal = mode === "minimal";
-  const isLuxury = mode === "luxury";
-
+function PhonePreview({ revision }: { revision: number }) {
   return (
     <div className="mx-auto h-fit w-[268px] self-center rounded-[3rem] bg-[#111315] p-2.5 shadow-[0_24px_70px_rgba(17,19,21,0.24)] ring-1 ring-black/20">
-      <div className="relative flex h-[548px] flex-col overflow-hidden rounded-[2.35rem] bg-white" style={{ backgroundColor: isSurf || isLuxury ? design.colors.primary : design.colors.page, color: isSurf || isLuxury ? design.colors.buttonText : design.colors.text }}>
+      <div className="relative h-[548px] overflow-hidden rounded-[2.35rem] bg-white">
         <div className="absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-[#111315]" />
-        <div className="flex h-8 items-end justify-between px-5 pb-1 text-[10px] font-semibold">
+        <div className="pointer-events-none absolute left-0 top-0 z-20 flex h-8 w-full items-end justify-between px-5 pb-1 text-[10px] font-semibold text-white mix-blend-difference">
           <span>9:41</span>
           <span className="tracking-[0.08em]">5G</span>
         </div>
-        {isMinimal ? (
-          <div className="flex flex-1 flex-col p-4 pt-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: design.colors.accent }}>{templateName}</p>
-            <h3 className={`mt-2 text-xl leading-tight ${design.headingClassName}`}>{site.name}</h3>
-            <PreviewImage site={site} design={design} className="mt-5 h-40" />
-            <div className="mt-4 grid gap-2">
-              {["Rooms", "Gallery", "Nearby"].map((item) => (
-                <div key={item} className="border-t pt-2 text-[11px]" style={{ borderColor: design.colors.accent, color: design.colors.muted }}>{item}</div>
-              ))}
-            </div>
-            <PhonePresetChips presets={presets} design={design} />
-          </div>
-        ) : (
-          <>
-            <PreviewImage site={site} design={design} className={isSurf ? "h-40" : "h-[9.75rem]"} />
-            <div className="flex flex-1 flex-col p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: design.colors.accent }}>{templateName}</p>
-              <h3 className={`mt-1 text-lg leading-tight ${design.headingClassName}`}>{site.name}</h3>
-              <p className={`mt-2 line-clamp-2 text-[11px] leading-5 ${design.bodyClassName}`} style={{ color: isSurf || isLuxury ? "rgba(255,255,255,0.74)" : design.colors.muted }}>{site.heroSubtitle || site.location}</p>
-              <div className={isSurf ? "mt-4 grid grid-cols-3 gap-1" : "mt-4"}>
-                {isSurf ? ["Stay", "Surf", "Ride"].map((item) => (
-                  <span key={item} className="rounded-md bg-white/15 px-2 py-2 text-center text-[9px] font-bold">{item}</span>
-                )) : <PreviewButton design={design} buttonStyle={buttonStyle} label={isLuxury ? "Reserve" : "Book"} className="w-full justify-center" />}
-              </div>
-              <PhonePresetChips presets={presets} design={design} inverted={isSurf || isLuxury} />
-            </div>
-          </>
-        )}
-        <div className="mx-auto mb-2 mt-auto h-1 w-20 rounded-full bg-black/30" />
+        <div className="pointer-events-none absolute left-1/2 top-8 h-[760px] w-[390px] origin-top -translate-x-1/2 scale-[0.636] [transform-style:preserve-3d]">
+          <iframe
+            key={`phone-${revision}`}
+            src={revision > 0 ? `/preview?dashboardPreview=${revision}&viewport=phone` : "about:blank"}
+            title="Phone template preview"
+            className="h-full w-full border-0"
+          />
+        </div>
+        <div className="pointer-events-none absolute bottom-2 left-1/2 z-20 h-1 w-20 -translate-x-1/2 rounded-full bg-black/30" />
       </div>
     </div>
   );
 }
 
-function PhonePresetChips({
-  presets,
-  design,
-  inverted = false,
-}: {
-  presets: PresetPreviewItem[];
-  design: DesignTokens;
-  inverted?: boolean;
-}) {
-  if (presets.length === 0) {
+function previewResortFromSite(
+  site: ResortConsoleData,
+  design: ResortConsoleData["designSettings"] & { template: string },
+): Resort {
+  return {
+    id: site.id,
+    owner_user_id: null,
+    owner_email: site.contactEmail || null,
+    slug: site.slug,
+    name: site.name,
+    domain: site.domain,
+    template_id: design.template,
+    plan: site.plan,
+    plan_type: site.planType,
+    site_type: site.siteType,
+    location: site.location,
+    type: site.type,
+    description: site.about || null,
+    hero_title: site.heroTitle || site.name,
+    hero_subtitle: site.heroSubtitle || null,
+    hero_image_url: site.heroImageUrl || null,
+    whatsapp_number: site.whatsappNumber,
+    capacity: null,
+    bedrooms: null,
+    bathrooms: null,
+    features: site.features,
+    gallery: site.gallery,
+    experiences: site.experiences,
+    booking_message_template: site.bookingMessageTemplate || null,
+    design_settings: {
+      colorTheme: design.colorTheme,
+      customColors: design.customColors,
+      logoUrl: design.logoUrl,
+      fontStyle: design.fontStyle,
+      buttonStyle: design.buttonStyle,
+      imageStyle: design.imageStyle,
+      templateCatalogName: design.templateCatalogName,
+    },
+    is_active: site.isActive,
+    domain_status: site.domainStatus,
+    ssl_status: site.sslStatus,
+    domain_verified_at: site.domainVerifiedAt,
+    services: site.services.map((service) => ({
+      id: service.id,
+      resort_id: site.id,
+      kind: service.kind,
+      title: service.title,
+      description: service.description || null,
+      price_label: service.priceLabel || null,
+      capacity: numberFromString(service.capacity),
+      image_url: service.imageUrl || null,
+      highlight: service.highlight || null,
+      duration: service.duration || null,
+      included: service.included,
+      cta_label: service.ctaLabel || null,
+      bed_type: service.bedType || null,
+      room_size: service.roomSize || null,
+      view_type: service.viewType || null,
+      bathroom_info: service.bathroomInfo || null,
+      max_guests: numberFromString(service.maxGuests),
+      room_amenities: service.roomAmenities,
+      sort_order: service.sortOrder,
+      is_active: service.isActive,
+    })),
+    reviews: [],
+    pages: [],
+    sections: [],
+    navigation_items: [],
+    created_at: site.createdAt,
+    updated_at: site.updatedAt,
+  };
+}
+
+function numberFromString(value: string) {
+  if (!value.trim()) {
     return null;
   }
 
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const colorPickerValue = isHexColor(value) ? value : "#000000";
+
   return (
-    <div className="mt-4 flex gap-1 overflow-hidden">
-      {presets.slice(0, 3).map((preset) => (
-        <span
-          key={preset.slug}
-          className="max-w-[72px] truncate rounded-full px-2 py-1 text-[9px] font-semibold"
-          style={{
-            backgroundColor: inverted ? "rgba(255,255,255,0.14)" : design.colors.section,
-            color: inverted ? "rgba(255,255,255,0.82)" : design.colors.text,
-          }}
-        >
-          {preset.label}
-        </span>
-      ))}
-    </div>
+    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+      {label}
+      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-[#d8cebb] bg-white px-3">
+        <input
+          type="color"
+          value={colorPickerValue}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-8 w-10 cursor-pointer rounded-md border-0 bg-transparent p-0"
+          aria-label={`${label} color picker`}
+        />
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          maxLength={7}
+          placeholder="#18352f"
+          className="min-w-0 flex-1 bg-transparent font-mono text-sm uppercase outline-none"
+        />
+      </div>
+    </label>
   );
 }
 

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        stone: {
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        brand: {
+                            orange: '#F97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f5f5f4; }
+        .glass-nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        .editorial-dropcap::first-letter { float: left; font-size: 4.5rem; line-height: 0.9; padding-right: 0.5rem; font-family: 'Playfair Display', serif; color: #F97316; }
+        .timeline-dot { width: 16px; height: 16px; background: #F97316; border: 3px solid rgba(15, 23, 42, 0.9); border-radius: 50%; position: absolute; left: -8px; }
+        .timeline-line { width: 2px; background: linear-gradient(to bottom, #F97316, rgba(249, 115, 22, 0.2)); position: absolute; left: 0; top: 0; bottom: 0; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <nav id="header" class="fixed w-full top-0 z-50 glass-nav rounded-full mt-4 mx-auto max-w-7xl left-0 right-0 px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-200 flex-wrap justify-center">
+            <a href="#" class="hover:text-white transition-colors">Home</a>
+            <a href="#" class="hover:text-white transition-colors">Rooms</a>
+            <a href="#" class="hover:text-white transition-colors">Experiences</a>
+            <a href="#" class="hover:text-white transition-colors">Gallery</a>
+            <a href="#" class="hover:text-white transition-colors">Reviews</a>
+            <a href="#" class="hover:text-white transition-colors">Promotions</a>
+            <a href="#" class="hover:text-white transition-colors">Dining</a>
+            <a href="#" class="text-brand-orange font-semibold">About</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="hidden lg:block text-xl font-serif font-semibold tracking-wide text-white absolute left-1/2 transform -translate-x-1/2">
+            THE HAVEN
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="#" class="text-sm font-medium text-stone-200 hover:text-white transition-colors hidden lg:block">Guest Portal</a>
+            <button class="bg-brand-orange hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                Book Direct
+            </button>
+        </div>
+    </nav>
+
+    <section id="about-hero" class="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-6 border border-white/20">
+                    <i class="fa-solid fa-compass text-brand-orange"></i>
+                    <span class="text-sm text-white font-medium">Our Story</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">Where Luxury Meets Serenity</h1>
+                <p class="text-xl text-stone-300 leading-relaxed">A boutique sanctuary crafted for those who seek more than just a destination—an experience that touches the soul.</p>
+            </div>
+            <div class="relative h-[500px] rounded-3xl overflow-hidden">
+                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/de30fcc54d-f88fdfefd519d9f46054.png" alt="luxury boutique resort exterior with infinity pool overlooking ocean at sunset, modern tropical architecture, warm ambient lighting" />
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="editorial-story" class="px-6 md:px-12 max-w-5xl mx-auto w-full mb-20">
+        <div class="glass-card rounded-3xl p-10 md:p-16 border border-white/10">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-8 text-center">The Haven Philosophy</h2>
+            
+            <div class="prose prose-invert max-w-none">
+                <p class="editorial-dropcap text-lg text-stone-200 leading-relaxed mb-6">
+                    Nestled between azure waters and lush tropical hillsides, The Haven was born from a simple vision: to create a sanctuary where time slows down, connections deepen, and every moment becomes a cherished memory. Our founders, seasoned travelers and hospitality visionaries, dreamed of a place that transcends the ordinary—a boutique retreat where luxury whispers rather than shouts, and authenticity reigns supreme.
+                </p>
+                
+                <p class="text-lg text-stone-200 leading-relaxed mb-6">
+                    What sets The Haven apart is our unwavering commitment to personalized experiences. Unlike sprawling resorts where guests become numbers, we limit our capacity to ensure every visitor receives the attention they deserve. Our intimate scale allows our team to learn your name, remember your preferences, and anticipate your needs before you voice them.
+                </p>
+                
+                <p class="text-lg text-stone-200 leading-relaxed mb-6">
+                    We believe true luxury lies in the details—freshly picked flowers in your room each morning, hand-written welcome notes, locally sourced breakfast ingredients prepared to your exact taste, and sunset cocktails mixed by bartenders who remember how you like them. This is hospitality elevated to an art form.
+                </p>
+                
+                <div class="grid md:grid-cols-3 gap-6 my-12">
+                    <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                        <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-leaf text-brand-orange text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-semibold text-lg mb-2">Sustainable Luxury</h3>
+                        <p class="text-stone-400 text-sm">Eco-conscious practices without compromising comfort</p>
+                    </div>
+                    
+                    <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                        <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-heart text-brand-orange text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-semibold text-lg mb-2">Personalized Care</h3>
+                        <p class="text-stone-400 text-sm">Every guest receives bespoke attention</p>
+                    </div>
+                    
+                    <div class="glass-card p-6 rounded-2xl border border-white/10 text-center">
+                        <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-globe text-brand-orange text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-semibold text-lg mb-2">Local Culture</h3>
+                        <p class="text-stone-400 text-sm">Authentic experiences rooted in tradition</p>
+                    </div>
+                </div>
+                
+                <p class="text-lg text-stone-200 leading-relaxed">
+                    From our architecture that seamlessly blends modern design with local heritage to our partnerships with artisan communities, every aspect of The Haven tells a story. We're not just a place to stay—we're a gateway to discovering the soul of this remarkable destination, one unforgettable moment at a time.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="location-section" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Where Paradise Awaits</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">Perfectly positioned to offer both tranquil seclusion and convenient access to local attractions.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10">
+                <div class="h-[400px] bg-slate-800 relative">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa-solid fa-map-location-dot text-6xl text-brand-orange mb-4"></i>
+                            <p class="text-white text-lg font-medium">Interactive Map Preview</p>
+                            <p class="text-stone-400 text-sm mt-2">Coastal Paradise Location</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="glass-card rounded-2xl p-8 border border-white/10">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-location-dot text-brand-orange text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-2">Address</h3>
+                            <p class="text-stone-300">123 Coastal Paradise Drive</p>
+                            <p class="text-stone-300">Sunset Bay, Tropical Island 12345</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-8 border border-white/10">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-plane text-brand-orange text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold text-lg mb-4">Getting Here</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-stone-300">From International Airport</span>
+                                    <span class="text-white font-medium">45 minutes</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-stone-300">Private Transfer Available</span>
+                                    <span class="text-brand-orange font-medium">Complimentary</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-stone-300">City Center Distance</span>
+                                    <span class="text-white font-medium">15 minutes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-8 border border-white/10">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-circle-info text-brand-orange text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold text-lg mb-2">Travel Tips</h3>
+                            <ul class="space-y-2 text-stone-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-brand-orange mt-1 text-sm"></i>
+                                    <span>Arrange airport pickup 24 hours in advance</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-brand-orange mt-1 text-sm"></i>
+                                    <span>Best time to visit: November to April</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-brand-orange mt-1 text-sm"></i>
+                                    <span>Local currency accepted, USD widely used</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="property-story" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Design & Philosophy</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">Architecture that honors the past while embracing the future, sustainability at our core.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="h-64 overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3de9ec7853-f38fc49188c11ea16cff.png" alt="modern minimalist resort architecture with natural materials, wood and stone, tropical setting" />
+                </div>
+                <div class="p-8">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-building text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-2xl mb-4">Architectural Vision</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        Our design celebrates the harmony between modern luxury and natural beauty. Local stone, sustainable timber, and floor-to-ceiling glass create spaces that breathe with the landscape.
+                    </p>
+                    <p class="text-stone-400 text-sm">
+                        Every corner is thoughtfully designed to frame breathtaking views while maintaining intimate, human-scale proportions that make you feel at home.
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="h-64 overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/931a280696-2a24ff5beed1a4c6b5a6.png" alt="sustainable eco-friendly resort with solar panels, green roof, natural landscaping, tropical environment" />
+                </div>
+                <div class="p-8">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-seedling text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-2xl mb-4">Sustainability Commitment</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        We power 80% of our operations with solar energy, harvest rainwater for irrigation, and source 90% of our ingredients from local organic farms within 50 kilometers.
+                    </p>
+                    <p class="text-stone-400 text-sm">
+                        Our zero-waste kitchen, plastic-free guest amenities, and coral reef restoration program reflect our dedication to protecting paradise for generations to come.
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/10 hover:border-brand-orange/30 transition-all">
+                <div class="h-64 overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/441850b614-b9f387fa38e8e82f786b.png" alt="artisan craftspeople creating traditional handicrafts, local culture, workshop setting" />
+                </div>
+                <div class="p-8">
+                    <div class="w-12 h-12 bg-brand-orange/20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-hands-holding-circle text-brand-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-white font-semibold text-2xl mb-4">Community Partnership</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        We employ 95% local staff, partner with artisan cooperatives for our décor, and contribute 5% of profits to community education and healthcare initiatives.
+                    </p>
+                    <p class="text-stone-400 text-sm">
+                        Every stay supports local families and helps preserve traditional crafts, creating a positive ripple effect throughout the region.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="team-section" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Meet Our Team</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">The passionate individuals dedicated to making your stay extraordinary.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Resort Director" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Marcus Chen</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Resort Director & Co-Founder</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    With 20 years in luxury hospitality across Asia and Europe, Marcus brings a vision of intimate, authentic experiences that transform stays into lifelong memories.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "Our mission is simple: create moments so special, guests can't wait to return and share them with loved ones."
+                </blockquote>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Guest Experience Manager" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Isabella Rodriguez</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Guest Experience Manager</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Isabella's background in psychology and hospitality allows her to anticipate guest needs intuitively, creating seamless, personalized experiences from arrival to departure.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "I believe every guest has a unique story. My role is to help write the most beautiful chapter during their time with us."
+                </blockquote>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Executive Chef" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Chef Aiden Thompson</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Executive Chef</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Trained in Michelin-starred kitchens, Aiden brings farm-to-table philosophy to life, showcasing local ingredients through innovative techniques and traditional recipes.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "Cooking is storytelling. Each dish shares the flavors, traditions, and soul of this incredible place."
+                </blockquote>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg" alt="Wellness Director" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Priya Sharma</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Wellness & Spa Director</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    A certified yoga instructor and holistic wellness expert, Priya designs transformative programs that nurture mind, body, and spirit through ancient and modern practices.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "True luxury is inner peace. We create sanctuaries where guests reconnect with themselves."
+                </blockquote>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Concierge Manager" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Lucas Martinez</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Chief Concierge</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Born and raised locally, Lucas knows every hidden beach, authentic restaurant, and cultural treasure, curating bespoke adventures that reveal the destination's true essence.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "This is my home. Sharing its magic with guests and seeing their joy is my greatest privilege."
+                </blockquote>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 border border-white/10 text-center hover:border-brand-orange/30 transition-all">
+                <div class="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-brand-orange/20">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Operations Manager" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-white font-semibold text-xl mb-2">Sophie Laurent</h3>
+                <p class="text-brand-orange text-sm font-medium mb-4">Operations & Sustainability Manager</p>
+                <p class="text-stone-300 text-sm leading-relaxed mb-4">
+                    Sophie ensures every operational detail supports our sustainability goals while maintaining the highest standards of comfort and service excellence.
+                </p>
+                <blockquote class="text-stone-400 text-xs italic border-l-2 border-brand-orange/30 pl-4">
+                    "Behind every seamless experience is a commitment to doing things right—for guests, staff, and our planet."
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+    <section id="awards-press" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Recognition & Awards</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">Honored by industry leaders and featured in prestigious publications worldwide.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="glass-card rounded-3xl p-10 border border-white/10">
+                <div class="flex items-start gap-6 mb-6">
+                    <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-award text-brand-orange text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-xl mb-2">Best Boutique Resort 2025</h3>
+                        <p class="text-stone-400 text-sm mb-3">World Luxury Hotel Awards</p>
+                        <p class="text-stone-300 text-sm leading-relaxed">
+                            Recognized for exceptional personalized service, sustainable practices, and creating unforgettable guest experiences in intimate settings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-10 border border-white/10">
+                <div class="flex items-start gap-6 mb-6">
+                    <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-trophy text-brand-orange text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-xl mb-2">Sustainability Excellence Award</h3>
+                        <p class="text-stone-400 text-sm mb-3">Green Hospitality Initiative, 2024</p>
+                        <p class="text-stone-300 text-sm leading-relaxed">
+                            Honored for pioneering eco-friendly operations, renewable energy implementation, and meaningful community partnerships.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-10 border border-white/10">
+                <div class="flex items-start gap-6 mb-6">
+                    <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-star text-brand-orange text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-xl mb-2">Tripadvisor Travelers' Choice</h3>
+                        <p class="text-stone-400 text-sm mb-3">Top 1% Worldwide, 2023-2025</p>
+                        <p class="text-stone-300 text-sm leading-relaxed">
+                            Consistently ranked among the world's finest hotels based on authentic guest reviews and exceptional ratings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-10 border border-white/10">
+                <div class="flex items-start gap-6 mb-6">
+                    <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-newspaper text-brand-orange text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-xl mb-2">Featured in Travel + Leisure</h3>
+                        <p class="text-stone-400 text-sm mb-3">"50 Best Romantic Getaways," 2025</p>
+                        <p class="text-stone-300 text-sm leading-relaxed">
+                            Celebrated for creating intimate, romantic atmospheres perfect for couples seeking privacy and personalized attention.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 border border-white/10">
+            <h3 class="text-white font-semibold text-xl mb-6 text-center">As Featured In</h3>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+                <div class="text-stone-400 font-serif text-2xl hover:text-white transition-colors cursor-pointer">Condé Nast Traveler</div>
+                <div class="text-stone-400 font-serif text-2xl hover:text-white transition-colors cursor-pointer">Forbes Travel</div>
+                <div class="text-stone-400 font-serif text-2xl hover:text-white transition-colors cursor-pointer">Architectural Digest</div>
+                <div class="text-stone-400 font-serif text-2xl hover:text-white transition-colors cursor-pointer">Vogue Living</div>
+                <div class="text-stone-400 font-serif text-2xl hover:text-white transition-colors cursor-pointer">Wallpaper*</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="timeline-section" class="px-6 md:px-12 max-w-5xl mx-auto w-full mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-4">Our Journey</h2>
+            <p class="text-stone-300 max-w-2xl mx-auto">From vision to reality—the milestones that shaped The Haven.</p>
+        </div>
+
+        <div class="relative pl-8">
+            <div class="timeline-line"></div>
+
+            <div class="relative mb-12">
+                <div class="timeline-dot"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-white/10 hover:border-brand-orange/30 transition-all">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">The Vision</h3>
+                        <span class="text-brand-orange font-medium">2018</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        Marcus and Isabella meet at a hospitality conference, sharing frustrations with impersonal mega-resorts. Over coffee, they sketch their dream: a boutique sanctuary where every guest feels like family.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative mb-12">
+                <div class="timeline-dot"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-white/10 hover:border-brand-orange/30 transition-all">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">Finding Paradise</h3>
+                        <span class="text-brand-orange font-medium">2019</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        After exploring 50+ locations, they discover this pristine coastal property. The moment they see the sunset over the bay, they know they've found home. Partnerships with local communities begin.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative mb-12">
+                <div class="timeline-dot"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-white/10 hover:border-brand-orange/30 transition-all">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">Building with Purpose</h3>
+                        <span class="text-brand-orange font-medium">2020-2021</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        Construction begins using sustainable materials and local artisans. Solar panels installed, rainwater systems implemented. Every design choice reflects the commitment to environmental stewardship.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative mb-12">
+                <div class="timeline-dot"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-white/10 hover:border-brand-orange/30 transition-all">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">Grand Opening</h3>
+                        <span class="text-brand-orange font-medium">March 2022</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        The Haven welcomes its first guests. Within weeks, word spreads about the personalized service and stunning location. Early reviews exceed all expectations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative mb-12">
+                <div class="timeline-dot"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-white/10 hover:border-brand-orange/30 transition-all">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">Award Recognition</h3>
+                        <span class="text-brand-orange font-medium">2023-2024</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        Industry accolades pour in. Tripadvisor Travelers' Choice, sustainability awards, and features in Travel + Leisure and Condé Nast Traveler validate the vision.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="timeline-dot" style="background: linear-gradient(135deg, #F97316, #fb923c);"></div>
+                <div class="glass-card rounded-2xl p-8 ml-6 border border-brand-orange/30">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold text-2xl">Today & Beyond</h3>
+                        <span class="text-brand-orange font-medium">2025+</span>
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        With 97% guest satisfaction and countless return visitors, The Haven continues evolving. New wellness programs, expanded sustainability initiatives, and deeper community partnerships define our future.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="values-cta" class="px-6 md:px-12 max-w-7xl mx-auto w-full mb-20">
+        <div class="relative rounded-3xl overflow-hidden">
+            <div class="absolute inset-0">
+                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7b51e059e7-e3509c560aa6e64d375e.png" alt="sunrise yoga session on beach, peaceful ocean view, silhouettes of people meditating, golden hour lighting" />
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/70"></div>
+            <div class="relative z-10 py-20 px-8 md:px-16">
+                <div class="max-w-3xl">
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Experience The Haven Difference</h2>
+                    <p class="text-stone-200 text-lg mb-8 leading-relaxed">
+                        We're more than a resort—we're a community of passionate individuals committed to creating experiences that linger in your heart long after you've returned home. Every detail, every interaction, every moment is crafted with care.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-6 mb-10">
+                        <div class="glass-card p-6 rounded-2xl border border-white/10">
+                            <h4 class="text-white font-semibold mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-users text-brand-orange"></i>
+                                Intimate Scale
+                            </h4>
+                            <p class="text-stone-300 text-sm">Limited rooms ensure personalized attention for every guest</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border border-white/10">
+                            <h4 class="text-white font-semibold mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-leaf text-brand-orange"></i>
+                                Eco-Conscious
+                            </h4>
+                            <p class="text-stone-300 text-sm">Sustainable luxury that protects our beautiful planet</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border border-white/10">
+                            <h4 class="text-white font-semibold mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-heart text-brand-orange"></i>
+                                Locally Rooted
+                            </h4>
+                            <p class="text-stone-300 text-sm">Authentic experiences celebrating local culture and community</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border border-white/10">
+                            <h4 class="text-white font-semibold mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-star text-brand-orange"></i>
+                                Award-Winning
+                            </h4>
+                            <p class="text-stone-300 text-sm">Recognized globally for excellence and innovation</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start gap-4">
+                        <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-4 rounded-full text-base font-medium transition-all shadow-[0_0_30px_rgba(249,115,22,0.5)] w-full sm:w-auto">
+                            Book Your Stay
+                        </button>
+                        <button class="glass-card hover:bg-slate-800 text-white px-8 py-4 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                            <i class="fa-solid fa-phone text-brand-orange"></i> Speak with Our Team
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="relative py-24 border-t border-white/10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Begin Your Journey</h2>
+            <p class="text-stone-300 mb-10 max-w-xl mx-auto">Connect with our concierge team to design your perfect stay, or book directly for exclusive privileges.</p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="bg-brand-orange hover:bg-orange-600 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)] w-full sm:w-auto">
+                    Check Availability
+                </button>
+                <button class="glass-card hover:bg-slate-800 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20">
+                    <i class="fa-brands fa-whatsapp text-green-400 text-lg"></i> WhatsApp Concierge
+                </button>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-stone-400">
+                <p>&copy; 2026 The Haven Boutique Resort. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

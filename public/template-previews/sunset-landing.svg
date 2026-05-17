@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Sunset Landing template preview</title>
+  <desc id="desc">Warm sunset landing page preview with hero image, direct booking CTA, room cards, and coral accents.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8c6a6"/>
+      <stop offset="0.45" stop-color="#e85d75"/>
+      <stop offset="1" stop-color="#2d3e50"/>
+    </linearGradient>
+    <linearGradient id="heroShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#2d3e50" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="900" fill="#fff9f5"/>
+  <rect x="0" y="0" width="1200" height="112" fill="#ffffff" opacity="0.96"/>
+  <text x="92" y="70" fill="#2d3e50" font-family="Georgia, serif" font-size="34" font-weight="600">Casa Soleil</text>
+  <rect x="930" y="34" width="178" height="48" rx="24" fill="#25d366"/>
+  <text x="971" y="65" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Book Direct</text>
+  <rect x="0" y="112" width="1200" height="456" fill="url(#sky)"/>
+  <path d="M0 481 C180 380 287 465 433 380 C584 292 705 392 856 316 C986 251 1085 285 1200 233 L1200 568 L0 568 Z" fill="#f4e8d8" opacity="0.36"/>
+  <path d="M0 568 L1200 568 L1200 288 C1083 350 1003 466 836 414 C683 366 596 464 456 439 C299 411 196 489 0 432 Z" fill="#2d3e50" opacity="0.28"/>
+  <rect x="0" y="112" width="1200" height="456" fill="url(#heroShade)"/>
+  <rect x="466" y="196" width="268" height="42" rx="21" fill="#ffffff" opacity="0.22" stroke="#ffffff" stroke-opacity="0.38"/>
+  <text x="509" y="224" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">SANTORINI, GREECE</text>
+  <text x="255" y="323" fill="#ffffff" font-family="Georgia, serif" font-size="76" font-weight="600">Your private escape</text>
+  <text x="309" y="404" fill="#ffffff" font-family="Georgia, serif" font-size="76" font-weight="600">under painted skies</text>
+  <text x="336" y="461" fill="#ffffff" fill-opacity="0.88" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="400">A warm, intimate villa for two with sunset views.</text>
+  <rect x="476" y="500" width="248" height="60" rx="30" fill="#e85d75" filter="url(#shadow)"/>
+  <text x="516" y="538" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="700">Check Availability</text>
+  <text x="92" y="654" fill="#2d3e50" font-family="Georgia, serif" font-size="46" font-weight="600">Our Rooms</text>
+  <text x="92" y="690" fill="#2d3e50" fill-opacity="0.68" font-family="Inter, Arial, sans-serif" font-size="20">Simple comfort, warm details</text>
+  <g filter="url(#shadow)">
+    <rect x="92" y="726" width="300" height="132" rx="18" fill="#ffffff"/>
+    <rect x="92" y="726" width="300" height="58" rx="18" fill="#f4e8d8"/>
+    <text x="116" y="821" fill="#2d3e50" font-family="Georgia, serif" font-size="27" font-weight="600">Sunset Suite</text>
+    <text x="116" y="849" fill="#e85d75" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">$180</text>
+    <text x="178" y="849" fill="#2d3e50" fill-opacity="0.6" font-family="Inter, Arial, sans-serif" font-size="17">/night</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="450" y="726" width="300" height="132" rx="18" fill="#ffffff"/>
+    <rect x="450" y="726" width="300" height="58" rx="18" fill="#ffb4a2" opacity="0.62"/>
+    <text x="474" y="821" fill="#2d3e50" font-family="Georgia, serif" font-size="27" font-weight="600">Garden Room</text>
+    <text x="474" y="849" fill="#e85d75" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">$140</text>
+    <text x="536" y="849" fill="#2d3e50" fill-opacity="0.6" font-family="Inter, Arial, sans-serif" font-size="17">/night</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="808" y="726" width="300" height="132" rx="18" fill="#ffffff"/>
+    <rect x="808" y="726" width="300" height="58" rx="18" fill="#2d3e50" opacity="0.28"/>
+    <text x="832" y="821" fill="#2d3e50" font-family="Georgia, serif" font-size="27" font-weight="600">Villa Suite</text>
+    <text x="832" y="849" fill="#e85d75" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">$220</text>
+    <text x="894" y="849" fill="#2d3e50" fill-opacity="0.6" font-family="Inter, Arial, sans-serif" font-size="17">/night</text>
+  </g>
+</svg>

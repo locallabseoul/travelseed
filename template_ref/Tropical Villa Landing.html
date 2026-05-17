@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tropical Villa Landing | Travelseed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        villa: {
+                            dark: '#1B231D',
+                            light: '#F8F7F4',
+                            accent: '#D4AF37',
+                            wood: '#8A6D4B',
+                            text: '#33332D',
+                            muted: '#7A7A6C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #1B231D; color: #F8F7F4; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { display: none; }
+        .glass-nav { background: rgba(27, 35, 29, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(248, 247, 244, 0.1); }
+        .outline-text { color: transparent; -webkit-text-stroke: 1px rgba(248, 247, 244, 0.3); }
+        .hover-lift { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body class="antialiased selection:bg-villa-accent selection:text-villa-dark">
+
+    <!-- Navigation -->
+    <nav id="header" class="fixed top-0 w-full z-50 glass-nav py-5 px-6 md:px-12 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-serif tracking-wide text-villa-light flex items-center gap-3 group">
+                <i class="fa-brands fa-pagelines text-villa-accent group-hover:rotate-12 transition-transform duration-500"></i>
+                Travelseed
+            </a>
+            
+            <div class="hidden lg:flex items-center space-x-10 text-sm font-light tracking-widest uppercase">
+                <a href="#rooms" class="hover:text-villa-accent transition-colors">Rooms</a>
+                <a href="#experiences" class="hover:text-villa-accent transition-colors">Experiences</a>
+                <a href="#gallery" class="hover:text-villa-accent transition-colors">Gallery</a>
+                <a href="#reviews" class="hover:text-villa-accent transition-colors">Reviews</a>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="https://wa.me/1234567890" class="hidden md:flex items-center gap-2 text-sm hover:text-villa-accent transition-colors">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>+62 812 3456 7890</span>
+                </a>
+                <a href="#book" class="border border-villa-light/30 rounded-full px-6 py-2.5 text-sm uppercase tracking-widest hover:bg-villa-light hover:text-villa-dark transition-all duration-300">
+                    Book Direct
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Immersive Hero -->
+    <section id="hero" class="relative h-[100vh] w-full flex items-center justify-center overflow-hidden pt-20">
+        <div class="absolute inset-0 z-0">
+            <img class="w-full h-full object-cover opacity-60" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e7362c4a8d-0781c94f2c0ef3f0d134.png" alt="Stunning luxury tropical villa exterior at golden hour, infinity pool reflecting the sky, surrounded by lush jungle, cinematic lighting, ultra high resolution" />
+            <div class="absolute inset-0 bg-gradient-to-b from-villa-dark/60 via-transparent to-villa-dark"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center mt-20">
+            <span class="text-villa-accent tracking-[0.3em] uppercase text-xs md:text-sm mb-6 inline-block border-b border-villa-accent pb-2">Ubud, Bali</span>
+            <h1 class="text-6xl md:text-8xl lg:text-[140px] font-serif leading-none tracking-tight mb-8">
+                <span class="block">Serenity</span>
+                <span class="block italic text-villa-light/90">Awaits</span>
+            </h1>
+            <p class="text-lg md:text-xl font-light text-villa-light/80 max-w-2xl mx-auto mb-12">
+                Step into your private sanctuary where comfort, luxury, and nature merge effortlessly.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 items-center">
+                <a href="https://wa.me/1234567890" class="bg-[#25D366] text-white rounded-full px-8 py-4 flex items-center gap-3 hover:bg-[#128C7E] transition-colors text-sm uppercase tracking-widest font-medium">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    WhatsApp Booking
+                </a>
+                <a href="#rooms" class="border border-villa-light/30 rounded-full px-8 py-4 text-sm uppercase tracking-widest hover:bg-villa-light/10 transition-colors">
+                    View Villas
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-60">
+            <span class="text-xs uppercase tracking-widest">Scroll</span>
+            <div class="w-[1px] h-16 bg-gradient-to-b from-villa-light to-transparent"></div>
+        </div>
+    </section>
+
+    <!-- Villa Highlights -->
+    <section id="highlights" class="py-32 bg-villa-light text-villa-dark">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+                <div class="relative h-[600px] w-full">
+                    <img class="w-full h-full object-cover rounded-sm shadow-2xl" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/68d75e4eff-1e2b020bab68a052b95c.png" alt="Close up of a luxurious floating breakfast in an infinity pool overlooking lush green rice terraces in Bali, soft morning light" />
+                    <div class="absolute -bottom-10 -right-10 bg-villa-dark text-villa-light p-10 rounded-sm w-72 shadow-2xl hidden lg:block">
+                        <i class="fa-solid fa-quote-left text-3xl text-villa-accent mb-4 opacity-50"></i>
+                        <p class="font-serif italic text-lg leading-relaxed">"Every corner creates lasting memories, providing an opportunity to enjoy everything nature has to offer."</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col justify-center">
+                    <h2 class="text-4xl md:text-5xl font-serif mb-12 leading-tight">The essence of <br><span class="italic text-villa-wood">tropical living</span></h2>
+                    
+                    <div class="space-y-10">
+                        <div class="flex items-start gap-6 border-b border-villa-dark/10 pb-8">
+                            <div class="w-12 h-12 rounded-full border border-villa-dark/20 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-water text-villa-dark"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-serif mb-2">Private Infinity Pools</h3>
+                                <p class="text-villa-muted font-light leading-relaxed">Each villa features a secluded pool overlooking the jungle canopy, perfect for morning dips and evening relaxation.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-6 border-b border-villa-dark/10 pb-8">
+                            <div class="w-12 h-12 rounded-full border border-villa-dark/20 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-mug-hot text-villa-dark"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-serif mb-2">Floating Breakfast</h3>
+                                <p class="text-villa-muted font-light leading-relaxed">Start your day with our signature complimentary floating breakfast served directly in your private pool.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-6">
+                            <div class="w-12 h-12 rounded-full border border-villa-dark/20 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-car text-villa-dark"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-serif mb-2">VIP Airport Transfer</h3>
+                                <p class="text-villa-muted font-light leading-relaxed">Seamless arrival and departure with our complimentary private chauffeur service from Denpasar airport.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suites & Villas -->
+    <section id="rooms" class="py-32 bg-villa-dark relative overflow-hidden">
+        <div class="absolute top-0 right-0 text-[200px] font-serif outline-text opacity-10 pointer-events-none whitespace-nowrap">Villas</div>
+        
+        <div class="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+            <div class="flex justify-between items-end mb-20">
+                <div>
+                    <span class="text-villa-accent tracking-[0.2em] uppercase text-xs mb-4 block">Our Sanctuaries</span>
+                    <h2 class="text-4xl md:text-6xl font-serif">Choose your <span class="italic">retreat</span></h2>
+                </div>
+                <div class="hidden md:flex gap-4">
+                    <button class="w-12 h-12 rounded-full border border-villa-light/20 flex items-center justify-center hover:bg-villa-light hover:text-villa-dark transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button class="w-12 h-12 rounded-full border border-villa-light/20 flex items-center justify-center hover:bg-villa-light hover:text-villa-dark transition-all"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Villa Card 1 -->
+                <div class="group hover-lift cursor-pointer bg-[#222B24] rounded-sm overflow-hidden">
+                    <div class="h-[400px] overflow-hidden relative">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/a10dc4d78f-1e96edf2bb1cf1df8b05.png" alt="Luxurious tropical villa bedroom with four poster bed, open sliding doors leading to a private pool and jungle view" />
+                        <div class="absolute top-4 right-4 bg-villa-dark/80 backdrop-blur-sm px-4 py-2 text-xs uppercase tracking-widest rounded-full">
+                            From $450/night
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h3 class="text-2xl font-serif mb-4 group-hover:text-villa-accent transition-colors">Jungle Pool Villa</h3>
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">1 King Bed</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">2 Guests</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">Valley View</span>
+                        </div>
+                        <a href="#book" class="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-villa-accent hover:text-villa-light transition-colors group/btn">
+                            View Details <i class="fa-solid fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Villa Card 2 -->
+                <div class="group hover-lift cursor-pointer bg-[#222B24] rounded-sm overflow-hidden">
+                    <div class="h-[400px] overflow-hidden relative">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ce17e245af-211dab1f8dd2ad96c50f.png" alt="Spacious luxury villa living room open to the outdoors, natural wood furniture, stone floors, overlooking a large private pool" />
+                        <div class="absolute top-4 right-4 bg-villa-dark/80 backdrop-blur-sm px-4 py-2 text-xs uppercase tracking-widest rounded-full">
+                            From $850/night
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h3 class="text-2xl font-serif mb-4 group-hover:text-villa-accent transition-colors">Two Bedroom Estate</h3>
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">2 King Beds</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">4 Guests</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">River View</span>
+                        </div>
+                        <a href="#book" class="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-villa-accent hover:text-villa-light transition-colors group/btn">
+                            View Details <i class="fa-solid fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Villa Card 3 -->
+                <div class="group hover-lift cursor-pointer bg-[#222B24] rounded-sm overflow-hidden md:col-span-2 lg:col-span-1">
+                    <div class="h-[400px] overflow-hidden relative">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/da635aabab-ddc9ffdadf8b6929ca3a.png" alt="Extravagant presidential tropical villa, massive infinity pool, multi-level terraces, sunset lighting" />
+                        <div class="absolute top-4 right-4 bg-villa-dark/80 backdrop-blur-sm px-4 py-2 text-xs uppercase tracking-widest rounded-full">
+                            From $1500/night
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h3 class="text-2xl font-serif mb-4 group-hover:text-villa-accent transition-colors">The Royal Sanctuary</h3>
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">3 King Beds</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">6 Guests</span>
+                            <span class="border border-villa-light/20 rounded-full px-3 py-1 text-xs text-villa-light/70">Panoramic View</span>
+                        </div>
+                        <a href="#book" class="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-villa-accent hover:text-villa-light transition-colors group/btn">
+                            View Details <i class="fa-solid fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Editorial Gallery -->
+    <section id="gallery" class="py-32 bg-villa-light text-villa-dark">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-6xl font-serif mb-6">Visual <span class="italic">Journey</span></h2>
+                <p class="text-villa-muted max-w-xl mx-auto font-light">Explore the intricate details, natural textures, and expansive spaces that define our property.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[300px]">
+                <div class="md:col-span-7 row-span-2 overflow-hidden group">
+                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/db09285355-3114a2ebf88d5b3d798b.png" alt="Aerial view of a luxury tropical resort nestled in dense green jungle, winding paths, private pools" />
+                </div>
+                <div class="md:col-span-5 row-span-1 overflow-hidden group">
+                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/bef3226f11-f932a3628b15979b9945.png" alt="Close up detail of natural stone wall and warm wood architecture in a tropical bathroom setting" />
+                </div>
+                <div class="md:col-span-5 row-span-1 overflow-hidden group">
+                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/90beaa6bfb-1636e6d7a761ab97bc1e.png" alt="Romantic candlelit dinner setup on a wooden deck next to a pool at night in Bali" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer & Booking CTA -->
+    <footer id="footer" class="bg-[#151B17] pt-32 pb-10 border-t border-villa-light/10">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32">
+                <div>
+                    <h2 class="text-5xl md:text-7xl font-serif mb-8 leading-tight">Ready to step <br>into your <span class="italic text-villa-accent">sanctuary?</span></h2>
+                    <p class="text-villa-light/70 font-light max-w-md mb-12 text-lg">
+                        Book directly through WhatsApp for our best rate guarantee, complimentary airport transfer, and personalized concierge service.
+                    </p>
+                    <a href="https://wa.me/1234567890" class="inline-flex items-center justify-center gap-4 bg-[#25D366] text-white rounded-full px-10 py-5 hover:bg-[#128C7E] transition-colors text-sm uppercase tracking-widest font-medium w-full sm:w-auto shadow-lg shadow-[#25D366]/20">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i>
+                        Book via WhatsApp
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <h4 class="text-villa-accent uppercase tracking-widest text-xs mb-6">Contact</h4>
+                        <ul class="space-y-4 text-villa-light/70 font-light text-sm">
+                            <li><a href="#" class="hover:text-villa-light transition-colors">info@travelseed.com</a></li>
+                            <li><a href="#" class="hover:text-villa-light transition-colors">+62 812 3456 7890</a></li>
+                            <li class="pt-4">Jl. Raya Sayan, Ubud<br>Bali, Indonesia 80571</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-villa-accent uppercase tracking-widest text-xs mb-6">Explore</h4>
+                        <ul class="space-y-4 text-villa-light/70 font-light text-sm">
+                            <li><a href="#rooms" class="hover:text-villa-light transition-colors">Villas</a></li>
+                            <li><a href="#experiences" class="hover:text-villa-light transition-colors">Experiences</a></li>
+                            <li><a href="#gallery" class="hover:text-villa-light transition-colors">Gallery</a></li>
+                            <li><a href="#reviews" class="hover:text-villa-light transition-colors">Reviews</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-villa-light/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-3 text-xl font-serif tracking-wide">
+                    <i class="fa-brands fa-pagelines text-villa-accent"></i>
+                    Travelseed
+                </div>
+                <div class="text-villa-light/40 text-xs font-light">
+                    &copy; 2026 Travelseed Villas. All rights reserved.
+                </div>
+                <div class="flex gap-6">
+                    <a href="#" class="text-villa-light/50 hover:text-villa-light transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-villa-light/50 hover:text-villa-light transition-colors"><i class="fa-brands fa-facebook text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

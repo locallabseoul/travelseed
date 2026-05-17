@@ -42,6 +42,7 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     template: resort.template_id,
     designSettings: {
       colorTheme: designSettings.colorTheme ?? "Tropical Green",
+      customColors: designSettings.customColors ?? {},
       logoUrl: designSettings.logoUrl ?? "",
       fontStyle: designSettings.fontStyle ?? "Editorial Sans",
       buttonStyle: designSettings.buttonStyle ?? "Rounded",
