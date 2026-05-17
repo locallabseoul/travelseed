@@ -20,6 +20,7 @@ import { SiteStructureManager } from "@/components/dashboard/SiteStructureManage
 import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { VouchersManager } from "@/components/dashboard/VouchersManager";
 import { WhatsAppManager } from "@/components/dashboard/WhatsAppManager";
 import { resortPayloadFromSite, siteFromResort } from "@/components/dashboard/data";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
@@ -66,7 +67,9 @@ function renderTab(
     case "whatsapp":
       return <WhatsAppManager site={selectedSite} onSiteUpdate={onSiteUpdate} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "inquiries":
-      return <InquiriesManager site={selectedSite} operatorFetch={operatorFetch} onNotificationsRefresh={onNotificationsRefresh} />;
+      return <InquiriesManager site={selectedSite} operatorFetch={operatorFetch} onTabChange={onTabChange} onNotificationsRefresh={onNotificationsRefresh} />;
+    case "vouchers":
+      return <VouchersManager site={selectedSite} operatorFetch={operatorFetch} />;
     case "domain":
       return <DomainManager site={selectedSite} onSiteUpdate={onSiteUpdate} operatorFetch={operatorFetch} onUnsavedChangesChange={onUnsavedChangesChange} />;
     case "analytics":

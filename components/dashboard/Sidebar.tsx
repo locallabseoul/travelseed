@@ -15,6 +15,7 @@ const menuItems: Array<{ id: DashboardTab; label: string; icon: string }> = [
   { id: "design", label: "Design", icon: "D" },
   { id: "whatsapp", label: "WhatsApp", icon: "W" },
   { id: "inquiries", label: "Inquiries", icon: "I" },
+  { id: "vouchers", label: "Vouchers", icon: "V" },
   { id: "domain", label: "Domain", icon: "D" },
   { id: "analytics", label: "Analytics", icon: "A" },
   { id: "reviews", label: "Reviews", icon: "R" },

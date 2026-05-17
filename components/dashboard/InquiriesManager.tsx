@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
-import type { BookingInquiry, InquiryStatus, ResortConsoleData } from "@/types/dashboard";
+import type { BookingInquiry, DashboardTab, InquiryStatus, ResortConsoleData } from "@/types/dashboard";
 
 const statusOptions: InquiryStatus[] = ["new", "contacted", "confirmed", "cancelled"];
 
@@ -17,10 +17,12 @@ const emptyForm = {
 export function InquiriesManager({
   site,
   operatorFetch,
+  onTabChange,
   onNotificationsRefresh,
 }: {
   site: ResortConsoleData;
   operatorFetch: (path: string, init?: RequestInit) => Promise<unknown>;
+  onTabChange?: (tab: DashboardTab) => void;
   onNotificationsRefresh?: () => void;
 }) {
   const [inquiries, setInquiries] = useState<BookingInquiry[]>([]);
@@ -95,6 +97,23 @@ export function InquiriesManager({
     }
   }
 
+  async function createVoucherFromInquiry(inquiry: BookingInquiry) {
+    setSaving(true);
+    setStatus("Creating voucher draft...");
+    try {
+      await operatorFetch(`/api/operator/resorts/${site.id}/vouchers`, {
+        method: "POST",
+        body: JSON.stringify({ inquiryId: inquiry.id }),
+      });
+      setStatus("Voucher draft is ready.");
+      onTabChange?.("vouchers");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not create voucher.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="grid gap-6">
       <Panel>
@@ -150,13 +169,20 @@ export function InquiriesManager({
                       </p>
                       {inquiry.notes ? <p className="mt-3 text-sm leading-6 text-[#52615a]">{inquiry.notes}</p> : null}
                     </div>
-                    <select value={inquiry.status} onChange={(event) => void updateStatus(inquiry, event.target.value as InquiryStatus)} className="min-h-10 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]">
-                      {statusOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex flex-wrap gap-2 md:justify-end">
+                      {inquiry.status === "confirmed" ? (
+                        <button type="button" disabled={saving} onClick={() => void createVoucherFromInquiry(inquiry)} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                          Issue voucher
+                        </button>
+                      ) : null}
+                      <select value={inquiry.status} onChange={(event) => void updateStatus(inquiry, event.target.value as InquiryStatus)} className="min-h-10 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]">
+                        {statusOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </article>
               ))

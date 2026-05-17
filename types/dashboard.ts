@@ -9,6 +9,7 @@ export type DashboardTab =
   | "design"
   | "whatsapp"
   | "inquiries"
+  | "vouchers"
   | "domain"
   | "analytics"
   | "reviews"
@@ -81,6 +82,12 @@ export type ResortConsoleData = {
   template: string;
   designSettings: {
     colorTheme: string;
+    customColors: {
+      primary?: string;
+      accent?: string;
+      page?: string;
+      text?: string;
+    };
     logoUrl: string;
     fontStyle: string;
     buttonStyle: string;
@@ -111,6 +118,7 @@ export type ResortConsoleData = {
 };
 
 export type InquiryStatus = "new" | "contacted" | "confirmed" | "cancelled";
+export type VoucherStatus = "draft" | "issued" | "void";
 
 export type BookingInquiry = {
   id: string;
@@ -123,6 +131,30 @@ export type BookingInquiry = {
   status: InquiryStatus;
   source: string;
   notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BookingVoucher = {
+  id: string;
+  resortId: string;
+  inquiryId: string | null;
+  roomOfferId: string | null;
+  voucherCode: string;
+  publicToken: string;
+  guestName: string;
+  guestContact: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  offerTitle: string;
+  roomLabel: string;
+  amountNote: string;
+  includedNotes: string;
+  policyNotes: string;
+  status: VoucherStatus;
+  issuedAt: string | null;
+  voidedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
