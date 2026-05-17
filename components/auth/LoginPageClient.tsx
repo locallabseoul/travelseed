@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: string }) {
@@ -65,7 +66,7 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -76,8 +77,8 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
     }
 
     setPassword("");
-    setStatus("");
-    router.push(redirectPath);
+    setStatus("Checking your sites...");
+    router.push(await postLoginRedirectPath(data.session?.access_token, redirectPath));
   }
 
   async function handleSignOut() {
@@ -111,7 +112,10 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
-                onClick={() => router.push(redirectPath)}
+                onClick={() => {
+                  setStatus("Checking your sites...");
+                  void postLoginRedirectPath(session.access_token, redirectPath).then((path) => router.push(path));
+                }}
                 className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white"
               >
                 Continue

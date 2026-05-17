@@ -180,7 +180,7 @@ export function DashboardHub() {
               {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
 
               {sites.length > 0 ? (
-                <div className="grid gap-4 xl:grid-cols-2">
+                <div className="grid gap-4">
                   {sites.map((site) => (
                     <SiteCard
                       key={site.id}
@@ -257,30 +257,30 @@ function SiteCard({
         <span className="rounded-full bg-[#f8f5ef] px-3 py-1 text-xs font-semibold text-[#52615a]">{site.template}</span>
       </div>
 
-      <div className="mt-5 grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#52615a] sm:grid-cols-2">
-        <div className="flex items-center justify-between gap-4">
+      <div className="mt-5 grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#52615a] md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-1 xl:col-span-2">
           <span>Travelseed URL</span>
-          <span className="break-all text-right font-semibold text-[#18352f]">{site.travelseedUrl}</span>
+          <span className="break-all font-semibold text-[#18352f]">{site.travelseedUrl}</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
+        <div className="grid gap-1 xl:col-span-2">
           <span>Custom domain</span>
-          <span className="break-all text-right font-semibold text-[#18352f]">{site.customDomain || "Not connected"}</span>
+          <span className="break-all font-semibold text-[#18352f]">{site.customDomain || "Not connected"}</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
+        <div className="grid gap-1">
           <span>WhatsApp</span>
-          <span className="text-right font-semibold text-[#18352f]">{site.whatsappNumber}</span>
+          <span className="font-semibold text-[#18352f]">{site.whatsappNumber}</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
+        <div className="grid gap-1">
           <span>Created</span>
-          <span className="text-right font-semibold text-[#18352f]">{created}</span>
+          <span className="font-semibold text-[#18352f]">{created}</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
+        <div className="grid gap-1">
           <span>Last updated</span>
-          <span className="text-right font-semibold text-[#18352f]">{lastUpdated}</span>
+          <span className="font-semibold text-[#18352f]">{lastUpdated}</span>
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:flex-wrap">
+      <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-end">
         <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
           Manage
         </Link>

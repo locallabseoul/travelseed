@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -403,7 +404,7 @@ export function CreateSiteBuilder() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: authEmail.trim(),
       password: authPassword,
     });
@@ -414,6 +415,13 @@ export function CreateSiteBuilder() {
     }
 
     setAuthPassword("");
+    setAuthStatus("Checking your sites...");
+    const nextPath = await postLoginRedirectPath(data.session?.access_token, "/create");
+    if (nextPath !== "/create") {
+      router.push(nextPath);
+      return;
+    }
+
     setAuthStatus("");
   }
 
