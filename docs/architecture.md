@@ -1,6 +1,6 @@
 # Travelseed Architecture
 
-Last updated: 2026-05-16
+Last updated: 2026-05-17
 
 ## Purpose
 
@@ -14,6 +14,7 @@ Primary surfaces:
 
 - Public tenant sites at `/{slug}`.
 - Public multi-page subpages at `/{slug}/{pageSlug}`.
+- Public issued booking vouchers at `/{slug}/vouchers/{publicToken}`.
 - Legacy `/sites/{slug}` route that redirects to `/{slug}`.
 - Operator dashboard at `/dashboard` and `/dashboard/[siteId]`.
 - Admin tools at `/admin`.
@@ -44,6 +45,7 @@ Operator API routing:
 - `/api/operator/resorts/[id]/structure` manages pages, sections, and navigation.
 - `/api/operator/resorts/[id]/services` manages the shared offers table.
 - `/api/operator/resorts/[id]/inquiries` and nested inquiry routes manage booking inquiries.
+- `/api/operator/resorts/[id]/vouchers` and nested voucher routes manage booking confirmation vouchers.
 - `/api/operator/resorts/[id]/reviews` and nested review routes manage website reviews.
 - `/api/operator/resorts/[id]/notifications` returns dashboard notification counts.
 - `/api/operator/resorts/[id]/domain/recheck` handles domain verification refreshes.
@@ -61,6 +63,7 @@ Operator API routing:
 - `design` -> `DesignManager`
 - `whatsapp` -> `WhatsAppManager`
 - `inquiries` -> `InquiriesManager`
+- `vouchers` -> `VouchersManager`
 - `domain` -> `DomainManager`
 - `analytics` -> `AnalyticsView`
 - `reviews` -> `ReviewsView`
@@ -192,6 +195,7 @@ Main tables:
 - `resorts`: tenant site, owner, plan, template, hero, content, domain, design, and publishing state.
 - `resort_services`: shared offer model for rooms, packages, and services.
 - `booking_inquiries`: direct booking inquiry records.
+- `booking_vouchers`: issued or draft booking confirmation vouchers linked to an inquiry when available, and optionally linked to a room offer through `room_offer_id`.
 - `site_events`: analytics events such as page views and WhatsApp clicks.
 - `feature_presets`: admin-managed feature presets.
 - `website_reviews`: manually managed public website reviews.
@@ -205,6 +209,8 @@ Important migrations:
 - `20260514120000_add_site_structure.sql`: adds `plan_type`, `site_type`, `site_sections`, `site_pages`, and `site_navigation_items`.
 - `20260514133000_add_site_page_hero_image.sql`: adds `site_pages.hero_image_url`.
 - `20260515103000_extend_resort_offers_room_fields.sql`: adds room-only fields to `resort_services`.
+- `20260517090000_create_booking_vouchers.sql`: adds `booking_vouchers` and public read policy for issued vouchers.
+- `20260517100000_add_room_offer_to_booking_vouchers.sql`: adds optional room offer linkage to vouchers.
 
 ## Type Locations
 

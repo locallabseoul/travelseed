@@ -1,6 +1,6 @@
 # Travelseed Product Rules
 
-Last updated: 2026-05-15
+Last updated: 2026-05-17
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Travelseed helps resort operators publish direct-booking websites and manage bas
 Current product surfaces:
 
 - Public direct-booking resort site.
-- Operator dashboard for site content, pages, offers, design, WhatsApp, inquiries, domains, analytics, reviews, plans, and settings.
+- Operator dashboard for site content, pages, offers, design, WhatsApp, inquiries, vouchers, domains, analytics, reviews, plans, and settings.
 - Admin feature preset tooling.
 
 ## Plan Terminology
@@ -133,6 +133,24 @@ Current semantics:
 - Changing an inquiry from `new` to another status removes it from the notification count.
 - `DashboardNotificationSummary.items` is already shaped for a future popover/list.
 
+## Voucher Policy
+
+Vouchers are booking confirmations, not payments or inventory reservations.
+
+Current v1 rules:
+
+- Create vouchers from confirmed inquiries or as manual drafts.
+- Keep voucher states simple: `draft`, `issued`, `void`.
+- Only issued vouchers are publicly readable.
+- Public voucher URL format is `/{slug}/vouchers/{publicToken}`.
+- Vouchers should contain stay essentials: guest, contact, dates, guest count, offer/room label, amount note, included notes, and policy notes.
+- Voucher room selection should reuse active `room` offers from the shared `resort_services` model through `booking_vouchers.room_offer_id`.
+- `room_label` remains a denormalized/manual display label so old vouchers and custom room names still work even if the linked offer changes.
+- Draft vouchers may be deleted.
+- Issued vouchers should not be deleted; void them instead.
+- Voided vouchers should not be edited.
+- Do not add PDF export, payment capture, deposit logic, OTA sync, room inventory, or legal invoice semantics until the product explicitly expands beyond confirmation vouchers.
+
 ## Content Safety Rules
 
 - Do not delete customer content as part of plan downgrade.
@@ -151,6 +169,7 @@ Prefer:
 - `package`
 - `service`
 - `inquiry`
+- `voucher`
 - `review`
 
 Avoid introducing new synonyms for the same product concept unless the UI copy is being deliberately revised.

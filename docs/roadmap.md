@@ -1,6 +1,6 @@
 # Travelseed Roadmap
 
-Last updated: 2026-05-16
+Last updated: 2026-05-17
 
 ## Purpose
 
@@ -28,6 +28,7 @@ This document tracks known gaps, recommended next steps, and future features. Ke
 - Extract shared operator ownership checks.
 - Add API regression tests for `resort_services` replacement writes.
 - Add public route tests for `/{slug}` and `/{slug}/{pageSlug}`.
+- Add API and public route tests for booking voucher issue/void/link behavior.
 - Add dashboard tests for dirty form guards and plan/publish confirmations.
 - Add image cleanup or replacement policy.
 
@@ -39,6 +40,7 @@ This document tracks known gaps, recommended next steps, and future features. Ke
   - Plan limits.
   - Unpublished or draft warnings.
 - Review requests.
+- Voucher PDF export, payment/deposit states, and richer reservation lifecycle if booking operations expand beyond confirmation links.
 - Dedicated CMS for Blog.
 - Structured preset editors beyond the current lightweight title, intro, items, and CTA fields.
 - More complete Promotions page workflow with date ranges, offer linking, and direct-booking campaign copy.

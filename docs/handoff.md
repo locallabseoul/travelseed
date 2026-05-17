@@ -1,6 +1,6 @@
 # Travelseed Handoff
 
-Last updated: 2026-05-16
+Last updated: 2026-05-17
 
 ## Current Session State
 
@@ -19,6 +19,24 @@ The latest implementation changes referenced by this handoff had passed both com
 
 ## Recent Implementation Changes
 
+### Booking Voucher Management V1
+
+- Added dashboard `Vouchers` as a booking confirmation workflow for confirmed direct inquiries.
+- Added `booking_vouchers` via `supabase/migrations/20260517090000_create_booking_vouchers.sql`.
+- Operator APIs:
+  - `GET /api/operator/resorts/[id]/vouchers`
+  - `POST /api/operator/resorts/[id]/vouchers`
+  - `PATCH /api/operator/resorts/[id]/vouchers/[voucherId]`
+  - `POST /api/operator/resorts/[id]/vouchers/[voucherId]/issue`
+  - `POST /api/operator/resorts/[id]/vouchers/[voucherId]/void`
+- `Inquiries` now shows `Issue voucher` for confirmed inquiries and creates/reuses a voucher draft before moving users to `Vouchers`.
+- `Vouchers` supports manual voucher drafts, editing stay details, issuing, voiding, copying public links, and opening WhatsApp with the voucher link.
+- Vouchers can link to active room offers through `booking_vouchers.room_offer_id`; selecting a room fills the display room label and related booking fields while keeping `room_label` editable as a denormalized confirmation label.
+- Draft vouchers can be deleted. Issued vouchers are not deleted; they should be voided.
+- Public issued voucher route is `/{slug}/vouchers/{publicToken}`.
+- Public vouchers are intentionally confirmation links only. PDF, payment capture, deposits, and full reservation inventory are not included in v1.
+- Shared operator ownership checks now live in `lib/server/operator-resorts.ts` for voucher APIs.
+
 ### Template System Documentation
 
 - Added `docs/template-system.md` as the source of truth for public template design architecture.
@@ -28,6 +46,18 @@ The latest implementation changes referenced by this handoff had passed both com
 - Current template IDs are `boutique-villa`, `surf-camp`, and `minimal-stay`.
 - Current recommended direction is to normalize token usage, improve previews, clarify catalog/package naming, and expand with theme/section presets before adding many new template components.
 - Keep multi-page architecture, Pages CMS, dashboard/page/content flow, and the `resort_services` shared offer model intact while improving templates.
+
+### Seed Landing Template Upgrade
+
+- `Sunset Landing` keeps its catalog mapping to `minimal-stay`, but `MinimalStayTemplate` now follows the UXPilot Sunset reference as a warm image-led landing page.
+- `Tropical Villa Landing` keeps its catalog mapping to `boutique-villa`, but `BoutiqueVillaTemplate` now follows the UXPilot Tropical Villa reference as an immersive dark villa landing page.
+- Both implementations convert UXPilot HTML into dynamic React/Tailwind templates:
+  - Hero uses resort hero fields and images.
+  - Room cards use active `resort_services` rows where `kind = "room"`.
+  - Gallery uses `resort.gallery`.
+  - Reviews use `website_reviews`.
+  - Booking CTAs use the existing WhatsApp booking modal.
+- No new `template_id`, catalog entry, DB table, or migration was added for this template upgrade.
 
 ### Template Token Normalization Pass
 
