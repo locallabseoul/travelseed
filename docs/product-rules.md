@@ -173,3 +173,18 @@ Prefer:
 - `review`
 
 Avoid introducing new synonyms for the same product concept unless the UI copy is being deliberately revised.
+
+## App Language Policy
+
+Travelseed supports English and Bahasa Indonesia for core service UI.
+
+Current v1 scope:
+
+- Global language toggle in the shared app header.
+- Marketing home page core copy.
+- Login and account navigation copy.
+- Site creation entry, AI import, account panel, and preview shell copy.
+- Dashboard sidebar menu labels.
+- Public resort navigation booking CTA.
+
+Do not automatically translate operator/customer-authored resort content such as site names, page titles, offer descriptions, room labels, gallery text, reviews, inquiries, or voucher details. Those fields are business content and should remain exactly as entered unless a dedicated translation workflow is added.

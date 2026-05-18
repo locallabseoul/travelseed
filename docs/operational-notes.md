@@ -119,6 +119,8 @@ Current practical checks:
 - Manual public route checks for root site and subpages.
 - Manual offer edit checks when touching `resort_services`.
 - Manual inquiry status checks when touching notifications.
+- Staff product QA checklist: `docs/testing-guide.md`.
+- Korean staff product QA checklist: `docs/testing-guide.ko.md`.
 
 Known missing coverage:
 

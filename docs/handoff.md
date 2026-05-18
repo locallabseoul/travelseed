@@ -19,6 +19,20 @@ The latest implementation changes referenced by this handoff had passed both com
 
 ## Recent Implementation Changes
 
+### Staff Testing Guide
+
+- Added `docs/testing-guide.md` for internal staff QA before broader customer feedback.
+- Added Korean version at `docs/testing-guide.ko.md`.
+- The guide covers account routing, site creation, URL AI loading state, dashboard setup, Pages CMS, Offers, Design templates, inquiries, vouchers, settings, and issue reporting.
+- `docs/operational-notes.md` now links to the staff testing guide from Testing Notes.
+
+### English / Indonesian UI Language V1
+
+- Added a client-side `LanguageProvider` with `en` and `id` dictionaries and a persistent EN/ID toggle.
+- The shared header, marketing home page, login page, create-site entry flow, dashboard sidebar, and public resort booking CTA now use the global language state.
+- The current language is stored in `localStorage` as `travelseed-language` and updates `document.documentElement.lang`.
+- Customer-authored resort/site content is intentionally not translated automatically.
+
 ### Booking Voucher Management V1
 
 - Added dashboard `Vouchers` as a booking confirmation workflow for confirmed direct inquiries.
