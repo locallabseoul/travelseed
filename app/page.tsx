@@ -2,30 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
 
-const demoResorts = [
-  {
-    name: "Villa Jeruk",
-    location: "Selong Belanak, Lombok",
-    image:
-      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
-    href: "/villa-jeruk",
-  },
-  {
-    name: "Surf Camp Example",
-    location: "South Lombok Coast",
-    image:
-      "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=85",
-    href: "/villa-jeruk?template=surf-camp",
-  },
-  {
-    name: "Boutique Resort Example",
-    location: "Island Hideaway",
-    image:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=85",
-    href: "/villa-jeruk?template=minimal-stay",
-  },
-];
-
 const problems = [
   "OTA dependency",
   "High commission fees",
@@ -66,6 +42,27 @@ const features = [
   },
 ];
 
+const businessExamples = [
+  {
+    name: "Boutique Villa",
+    location: "Lombok stays and private villas",
+    image:
+      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    name: "Surf Camp",
+    location: "Activities, packages, and lessons",
+    image:
+      "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    name: "Local Resort",
+    location: "Multi-page hospitality brands",
+    image:
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=85",
+  },
+];
+
 const flowSteps = ["OTA Listing", "AI Branding", "Direct Booking Website", "WhatsApp Reservation", "Revenue Growth"];
 
 const howItWorks = [
@@ -83,7 +80,7 @@ export default function HomePage() {
       <ProblemSection />
       <SolutionSection />
       <FeaturesSection />
-      <SampleResortsSection />
+      <BusinessExamplesSection />
       <HowItWorksSection />
       <FinalCtaSection />
       <Footer />
@@ -110,9 +107,6 @@ function HeroSection() {
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#dbc895] px-7 text-sm font-semibold text-[#18352f] shadow-[0_18px_50px_rgba(176,142,86,0.2)]">
               Build My Site
             </Link>
-            <Link href="/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#18352f] px-7 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(24,53,47,0.22)]">
-              View Demo Resort
-            </Link>
           </div>
         </div>
 
@@ -132,13 +126,13 @@ function BrowserPreview() {
           <span className="h-3 w-3 rounded-full bg-[#dbc895]" />
           <span className="h-3 w-3 rounded-full bg-[#78906b]" />
           <span className="ml-3 rounded-full bg-[#f4efe7] px-4 py-1 text-xs text-[#6a675c]">
-            villa-jeruk.travelseed.app
+            your-site.travelseed.app
           </span>
         </div>
         <div className="relative min-h-[520px] overflow-hidden rounded-b-[18px] bg-[#18352f]">
           <Image
             src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1500&q=85"
-            alt="Villa Jeruk direct booking website preview"
+            alt="Direct booking website preview"
             fill
             priority
             sizes="(min-width: 1024px) 52vw, 100vw"
@@ -146,7 +140,7 @@ function BrowserPreview() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
           <div className="absolute left-6 right-6 top-6 flex items-center justify-between text-white">
-            <p className="text-sm font-semibold tracking-[0.18em]">Villa Jeruk</p>
+            <p className="text-sm font-semibold tracking-[0.18em]">Your Brand</p>
             <span className="rounded-full border border-white/40 px-4 py-2 text-xs font-semibold">BOOK DIRECT</span>
           </div>
           <div className="absolute bottom-7 left-6 right-6 text-white">
@@ -239,27 +233,26 @@ function FeaturesSection() {
   );
 }
 
-function SampleResortsSection() {
+function BusinessExamplesSection() {
   return (
     <section className="bg-white px-5 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="Sample resorts"
-          title="One platform, different hospitality brands."
-          text="Preview how the same system can support private villas, surf camps, and boutique resort positioning."
+          label="Business examples"
+          title="A visual system for stays, camps, and local businesses."
+          text="Use photography-led templates to present the atmosphere, services, and direct inquiry path without sending guests to a broken demo."
         />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {demoResorts.map((resort) => (
-            <Link key={resort.name} href={resort.href} className="group overflow-hidden rounded-md bg-[#fbf8f1] shadow-[0_24px_80px_rgba(54,43,29,0.1)]">
+          {businessExamples.map((business) => (
+            <article key={business.name} className="overflow-hidden rounded-md bg-[#fbf8f1] shadow-[0_24px_80px_rgba(54,43,29,0.1)]">
               <div className="relative h-72 overflow-hidden">
-                <Image src={resort.image} alt={resort.name} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
+                <Image src={business.image} alt={business.name} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
               </div>
               <div className="p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#72815e]">{resort.location}</p>
-                <h3 className="mt-3 text-2xl font-semibold">{resort.name}</h3>
-                <p className="mt-6 text-sm font-semibold text-[#0f5f6b]">View Demo</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#72815e]">{business.location}</p>
+                <h3 className="mt-3 text-2xl font-semibold">{business.name}</h3>
               </div>
-            </Link>
+            </article>
           ))}
         </div>
       </div>
@@ -303,9 +296,6 @@ function FinalCtaSection() {
           <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-[#18352f]">
               Build My Site
-            </Link>
-            <Link href="/villa-jeruk" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/25 px-7 text-sm font-semibold text-white">
-              View Demo Resort
             </Link>
           </div>
         </div>

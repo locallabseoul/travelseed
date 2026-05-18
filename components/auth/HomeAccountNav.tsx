@@ -40,8 +40,8 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
         <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">
           Log in
         </Link>
-        <Link href="/villa-jeruk" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
-          Demo Resort
+        <Link href="/create" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
+          Build My Site
         </Link>
       </div>
     );
@@ -63,9 +63,6 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
         </Link>
         <Link href="/create" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
           Build new site
-        </Link>
-        <Link href="/villa-jeruk" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
-          Demo resort
         </Link>
         <button
           type="button"
