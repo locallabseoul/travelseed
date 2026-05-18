@@ -1,26 +1,28 @@
 "use client";
 
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
+import type { TranslationKey } from "@/components/i18n/LanguageProvider";
 import type { DashboardTab } from "@/types/dashboard";
 import type { ResortConsoleData } from "@/types/dashboard";
 
-const menuItems: Array<{ id: DashboardTab; label: string; icon: string }> = [
-  { id: "dashboard", label: "Dashboard", icon: "D" },
-  { id: "setup", label: "Setup", icon: "S" },
-  { id: "import", label: "Import", icon: "I" },
-  { id: "aiCopy", label: "AI Copy", icon: "A" },
-  { id: "content", label: "Content", icon: "C" },
-  { id: "offers", label: "Offers", icon: "O" },
-  { id: "structure", label: "Pages", icon: "P" },
-  { id: "design", label: "Design", icon: "D" },
-  { id: "whatsapp", label: "WhatsApp", icon: "W" },
-  { id: "inquiries", label: "Inquiries", icon: "I" },
-  { id: "vouchers", label: "Vouchers", icon: "V" },
-  { id: "domain", label: "Domain", icon: "D" },
-  { id: "analytics", label: "Analytics", icon: "A" },
-  { id: "reviews", label: "Reviews", icon: "R" },
-  { id: "plan", label: "Plan", icon: "P" },
-  { id: "settings", label: "Settings", icon: "S" },
+const menuItems: Array<{ id: DashboardTab; labelKey: TranslationKey; icon: string }> = [
+  { id: "dashboard", labelKey: "dashboard.tab.dashboard", icon: "D" },
+  { id: "setup", labelKey: "dashboard.tab.setup", icon: "S" },
+  { id: "import", labelKey: "dashboard.tab.import", icon: "I" },
+  { id: "aiCopy", labelKey: "dashboard.tab.aiCopy", icon: "A" },
+  { id: "content", labelKey: "dashboard.tab.content", icon: "C" },
+  { id: "offers", labelKey: "dashboard.tab.offers", icon: "O" },
+  { id: "structure", labelKey: "dashboard.tab.structure", icon: "P" },
+  { id: "design", labelKey: "dashboard.tab.design", icon: "D" },
+  { id: "whatsapp", labelKey: "dashboard.tab.whatsapp", icon: "W" },
+  { id: "inquiries", labelKey: "dashboard.tab.inquiries", icon: "I" },
+  { id: "vouchers", labelKey: "dashboard.tab.vouchers", icon: "V" },
+  { id: "domain", labelKey: "dashboard.tab.domain", icon: "D" },
+  { id: "analytics", labelKey: "dashboard.tab.analytics", icon: "A" },
+  { id: "reviews", labelKey: "dashboard.tab.reviews", icon: "R" },
+  { id: "plan", labelKey: "dashboard.tab.plan", icon: "P" },
+  { id: "settings", labelKey: "dashboard.tab.settings", icon: "S" },
 ];
 
 export function Sidebar({
@@ -34,6 +36,7 @@ export function Sidebar({
   notificationsByTab?: Partial<Record<DashboardTab, number>>;
   onTabChange: (tab: DashboardTab) => void;
 }) {
+  const { t } = useLanguage();
   const isLanding = site ? planConfig[effectivePlanType(site)].siteType === "landing" : true;
   const visibleMenuItems = isLanding ? menuItems : menuItems.filter((item) => item.id !== "content");
 
@@ -41,7 +44,7 @@ export function Sidebar({
     <aside className="rounded-2xl border border-[#e8dfd0] bg-white p-3 shadow-[0_18px_60px_rgba(54,43,29,0.07)] lg:sticky lg:top-6 lg:flex lg:h-[calc(100vh-48px)] lg:flex-col lg:overflow-hidden">
       <div className="hidden shrink-0 px-3 pb-4 pt-2 lg:block">
         <p className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">TRAVELSEED</p>
-        <p className="mt-2 text-xs leading-5 text-[#6f7b74]">Direct booking operations</p>
+        <p className="mt-2 text-xs leading-5 text-[#6f7b74]">{t("dashboard.sidebar.subtitle")}</p>
       </div>
       <nav className="flex gap-2 overflow-x-auto pb-1 lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-1.5 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain lg:pb-1 lg:pr-1">
         {visibleMenuItems.map((item) => {
@@ -59,7 +62,7 @@ export function Sidebar({
               <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs ${isActive ? "bg-white/15" : "bg-[#f1eadc]"}`}>
                 {item.icon}
               </span>
-              <span className="min-w-0 flex-1 text-left">{item.label}</span>
+              <span className="min-w-0 flex-1 text-left">{t(item.labelKey)}</span>
               {notificationCount > 0 ? <MenuNotificationBadge count={notificationCount} active={isActive} /> : null}
             </button>
           );

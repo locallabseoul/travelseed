@@ -5,10 +5,12 @@ import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: string }) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -92,21 +94,21 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
       <section className="mx-auto mt-20 grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-[0_24px_80px_rgba(54,43,29,0.08)]">
         <div>
           <h1 className="text-3xl font-semibold">
-            {authMode === "sign-in" ? "Sign in" : "Create account"}
+            {authMode === "sign-in" ? t("auth.signInTitle") : t("auth.signUpTitle")}
           </h1>
           <p className="mt-2 text-sm leading-6 text-[#51635b]">
             {authMode === "sign-in"
-              ? "Sign in to build or manage your direct booking site."
-              : "Create an account and verify your email before publishing."}
+              ? t("auth.signInBody")
+              : t("auth.signUpBody")}
           </p>
         </div>
 
-        {!authReady ? <p className="text-sm text-[#51635b]">Checking session...</p> : null}
+        {!authReady ? <p className="text-sm text-[#51635b]">{t("auth.checking")}</p> : null}
 
         {session ? (
           <div className="grid gap-4 rounded-md border border-[#eadfce] bg-[#fbf8f1] p-4">
             <div>
-              <p className="text-sm font-semibold">Signed in</p>
+              <p className="text-sm font-semibold">{t("auth.signedIn")}</p>
               <p className="mt-1 text-sm text-[#51635b]">{session.user.email}</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -118,17 +120,17 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
                 }}
                 className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white"
               >
-                Continue
+                {t("auth.continue")}
               </button>
               <button type="button" onClick={() => void handleSignOut()} className="text-sm font-semibold text-[#0f5f6b]">
-                Sign out
+                {t("nav.signOut")}
               </button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="grid gap-4">
             <label className="grid gap-2 text-sm font-medium">
-              Email
+              {t("create.account.email")}
               <input
                 type="email"
                 value={email}
@@ -138,7 +140,7 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
               />
             </label>
             <label className="grid gap-2 text-sm font-medium">
-              Password
+              {t("create.account.password")}
               <input
                 type="password"
                 value={password}
@@ -148,7 +150,7 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
               />
             </label>
             <button type="submit" className="min-h-12 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
-              {authMode === "sign-in" ? "Sign in" : "Create account"}
+              {authMode === "sign-in" ? t("auth.signInTitle") : t("auth.signUpTitle")}
             </button>
             <button
               type="button"
@@ -158,7 +160,7 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
               }}
               className="text-sm font-semibold text-[#0f5f6b]"
             >
-              {authMode === "sign-in" ? "Create an account" : "Back to sign in"}
+              {authMode === "sign-in" ? t("create.account.create") : t("auth.backToSignIn")}
             </button>
           </form>
         )}

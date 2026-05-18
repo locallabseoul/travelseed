@@ -7,6 +7,7 @@ import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { savePreviewResort } from "@/components/create/preview-storage";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { Resort } from "@/types/resort";
@@ -219,6 +220,7 @@ Airport Pickup:`,
 
 export function CreateSiteBuilder() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [form, setForm] = useState<BuilderForm>(starterForm);
   const [builderStarted, setBuilderStarted] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -506,17 +508,17 @@ export function CreateSiteBuilder() {
       </div>
       <section className="px-5 py-10 sm:px-6 lg:py-14">
         {!authReady ? (
-          <p className="mx-auto max-w-3xl text-sm font-medium text-[#51635b]">Checking account session...</p>
+          <p className="mx-auto max-w-3xl text-sm font-medium text-[#51635b]">{t("create.loading.session")}</p>
         ) : null}
         {authReady && isSupabaseConfigured && !session ? (
           <div className="mx-auto max-w-3xl">
             <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Create your site</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">{t("create.auth.kicker")}</p>
               <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-                Sign in before building your direct booking site.
+                {t("create.auth.title")}
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-[#51635b]">
-                Create a verified account first, then import your listing or start manually.
+                {t("create.auth.body")}
               </p>
             </div>
             <AccountPanel
@@ -549,13 +551,12 @@ export function CreateSiteBuilder() {
         {builderStarted ? (
           <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[minmax(460px,0.9fr)_minmax(0,1.1fr)]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your preview</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">{t("create.preview.kicker")}</p>
               <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-                Try your direct booking website before you subscribe.
+                {t("create.preview.title")}
               </h1>
               <p className="mt-5 text-lg leading-8 text-[#51635b]">
-                Add your resort details step by step, switch templates, and preview how Travelseed can turn
-                your listing into a direct booking brand.
+                {t("create.preview.body")}
               </p>
 
               <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
@@ -609,7 +610,7 @@ export function CreateSiteBuilder() {
                   disabled={activeStep === 0}
                   className="min-h-[48px] rounded-full border border-[#d8cebb] px-6 text-sm font-semibold text-[#18352f] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Back
+                  {t("create.back")}
                 </button>
                 <button
                   type="button"
@@ -617,7 +618,7 @@ export function CreateSiteBuilder() {
                   disabled={isLastStep}
                   className="min-h-[48px] rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Next
+                  {t("create.next")}
                 </button>
               </div>
             </div>
@@ -632,7 +633,7 @@ export function CreateSiteBuilder() {
                 <span className="ml-3 truncate rounded-full bg-[#f4efe7] px-4 py-1 text-xs text-[#6a675c]">
                   {previewResort.slug}.travelseed.app
                 </span>
-                <span className="ml-auto hidden text-xs font-medium text-[#6a675c] sm:inline">Scrollable preview</span>
+                <span className="ml-auto hidden text-xs font-medium text-[#6a675c] sm:inline">{t("create.preview.scrollable")}</span>
               </div>
               <div className="relative h-[760px] overflow-y-auto overflow-x-hidden rounded-b-[20px] bg-white">
                 <div className="site-preview w-full">
@@ -645,7 +646,7 @@ export function CreateSiteBuilder() {
                   onClick={openFullPreview}
                   className="min-h-[48px] w-full rounded-full border border-[#d8cebb] bg-[#f8f5ef] px-6 text-sm font-semibold text-[#18352f]"
                 >
-                  Open Full Preview
+                  {t("create.preview.full")}
                 </button>
               </div>
             </div>
@@ -672,29 +673,29 @@ function StartChoice({
   onImportListing: () => Promise<void>;
   onManualStart: () => void;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="mx-auto mb-10 max-w-3xl">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">Build your site</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#72815e]">{t("create.start.kicker")}</p>
         <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-          Start with AI from your OTA listing, or build manually.
+          {t("create.start.title")}
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-[#51635b]">
-          Paste a public Booking, Airbnb, Agoda, or resort listing URL to generate a direct-booking
-          draft. You can review and edit every field before launch.
+          {t("create.start.body")}
         </p>
       </div>
 
       <div className="mt-8 rounded-md bg-white p-5 shadow-[0_24px_80px_rgba(54,43,29,0.08)] sm:p-6">
         <div className="grid gap-4">
           <div className="rounded-md border border-[#eadfce] bg-[#fbf8f1] p-4">
-            <p className="text-sm font-semibold text-[#18352f]">Create with AI</p>
+            <p className="text-sm font-semibold text-[#18352f]">{t("create.ai.title")}</p>
             <p className="mt-2 text-sm leading-6 text-[#51635b]">
-              Travelseed will read public listing text and turn it into a website draft with copy,
-              amenities, experiences, and a recommended template.
+              {t("create.ai.body")}
             </p>
             <label className="mt-4 grid gap-2 text-sm font-medium">
-              OTA listing URL
+              {t("create.ai.url")}
               <input
                 type="url"
                 value={listingUrl}
@@ -707,9 +708,16 @@ function StartChoice({
               type="button"
               onClick={() => void onImportListing()}
               disabled={importing}
-              className="mt-4 min-h-[52px] w-full rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {importing ? "Generating Draft..." : "Generate with AI"}
+              {importing ? (
+                <>
+                  <CircularProgressIcon className="h-4 w-4" />
+                  <span>{t("create.ai.loading")}</span>
+                </>
+              ) : (
+                t("create.ai.button")
+              )}
             </button>
           </div>
 
@@ -718,7 +726,7 @@ function StartChoice({
             onClick={onManualStart}
             className="min-h-[52px] rounded-full border border-[#d8cebb] bg-white px-6 text-sm font-semibold text-[#18352f]"
           >
-            Enter Details Manually
+            {t("create.manual")}
           </button>
 
           {importStatus ? (
@@ -727,6 +735,15 @@ function StartChoice({
         </div>
       </div>
     </div>
+  );
+}
+
+function CircularProgressIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" aria-hidden="true">
+      <circle className="opacity-25" cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-90" fill="currentColor" d="M22 12a10 10 0 0 1-10 10v-4a6 6 0 0 0 6-6h4Z" />
+    </svg>
   );
 }
 
@@ -753,15 +770,17 @@ function AccountPanel({
   onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
   onSignOut: () => Promise<void>;
 }) {
+  const { t } = useLanguage();
+
   if (session) {
     return (
       <div className="mb-5 flex flex-col gap-3 rounded-md border border-[#d8cebb] bg-[#fbf8f1] p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">Account ready</p>
+          <p className="text-sm font-semibold text-[#18352f]">{t("create.account.ready")}</p>
           <p className="mt-1 text-sm text-[#51635b]">{session.user.email}</p>
         </div>
         <button type="button" onClick={() => void onSignOut()} className="text-sm font-semibold text-[#0f5f6b]">
-          Sign out
+          {t("create.account.signOut")}
         </button>
       </div>
     );
@@ -771,21 +790,21 @@ function AccountPanel({
     <form onSubmit={(event) => void onSubmit(event)} className="mb-5 grid gap-4 rounded-md border border-[#d8cebb] bg-[#fbf8f1] p-4">
       <div>
         <p className="text-sm font-semibold text-[#18352f]">
-          {authMode === "sign-up" ? "Create your Travelseed account" : "Sign in to build"}
+          {authMode === "sign-up" ? t("create.account.signUpTitle") : t("create.account.signInTitle")}
         </p>
         <p className="mt-1 text-sm leading-6 text-[#51635b]">
           {authMode === "sign-up"
-            ? "Verify your email before publishing your direct booking site."
-            : "Use your verified account to create and manage your site."}
+            ? t("create.account.signUpBody")
+            : t("create.account.signInBody")}
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <TextField label="Email" value={authEmail} onChange={onEmailChange} type="email" />
-        <TextField label="Password" value={authPassword} onChange={onPasswordChange} type="password" />
+        <TextField label={t("create.account.email")} value={authEmail} onChange={onEmailChange} type="email" />
+        <TextField label={t("create.account.password")} value={authPassword} onChange={onPasswordChange} type="password" />
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <button type="submit" className="min-h-[48px] rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white">
-          {authMode === "sign-up" ? "Create Account" : "Sign In"}
+          {authMode === "sign-up" ? t("create.account.signUp") : t("create.account.signIn")}
         </button>
         <button
           type="button"
@@ -794,7 +813,7 @@ function AccountPanel({
           }}
           className="text-sm font-semibold text-[#0f5f6b]"
         >
-          {authMode === "sign-up" ? "Already have an account?" : "Create an account"}
+          {authMode === "sign-up" ? t("create.account.hasAccount") : t("create.account.create")}
         </button>
       </div>
       {authStatus ? <p className="rounded-md bg-white p-3 text-sm text-[#51635b]">{authStatus}</p> : null}

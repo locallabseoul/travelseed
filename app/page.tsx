@@ -1,46 +1,86 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
-const problems = [
-  "OTA dependency",
-  "High commission fees",
-  "No customer ownership",
-  "Manual WhatsApp booking",
-];
-
-const features = [
-  {
-    icon: "DB",
-    title: "Direct Booking Websites",
-    text: "Launch branded resort websites that feel independent from OTA listing pages.",
+const localizedHomeContent = {
+  en: {
+    problems: ["OTA dependency", "High commission fees", "No customer ownership", "Manual WhatsApp booking"],
+    features: [
+      {
+        icon: "DB",
+        title: "Direct Booking Websites",
+        text: "Launch branded resort websites that feel independent from OTA listing pages.",
+      },
+      {
+        icon: "WA",
+        title: "WhatsApp Reservation Flow",
+        text: "Route guest intent into a familiar WhatsApp conversation with prefilled booking details.",
+      },
+      {
+        icon: "MR",
+        title: "Multi Resort Dashboard",
+        text: "Manage multiple villas, camps, and boutique stays from one tenant-aware platform.",
+      },
+      {
+        icon: "AI",
+        title: "AI-generated Branding Copy",
+        text: "Turn raw listing details into polished hospitality positioning and guest-facing copy.",
+      },
+      {
+        icon: "TP",
+        title: "Reusable Resort Templates",
+        text: "Switch between villa, surf camp, and minimal stay layouts without rebuilding from scratch.",
+      },
+      {
+        icon: "CRM",
+        title: "CRM & Customer Data",
+        text: "Prepare for owned guest profiles, repeat stays, and direct revenue tracking.",
+      },
+    ],
+    flowSteps: ["OTA Listing", "AI Branding", "Direct Booking Website", "WhatsApp Reservation", "Revenue Growth"],
+    howItWorks: ["Import OTA Data", "Generate Resort Brand", "Launch Website", "Get Direct Bookings"],
   },
-  {
-    icon: "WA",
-    title: "WhatsApp Reservation Flow",
-    text: "Route guest intent into a familiar WhatsApp conversation with prefilled booking details.",
+  id: {
+    problems: ["Ketergantungan OTA", "Komisi tinggi", "Tidak memiliki pelanggan", "Booking WhatsApp manual"],
+    features: [
+      {
+        icon: "DB",
+        title: "Website Direct Booking",
+        text: "Luncurkan website resort bermerek yang terasa independen dari halaman listing OTA.",
+      },
+      {
+        icon: "WA",
+        title: "Alur Reservasi WhatsApp",
+        text: "Arahkan niat tamu ke percakapan WhatsApp dengan detail booking yang sudah terisi.",
+      },
+      {
+        icon: "MR",
+        title: "Dashboard Multi Resort",
+        text: "Kelola beberapa villa, camp, dan boutique stay dari satu platform tenant-aware.",
+      },
+      {
+        icon: "AI",
+        title: "Brand Copy Berbasis AI",
+        text: "Ubah detail listing mentah menjadi positioning hospitality dan copy tamu yang rapi.",
+      },
+      {
+        icon: "TP",
+        title: "Template Resort Reusable",
+        text: "Ganti layout villa, surf camp, dan minimal stay tanpa membangun ulang dari awal.",
+      },
+      {
+        icon: "CRM",
+        title: "CRM & Data Pelanggan",
+        text: "Siapkan profil tamu milik sendiri, repeat stay, dan tracking pendapatan langsung.",
+      },
+    ],
+    flowSteps: ["Listing OTA", "Branding AI", "Website Direct Booking", "Reservasi WhatsApp", "Pertumbuhan Revenue"],
+    howItWorks: ["Impor Data OTA", "Generate Brand Resort", "Luncurkan Website", "Dapatkan Direct Booking"],
   },
-  {
-    icon: "MR",
-    title: "Multi Resort Dashboard",
-    text: "Manage multiple villas, camps, and boutique stays from one tenant-aware platform.",
-  },
-  {
-    icon: "AI",
-    title: "AI-generated Branding Copy",
-    text: "Turn raw listing details into polished hospitality positioning and guest-facing copy.",
-  },
-  {
-    icon: "TP",
-    title: "Reusable Resort Templates",
-    text: "Switch between villa, surf camp, and minimal stay layouts without rebuilding from scratch.",
-  },
-  {
-    icon: "CRM",
-    title: "CRM & Customer Data",
-    text: "Prepare for owned guest profiles, repeat stays, and direct revenue tracking.",
-  },
-];
+};
 
 const businessExamples = [
   {
@@ -63,25 +103,19 @@ const businessExamples = [
   },
 ];
 
-const flowSteps = ["OTA Listing", "AI Branding", "Direct Booking Website", "WhatsApp Reservation", "Revenue Growth"];
-
-const howItWorks = [
-  "Import OTA Data",
-  "Generate Resort Brand",
-  "Launch Website",
-  "Get Direct Bookings",
-];
-
 // Public SaaS landing page for boutique resorts and villa operators.
 export default function HomePage() {
+  const { language } = useLanguage();
+  const content = localizedHomeContent[language];
+
   return (
     <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
       <HeroSection />
-      <ProblemSection />
-      <SolutionSection />
-      <FeaturesSection />
+      <ProblemSection problems={content.problems} />
+      <SolutionSection flowSteps={content.flowSteps} />
+      <FeaturesSection features={content.features} />
       <BusinessExamplesSection />
-      <HowItWorksSection />
+      <HowItWorksSection steps={content.howItWorks} />
       <FinalCtaSection />
       <Footer />
     </main>
@@ -89,23 +123,24 @@ export default function HomePage() {
 }
 
 function HeroSection() {
+  const { t } = useLanguage();
+
   return (
     <section className="overflow-hidden px-5 pb-20 pt-6 sm:px-6 lg:pb-28">
       <AppHeader />
 
       <div className="mx-auto grid max-w-7xl gap-12 pt-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pt-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#72815e]">TRAVELSEED</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#72815e]">{t("home.hero.kicker")}</p>
           <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[0.98] tracking-[-0.01em] sm:text-6xl lg:text-7xl">
-            Turn OTA Listings Into Direct Booking Brands
+            {t("home.hero.title")}
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-[#51635b] sm:text-xl">
-            Build beautiful direct booking websites for resorts and villas with WhatsApp reservations,
-            reusable templates, and AI-powered branding.
+            {t("home.hero.body")}
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#dbc895] px-7 text-sm font-semibold text-[#18352f] shadow-[0_18px_50px_rgba(176,142,86,0.2)]">
-              Build My Site
+              {t("home.hero.cta")}
             </Link>
           </div>
         </div>
@@ -117,6 +152,8 @@ function HeroSection() {
 }
 
 function BrowserPreview() {
+  const { t } = useLanguage();
+
   return (
     <div className="relative">
       <div className="absolute -inset-8 bg-[radial-gradient(circle_at_30%_20%,rgba(137,155,111,0.28),transparent_34%),radial-gradient(circle_at_90%_70%,rgba(219,194,151,0.34),transparent_30%)]" />
@@ -140,16 +177,16 @@ function BrowserPreview() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
           <div className="absolute left-6 right-6 top-6 flex items-center justify-between text-white">
-            <p className="text-sm font-semibold tracking-[0.18em]">Your Brand</p>
-            <span className="rounded-full border border-white/40 px-4 py-2 text-xs font-semibold">BOOK DIRECT</span>
+            <p className="text-sm font-semibold tracking-[0.18em]">{t("home.preview.brand")}</p>
+            <span className="rounded-full border border-white/40 px-4 py-2 text-xs font-semibold">{t("home.preview.cta")}</span>
           </div>
           <div className="absolute bottom-7 left-6 right-6 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/75">Lombok boutique villa</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/75">{t("home.preview.kicker")}</p>
             <h2 className="mt-3 max-w-lg text-4xl font-semibold leading-tight">
-              Private Tropical Escape in Selong Belanak
+              {t("home.preview.title")}
             </h2>
             <div className="mt-5 inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#18352f]">
-              Book Direct & Save
+              {t("home.hero.cta")}
             </div>
           </div>
         </div>
@@ -158,14 +195,16 @@ function BrowserPreview() {
   );
 }
 
-function ProblemSection() {
+function ProblemSection({ problems }: { problems: string[] }) {
+  const { t } = useLanguage();
+
   return (
     <section className="bg-white px-5 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="The problem"
-          title="Boutique properties are building their business on rented demand."
-          text="OTAs are useful for discovery, but they rarely help small hospitality operators build owned brands, customer relationships, or direct revenue systems."
+          label={t("home.problem.label")}
+          title={t("home.problem.title")}
+          text={t("home.problem.text")}
         />
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {problems.map((problem) => (
@@ -180,14 +219,16 @@ function ProblemSection() {
   );
 }
 
-function SolutionSection() {
+function SolutionSection({ flowSteps }: { flowSteps: string[] }) {
+  const { t } = useLanguage();
+
   return (
     <section className="px-5 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="The solution"
-          title="From listing page to direct booking engine."
-          text="Travelseed turns existing resort information into a branded website and WhatsApp-first booking flow that operators can own."
+          label={t("home.solution.label")}
+          title={t("home.solution.title")}
+          text={t("home.solution.text")}
         />
         <div className="mt-12 grid gap-3 lg:grid-cols-5">
           {flowSteps.map((step, index) => (
@@ -207,14 +248,16 @@ function SolutionSection() {
   );
 }
 
-function FeaturesSection() {
+function FeaturesSection({ features }: { features: Array<{ icon: string; title: string; text: string }> }) {
+  const { t } = useLanguage();
+
   return (
     <section className="bg-[#18352f] px-5 py-20 text-white sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="Platform features"
-          title="Built for independent resorts that sell through conversation."
-          text="A focused toolkit for direct booking websites, brand copy, reusable templates, and guest-owned customer data."
+          label={t("home.features.label")}
+          title={t("home.features.title")}
+          text={t("home.features.text")}
           inverted
         />
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -234,13 +277,15 @@ function FeaturesSection() {
 }
 
 function BusinessExamplesSection() {
+  const { t } = useLanguage();
+
   return (
     <section className="bg-white px-5 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="Business examples"
-          title="A visual system for stays, camps, and local businesses."
-          text="Use photography-led templates to present the atmosphere, services, and direct inquiry path without sending guests to a broken demo."
+          label={t("home.examples.label")}
+          title={t("home.examples.title")}
+          text={t("home.examples.text")}
         />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {businessExamples.map((business) => (
@@ -260,17 +305,19 @@ function BusinessExamplesSection() {
   );
 }
 
-function HowItWorksSection() {
+function HowItWorksSection({ steps }: { steps: string[] }) {
+  const { t } = useLanguage();
+
   return (
     <section className="px-5 py-20 sm:px-6 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          label="How it works"
-          title="Launch a direct booking brand without rebuilding your operations."
-          text="Travelseed starts from the data operators already have, then creates a stronger direct booking surface."
+          label={t("home.how.label")}
+          title={t("home.how.title")}
+          text={t("home.how.text")}
         />
         <div className="mt-12 grid gap-4 md:grid-cols-4">
-          {howItWorks.map((step, index) => (
+          {steps.map((step, index) => (
             <div key={step} className="rounded-md border border-[#dfd3bf] bg-white/70 p-6">
               <p className="text-4xl font-semibold text-[#b49a70]">{index + 1}</p>
               <h3 className="mt-8 text-xl font-semibold">{step}</h3>
@@ -283,19 +330,21 @@ function HowItWorksSection() {
 }
 
 function FinalCtaSection() {
+  const { t } = useLanguage();
+
   return (
     <section className="px-5 pb-20 sm:px-6 lg:pb-28">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[28px] bg-[#18352f] px-6 py-16 text-white shadow-[0_30px_100px_rgba(24,53,47,0.25)] sm:px-10 lg:px-16">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.7fr] lg:items-center">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#dbc895]">Direct revenue starts here</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#dbc895]">{t("home.cta.label")}</p>
             <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
-              Start Growing Your Direct Bookings
+              {t("home.cta.title")}
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
             <Link href="/create" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-[#18352f]">
-              Build My Site
+              {t("home.hero.cta")}
             </Link>
           </div>
         </div>
@@ -305,14 +354,16 @@ function FinalCtaSection() {
 }
 
 function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t border-[#ddd2c0] px-5 py-10 sm:px-6">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 text-sm text-[#51635b] sm:flex-row sm:items-center sm:justify-between">
         <p className="font-semibold tracking-[0.18em] text-[#18352f]">TRAVELSEED</p>
         <div className="flex flex-wrap gap-5">
-          <Link href="/">About</Link>
-          <Link href="/create">Build My Site</Link>
-          <Link href="mailto:hello@travelseed.app">Contact</Link>
+          <Link href="/">{t("home.footer.about")}</Link>
+          <Link href="/create">{t("home.hero.cta")}</Link>
+          <Link href="mailto:hello@travelseed.app">{t("home.footer.contact")}</Link>
         </div>
       </div>
     </footer>

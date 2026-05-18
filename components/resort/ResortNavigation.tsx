@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { LanguageToggle, useLanguage } from "@/components/i18n/LanguageProvider";
 import { designTokensFor } from "@/lib/design-settings";
 import { publicNavigationLinks } from "@/lib/site-structure";
 import type { Resort } from "@/types/resort";
@@ -31,6 +34,7 @@ const variantClassNames = {
 
 // Customer-site navigation reused by every resort template.
 export function ResortNavigation({ resort, variant = "light" }: ResortNavigationProps) {
+  const { t } = useLanguage();
   const styles = variantClassNames[variant];
   const design = designTokensFor(resort.design_settings);
   const links = publicNavigationLinks(resort);
@@ -55,8 +59,9 @@ export function ResortNavigation({ resort, variant = "light" }: ResortNavigation
             className={`inline-flex min-h-10 shrink-0 items-center border px-4 text-xs font-semibold uppercase tracking-[0.14em] transition ${styles.button} ${design.buttonClassName}`}
             style={variant === "light" ? undefined : { borderColor: `${design.colors.primary}33`, color: design.colors.primary }}
           >
-            Book direct
+            {t("public.bookDirect")}
           </a>
+          <LanguageToggle className="hidden md:inline-flex" />
         </nav>
       </div>
     </div>

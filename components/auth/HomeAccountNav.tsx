@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { LanguageToggle, useLanguage } from "@/components/i18n/LanguageProvider";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: number }) {
+  const { t } = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const hasNotifications = notificationCount > 0;
@@ -37,42 +39,49 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
   if (!session) {
     return (
       <div className="flex items-center gap-2">
+        <LanguageToggle />
         <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">
-          Log in
+          {t("nav.login")}
         </Link>
         <Link href="/create" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
-          Build My Site
+          {t("nav.build")}
         </Link>
       </div>
     );
   }
 
   return (
-    <details className="group relative">
-      <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] shadow-sm">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#18352f] text-xs text-white">
-          {(session.user.email ?? "U").slice(0, 1).toUpperCase()}
-        </span>
-        Profile
-        {hasNotifications ? <NotificationCountBadge count={notificationCount} className="-right-1 -top-1" /> : null}
-      </summary>
-      <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-md border border-[#eadfce] bg-white p-2 text-sm shadow-[0_18px_55px_rgba(54,43,29,0.16)]">
-        <p className="truncate px-3 py-2 text-xs font-medium text-[#51635b]">{session.user.email}</p>
-        <Link href="/dashboard" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
-          Site management
-        </Link>
-        <Link href="/create" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
-          Build new site
-        </Link>
-        <button
-          type="button"
-          onClick={() => void supabase.auth.signOut()}
-          className="rounded-md px-3 py-2 text-left font-semibold text-red-700 hover:bg-red-50"
-        >
-          Sign out
-        </button>
-      </div>
-    </details>
+    <div className="flex items-center gap-2">
+      <LanguageToggle className="hidden sm:inline-flex" />
+      <details className="group relative">
+        <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] shadow-sm">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#18352f] text-xs text-white">
+            {(session.user.email ?? "U").slice(0, 1).toUpperCase()}
+          </span>
+          {t("nav.profile")}
+          {hasNotifications ? <NotificationCountBadge count={notificationCount} className="-right-1 -top-1" /> : null}
+        </summary>
+        <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-md border border-[#eadfce] bg-white p-2 text-sm shadow-[0_18px_55px_rgba(54,43,29,0.16)]">
+          <p className="truncate px-3 py-2 text-xs font-medium text-[#51635b]">{session.user.email}</p>
+          <div className="px-3 py-2 sm:hidden">
+            <LanguageToggle />
+          </div>
+          <Link href="/dashboard" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
+            {t("nav.management")}
+          </Link>
+          <Link href="/create" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
+            {t("nav.newSite")}
+          </Link>
+          <button
+            type="button"
+            onClick={() => void supabase.auth.signOut()}
+            className="rounded-md px-3 py-2 text-left font-semibold text-red-700 hover:bg-red-50"
+          >
+            {t("nav.signOut")}
+          </button>
+        </div>
+      </details>
+    </div>
   );
 }
 
