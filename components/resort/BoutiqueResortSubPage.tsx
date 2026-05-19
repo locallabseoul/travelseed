@@ -7,6 +7,7 @@ import { ArrowRightIcon, CoffeeIcon, LocationIcon, MailIcon, MapIcon, WhatsAppIc
 import { templatePaletteFor } from "@/lib/design-settings";
 import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
 import { publicNavigationLinks } from "@/lib/site-structure";
+import type { SitePageContentCard } from "@/types/dashboard";
 import type { Resort, ResortOffer, ResortSitePage } from "@/types/resort";
 
 type ResortSubPageProps = {
@@ -122,8 +123,15 @@ function RoomCard({ resort, room }: { resort: Resort; room: ResortOffer }) {
 
 function ExperiencesPage({ resort }: { resort: Resort }) {
   const items = resort.experiences.length > 0 ? resort.experiences : ["Private arrival coordination", "Local beach days", "Dining and sunset plans"];
+  const cards = items.map((item, index) => ({
+    id: `experience-${index}`,
+    title: item,
+    description: "",
+    imageUrl: "",
+    sortOrder: index,
+  }));
 
-  return <CardGrid eyebrow="Guest experiences" items={items} images={resort.gallery} />;
+  return <CardGrid eyebrow="Guest experiences" cards={cards} images={resort.gallery} />;
 }
 
 function GalleryPage({ resort }: { resort: Resort }) {
@@ -222,10 +230,10 @@ function PresetPage({ resort, page }: ResortSubPageProps) {
   }
 
   if (page.slug.includes("nearby")) {
-    return <NearbyPage items={settings.items} images={resort.gallery} />;
+    return <NearbyPage cards={settings.cards} images={resort.gallery} />;
   }
 
-  return <CardGrid eyebrow={preset.card.eyebrow} items={settings.items} images={resort.gallery} />;
+  return <CardGrid eyebrow={preset.card.eyebrow} cards={settings.cards} images={resort.gallery} />;
 }
 
 function PromotionCards({ resort, offers, fallback, note, ctaLabel }: { resort: Resort; offers: ResortOffer[]; fallback: string[]; note?: string; ctaLabel: string }) {
@@ -266,15 +274,15 @@ function DiningPage({ settings, images }: { settings: ReturnType<typeof presetSe
     <section className="mx-auto w-full max-w-7xl px-6 py-16 md:px-12">
       <SectionHeading eyebrow="Dining" title={settings.title} description={settings.intro} />
       <div className="grid gap-8 md:grid-cols-3">
-        {settings.items.map((item, index) => (
-          <GlassCard key={item} className="overflow-hidden rounded-2xl">
+        {settings.cards.map((card, index) => (
+          <GlassCard key={card.id} className="overflow-hidden rounded-2xl">
             <div className="relative h-56 bg-slate-800">
-              {images[index] ? <Image src={images[index]} alt={item} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" /> : null}
+              {imageForCard(card, images, index) ? <Image src={imageForCard(card, images, index)} alt={card.title} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" /> : null}
               <span className="absolute left-4 top-4 rounded-full bg-slate-900/80 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md"><CoffeeIcon className="mr-1 inline h-3 w-3 text-[var(--br-accent)]" /> Dining</span>
             </div>
             <div className="p-6">
-              <h3 className="text-2xl text-white [font-family:'Playfair_Display',serif]">{item}</h3>
-              <p className="mt-3 text-sm leading-7 text-stone-300">Presented as part of the guest dining experience.</p>
+              <h3 className="text-2xl text-white [font-family:'Playfair_Display',serif]">{card.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-stone-300">{card.description || "Presented as part of the guest dining experience."}</p>
             </div>
           </GlassCard>
         ))}
@@ -291,7 +299,7 @@ function DiningPage({ settings, images }: { settings: ReturnType<typeof presetSe
   );
 }
 
-function NearbyPage({ items, images }: { items: string[]; images: string[] }) {
+function NearbyPage({ cards, images }: { cards: SitePageContentCard[]; images: string[] }) {
   return (
     <>
       <section className="mx-auto w-full max-w-7xl px-6 py-10 md:px-12">
@@ -303,30 +311,34 @@ function NearbyPage({ items, images }: { items: string[]; images: string[] }) {
           </div>
         </GlassCard>
       </section>
-      <CardGrid eyebrow="Nearby place" items={items} images={images} />
+      <CardGrid eyebrow="Nearby place" cards={cards} images={images} />
     </>
   );
 }
 
-function CardGrid({ eyebrow, items, images }: { eyebrow: string; items: string[]; images: string[] }) {
+function CardGrid({ eyebrow, cards, images }: { eyebrow: string; cards: SitePageContentCard[]; images: string[] }) {
   return (
     <section className="mx-auto w-full max-w-7xl px-6 py-16 md:px-12">
       <div className="grid gap-8 md:grid-cols-3">
-        {items.map((item, index) => (
-          <GlassCard key={item} className="overflow-hidden rounded-2xl">
+        {cards.map((card, index) => (
+          <GlassCard key={card.id} className="overflow-hidden rounded-2xl">
             <div className="relative h-56 bg-slate-800">
-              {images[index] ? <Image src={images[index]} alt={item} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" /> : null}
+              {imageForCard(card, images, index) ? <Image src={imageForCard(card, images, index)} alt={card.title} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" /> : null}
             </div>
             <div className="p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--br-accent)]">{eyebrow}</p>
-              <h3 className="mt-4 text-2xl text-white [font-family:'Playfair_Display',serif]">{item}</h3>
-              <p className="mt-3 text-sm leading-7 text-stone-300">A curated highlight guests can plan around during the stay.</p>
+              <h3 className="mt-4 text-2xl text-white [font-family:'Playfair_Display',serif]">{card.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-stone-300">{card.description || "A curated highlight guests can plan around during the stay."}</p>
             </div>
           </GlassCard>
         ))}
       </div>
     </section>
   );
+}
+
+function imageForCard(card: SitePageContentCard, images: string[], index: number) {
+  return card.imageUrl || images[index] || "";
 }
 
 function EditorialPage({ resort, page }: ResortSubPageProps) {

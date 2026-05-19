@@ -11,6 +11,7 @@ import { ServiceSection } from "@/components/resort/ServiceSection";
 import { designTokensFor } from "@/lib/design-settings";
 import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
 import Image from "next/image";
+import type { SitePageContentCard } from "@/types/dashboard";
 import type { Resort, ResortSitePage } from "@/types/resort";
 
 type ResortSubPageProps = {
@@ -64,18 +65,20 @@ function PresetPageSection({ resort, page }: ResortSubPageProps) {
     ? (resort.services ?? []).filter((service) => service.is_active && (service.kind === "package" || service.kind === "service") && Boolean(service.highlight))
     : [];
   const cards = promotionOffers.length > 0
-    ? promotionOffers.slice(0, 3).map((offer) => ({
+    ? promotionOffers.slice(0, 3).map((offer, index) => ({
       title: offer.title,
       description: offer.description || offer.highlight || preset.card.offerDescription || preset.card.fallbackDescription,
       eyebrow: offer.highlight || preset.card.eyebrow,
+      imageUrl: offer.image_url || resort.gallery[index] || resort.hero_image_url || "",
       priceLabel: offer.price_label,
       ctaLabel: offer.cta_label,
       isOffer: true,
     }))
-    : settings.items.map((item) => ({
-      title: item,
-      description: preset.card.fallbackDescription,
+    : settings.cards.map((card, index) => ({
+      title: card.title,
+      description: card.description || preset.card.fallbackDescription,
       eyebrow: preset.card.eyebrow,
+      imageUrl: imageForCard(card, resort.gallery, index),
       priceLabel: null,
       ctaLabel: null,
       isOffer: false,
@@ -101,7 +104,13 @@ function PresetPageSection({ resort, page }: ResortSubPageProps) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {cards.map((card, index) => (
-              <article key={`${card.title}-${index}`} className="rounded-2xl border p-5 shadow-[0_18px_50px_rgba(52,43,31,0.06)]" style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}>
+              <article key={`${card.title}-${index}`} className="overflow-hidden rounded-2xl border shadow-[0_18px_50px_rgba(52,43,31,0.06)]" style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}>
+                {card.imageUrl ? (
+                  <div className="relative h-48 bg-[#18352f]/10">
+                    <Image src={card.imageUrl} alt={card.title} fill sizes="(min-width: 768px) 35vw, 100vw" className="object-cover" />
+                  </div>
+                ) : null}
+                <div className="p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: design.colors.accent }}>{card.eyebrow}</p>
                 <h3 className={`mt-4 text-xl font-semibold ${design.headingClassName}`} style={{ color: design.colors.text }}>{card.title}</h3>
                 <p className={`mt-3 text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
@@ -113,6 +122,7 @@ function PresetPageSection({ resort, page }: ResortSubPageProps) {
                     {card.ctaLabel ? <span className="rounded-full px-3 py-2" style={{ backgroundColor: design.colors.page }}>{card.ctaLabel}</span> : null}
                   </div>
                 ) : null}
+                </div>
               </article>
             ))}
           </div>
@@ -142,6 +152,10 @@ function PresetPageSection({ resort, page }: ResortSubPageProps) {
       </div>
     </section>
   );
+}
+
+function imageForCard(card: SitePageContentCard, images: string[], index: number) {
+  return card.imageUrl || images[index] || "";
 }
 
 function SubPageHero({ resort, page }: ResortSubPageProps) {

@@ -5,7 +5,7 @@ import { ContentManager } from "@/components/dashboard/ContentManager";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { effectivePlanType, forestCustomPages, landingSections, planConfig, treePages } from "@/components/dashboard/subscriptionConfig";
 import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
-import type { DashboardConfirmOptions, DashboardTab, DashboardUnsavedChanges, PlanType, ResortConsoleData, SitePageSettings, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
+import type { DashboardConfirmOptions, DashboardTab, DashboardUnsavedChanges, PlanType, ResortConsoleData, SitePageContentCard, SitePageSettings, SiteStructurePage, SiteStructureSection } from "@/types/dashboard";
 
 type StructureResponse = {
   sections?: RawSection[];
@@ -521,6 +521,10 @@ function PageDetail({
   const [presetOpeningHours, setPresetOpeningHours] = useState(presetSettings?.openingHours ?? "");
   const [presetBreakfastInfo, setPresetBreakfastInfo] = useState(presetSettings?.breakfastInfo ?? "");
   const [presetPrivateDiningNote, setPresetPrivateDiningNote] = useState(presetSettings?.privateDiningNote ?? "");
+  const [presetCards, setPresetCards] = useState<SitePageContentCard[]>(presetSettings?.cards ?? []);
+  const [uploadingCardId, setUploadingCardId] = useState<string | null>(null);
+  const [cardUploadStatus, setCardUploadStatus] = useState("");
+  const supportsCards = Boolean(preset && ["dining", "activities"].includes(preset.layout) && preset.slug !== "/promotions");
 
   useEffect(() => {
     setSeoTitle(page.seoTitle ?? "");
@@ -535,8 +539,73 @@ function PageDetail({
       setPresetOpeningHours(presetSettings.openingHours ?? "");
       setPresetBreakfastInfo(presetSettings.breakfastInfo ?? "");
       setPresetPrivateDiningNote(presetSettings.privateDiningNote ?? "");
+      setPresetCards(presetSettings.cards);
+      setCardUploadStatus("");
     }
   }, [page.seoDescription, page.seoTitle, page.slug, presetSettings]);
+
+  async function uploadPresetCardImage(cardId: string, file: File) {
+    if (!accessToken) {
+      setCardUploadStatus("Sign in before uploading card images.");
+      return;
+    }
+
+    setUploadingCardId(cardId);
+    setCardUploadStatus("Uploading card image...");
+
+    try {
+      const formData = new FormData();
+      formData.set("file", file, file.name);
+      formData.set("folder", "page-content");
+      formData.set("slug", site.slug);
+
+      const response = await fetch("/api/operator/images", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Card image upload failed.");
+      }
+
+      const nextCards = presetCards.map((card) => (card.id === cardId ? { ...card, imageUrl: String(data.publicUrl) } : card));
+      setPresetCards(nextCards);
+      savePresetSettings(nextCards);
+      setCardUploadStatus("Card image uploaded and saved.");
+    } catch (error) {
+      setCardUploadStatus(error instanceof Error ? error.message : "Card image upload failed.");
+    } finally {
+      setUploadingCardId(null);
+    }
+  }
+
+  function savePresetSettings(nextPresetCards = presetCards) {
+    const cards = nextPresetCards
+      .map((card, index) => ({
+        ...card,
+        title: card.title.trim(),
+        description: card.description.trim(),
+        imageUrl: card.imageUrl.trim(),
+        sortOrder: index,
+      }))
+      .filter((card) => card.title);
+
+    onSaveSettings({
+      title: presetTitle,
+      intro: presetIntro,
+      items: supportsCards ? cards.map((card) => card.title) : presetItems.split("\n").map((item) => item.trim()).filter(Boolean),
+      cards: supportsCards ? cards : undefined,
+      ctaLabel: presetCtaLabel,
+      campaignNote: presetCampaignNote,
+      openingHours: presetOpeningHours,
+      breakfastInfo: presetBreakfastInfo,
+      privateDiningNote: presetPrivateDiningNote,
+    });
+  }
 
   return (
     <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
@@ -664,11 +733,23 @@ function PageDetail({
               {preset.editor.introLabel}
               <textarea value={presetIntro} rows={3} onChange={(event) => setPresetIntro(event.target.value)} placeholder={preset.settings.intro} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
             </label>
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
-              {preset.editor.itemsLabel}
-              <textarea value={presetItems} rows={4} onChange={(event) => setPresetItems(event.target.value)} placeholder={preset.settings.items.join("\n")} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
-              <span className="text-xs font-normal leading-5 text-[#6f7b74]">{preset.editor.itemsHelp}</span>
-            </label>
+            {supportsCards ? (
+              <PresetCardsEditor
+                label={preset.editor.itemsLabel}
+                help={preset.editor.itemsHelp}
+                cards={presetCards}
+                uploadingCardId={uploadingCardId}
+                onChange={setPresetCards}
+                onUploadImage={(cardId, file) => void uploadPresetCardImage(cardId, file)}
+              />
+            ) : (
+              <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                {preset.editor.itemsLabel}
+                <textarea value={presetItems} rows={4} onChange={(event) => setPresetItems(event.target.value)} placeholder={preset.settings.items.join("\n")} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                <span className="text-xs font-normal leading-5 text-[#6f7b74]">{preset.editor.itemsHelp}</span>
+              </label>
+            )}
+            {cardUploadStatus ? <p className="rounded-2xl bg-white p-3 text-sm leading-6 text-[#52615a]">{cardUploadStatus}</p> : null}
             <label className="grid gap-2 text-sm font-medium text-[#18352f]">
               {preset.editor.ctaLabel}
               <input value={presetCtaLabel} onChange={(event) => setPresetCtaLabel(event.target.value)} placeholder={preset.settings.ctaLabel} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
@@ -704,16 +785,7 @@ function PageDetail({
               <button
                 type="button"
                 disabled={locked}
-                onClick={() => onSaveSettings({
-                  title: presetTitle,
-                  intro: presetIntro,
-                  items: presetItems.split("\n").map((item) => item.trim()).filter(Boolean),
-                  ctaLabel: presetCtaLabel,
-                  campaignNote: presetCampaignNote,
-                  openingHours: presetOpeningHours,
-                  breakfastInfo: presetBreakfastInfo,
-                  privateDiningNote: presetPrivateDiningNote,
-                })}
+                onClick={() => savePresetSettings()}
                 className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]"
               >
                 Save preset content
@@ -755,6 +827,119 @@ function PageMetaCard({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">{label}</p>
       <p className="mt-2 break-words text-sm font-semibold text-[#18352f]">{value}</p>
+    </div>
+  );
+}
+
+function PresetCardsEditor({
+  label,
+  help,
+  cards,
+  uploadingCardId,
+  onChange,
+  onUploadImage,
+}: {
+  label: string;
+  help: string;
+  cards: SitePageContentCard[];
+  uploadingCardId: string | null;
+  onChange: (cards: SitePageContentCard[]) => void;
+  onUploadImage: (cardId: string, file: File) => void;
+}) {
+  function updateCard(cardId: string, patch: Partial<SitePageContentCard>) {
+    onChange(cards.map((card) => (card.id === cardId ? { ...card, ...patch } : card)));
+  }
+
+  function addCard() {
+    const nextIndex = cards.length + 1;
+    onChange([
+      ...cards,
+      {
+        id: `card-${Date.now()}`,
+        title: `New highlight ${nextIndex}`,
+        description: "",
+        imageUrl: "",
+        sortOrder: cards.length,
+      },
+    ]);
+  }
+
+  function removeCard(cardId: string) {
+    onChange(cards.filter((card) => card.id !== cardId).map((card, index) => ({ ...card, sortOrder: index })));
+  }
+
+  function moveCard(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= cards.length) {
+      return;
+    }
+
+    const nextCards = [...cards];
+    [nextCards[index], nextCards[nextIndex]] = [nextCards[nextIndex], nextCards[index]];
+    onChange(nextCards.map((card, cardIndex) => ({ ...card, sortOrder: cardIndex })));
+  }
+
+  return (
+    <div className="grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">{label}</p>
+          <p className="mt-1 text-xs font-normal leading-5 text-[#6f7b74]">{help}</p>
+        </div>
+        <button type="button" onClick={addCard} className="min-h-9 rounded-full bg-[#18352f] px-4 text-xs font-semibold text-white">
+          Add card
+        </button>
+      </div>
+
+      <div className="grid gap-3">
+        {cards.map((card, index) => (
+          <article key={card.id} className="grid gap-3 rounded-2xl bg-[#fbfaf7] p-3 ring-1 ring-[#eadfce]">
+            <div className="flex flex-col gap-3 md:grid md:grid-cols-[160px_minmax(0,1fr)]">
+              <div>
+                <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#eadfce] bg-cover bg-center" style={card.imageUrl ? { backgroundImage: `url(${card.imageUrl})` } : undefined} />
+                <label className="mt-2 inline-flex min-h-9 w-full cursor-pointer items-center justify-center rounded-full bg-white px-3 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                  {uploadingCardId === card.id ? "Uploading..." : card.imageUrl ? "Replace image" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    disabled={uploadingCardId === card.id}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      event.currentTarget.value = "";
+                      if (file) {
+                        onUploadImage(card.id, file);
+                      }
+                    }}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-3">
+                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                  Title
+                  <input value={card.title} onChange={(event) => updateCard(card.id, { title: event.target.value })} className="min-h-10 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+                </label>
+                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                  Description
+                  <textarea value={card.description} rows={3} onChange={(event) => updateCard(card.id, { description: event.target.value })} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                </label>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => moveCard(index, -1)} disabled={index === 0} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+                Up
+              </button>
+              <button type="button" onClick={() => moveCard(index, 1)} disabled={index === cards.length - 1} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+                Down
+              </button>
+              <button type="button" onClick={() => removeCard(card.id)} className="rounded-full bg-[#fff7f5] px-3 py-1.5 text-xs font-semibold text-[#9d3323]">
+                Remove
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }

@@ -46,10 +46,19 @@ export type DashboardNotificationSummary = {
 export type PlanType = "freeTrial" | "seed" | "tree" | "forest";
 export type SiteType = "landing" | "multipage" | "custom";
 export type SitePageType = "Standard" | "Landing" | "Event" | "Wedding" | "Tour" | "Membership";
+export type SitePageContentCard = {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  sortOrder: number;
+};
+
 export type SitePageSettings = {
   title?: string;
   intro?: string;
   items?: string[];
+  cards?: SitePageContentCard[];
   ctaLabel?: string;
   campaignNote?: string;
   openingHours?: string;

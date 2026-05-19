@@ -1,9 +1,10 @@
-import type { PlanType, SitePageType } from "@/types/dashboard";
+import type { PlanType, SitePageContentCard, SitePageType } from "@/types/dashboard";
 
 export type SectionPresetSettings = {
   title: string;
   intro: string;
   items: string[];
+  cards: SitePageContentCard[];
   ctaLabel: string;
   campaignNote?: string;
   openingHours?: string;
@@ -60,6 +61,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Dining shaped around the stay",
       intro: "Share breakfast, restaurant, bar, private dining, or local food experiences guests can enjoy during their stay.",
       items: ["Breakfast service", "Local ingredients", "Private dining"],
+      cards: [],
       ctaLabel: "Ask about dining",
       openingHours: "Breakfast daily from 7:00 AM to 10:30 AM",
       breakfastInfo: "Fresh breakfast options are available for guests before a beach day, tour, or slow morning at the property.",
@@ -91,6 +93,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Direct booking offers",
       intro: "Highlight seasonal packages, stay-more-save-more offers, and direct booking benefits.",
       items: ["Stay longer offer", "Direct booking perks", "Seasonal package"],
+      cards: [],
       ctaLabel: "Ask for current offers",
       campaignNote: "Direct booking offers may vary by date, length of stay, and availability. Ask the host for current terms.",
     },
@@ -119,6 +122,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Wellness for slower days",
       intro: "Introduce spa treatments, wellness rituals, yoga, recovery, and quiet spaces designed for guest wellbeing.",
       items: ["Signature massage", "Yoga or meditation", "Wellness facilities"],
+      cards: [],
       ctaLabel: "Plan a wellness stay",
     },
   },
@@ -146,6 +150,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Activities close to the stay",
       intro: "Turn your best experiences, tours, classes, and on-site activities into a clear planning page.",
       items: ["Guided experience", "Outdoor activity", "Local tour"],
+      cards: [],
       ctaLabel: "Ask about activities",
     },
   },
@@ -173,6 +178,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Everything close enough",
       intro: "Help guests understand what is nearby, from beaches and cafes to landmarks, viewpoints, and local favorites.",
       items: ["Nearby beach", "Local cafe", "Scenic viewpoint"],
+      cards: [],
       ctaLabel: "Ask for local tips",
     },
   },
@@ -200,6 +206,7 @@ export const sectionPresets: SectionPreset[] = [
       title: "Private events with a sense of place",
       intro: "Present weddings, retreats, dinners, or private celebrations with an inquiry-first page.",
       items: ["Wedding stays", "Private dinners", "Retreat buyouts"],
+      cards: [],
       ctaLabel: "Plan an event",
     },
   },
@@ -212,17 +219,46 @@ export function presetForSlug(slug: string) {
 
 export function presetSettingsFrom(value: unknown, preset: SectionPreset): SectionPresetSettings {
   const settings = value && typeof value === "object" ? value as Partial<SectionPresetSettings> : {};
+  const items = Array.isArray(settings.items) && settings.items.length > 0 ? settings.items.map(String).filter(Boolean) : preset.settings.items;
+  const cards = normalizePresetCards(settings.cards, items);
 
   return {
     title: typeof settings.title === "string" && settings.title.trim() ? settings.title : preset.settings.title,
     intro: typeof settings.intro === "string" && settings.intro.trim() ? settings.intro : preset.settings.intro,
-    items: Array.isArray(settings.items) && settings.items.length > 0 ? settings.items.map(String).filter(Boolean) : preset.settings.items,
+    items,
+    cards,
     ctaLabel: typeof settings.ctaLabel === "string" && settings.ctaLabel.trim() ? settings.ctaLabel : preset.settings.ctaLabel,
     campaignNote: optionalPresetText(settings.campaignNote, preset.settings.campaignNote),
     openingHours: optionalPresetText(settings.openingHours, preset.settings.openingHours),
     breakfastInfo: optionalPresetText(settings.breakfastInfo, preset.settings.breakfastInfo),
     privateDiningNote: optionalPresetText(settings.privateDiningNote, preset.settings.privateDiningNote),
   };
+}
+
+function normalizePresetCards(value: unknown, fallbackItems: string[]): SitePageContentCard[] {
+  if (Array.isArray(value) && value.length > 0) {
+    return value
+      .map((item, index) => {
+        const card = item && typeof item === "object" ? item as Partial<SitePageContentCard> : {};
+        return {
+          id: typeof card.id === "string" && card.id.trim() ? card.id : `card-${index + 1}`,
+          title: typeof card.title === "string" ? card.title.trim() : "",
+          description: typeof card.description === "string" ? card.description.trim() : "",
+          imageUrl: typeof card.imageUrl === "string" ? card.imageUrl.trim() : "",
+          sortOrder: typeof card.sortOrder === "number" && Number.isFinite(card.sortOrder) ? card.sortOrder : index,
+        };
+      })
+      .filter((card) => card.title)
+      .sort((first, second) => first.sortOrder - second.sortOrder);
+  }
+
+  return fallbackItems.map((item, index) => ({
+    id: `legacy-item-${index + 1}`,
+    title: item,
+    description: "",
+    imageUrl: "",
+    sortOrder: index,
+  }));
 }
 
 function optionalPresetText(value: unknown, fallback: string | undefined) {
