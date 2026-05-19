@@ -99,7 +99,8 @@ export async function POST(request: Request, { params }: RouteContext) {
 
         if (aiDraft) {
           return NextResponse.json({
-            draft: { ...fallbackDraft(url), ...aiDraft },
+            draft: { ...fallbackDraft(url), ...aiDraft.site },
+            servicesDraft: aiDraft.services,
             sourceTextAvailable: Boolean(
               listingSource.bodyText ||
                 listingSource.metaDescription ||
@@ -117,6 +118,7 @@ export async function POST(request: Request, { params }: RouteContext) {
 
       return NextResponse.json({
         draft: fallbackDraft(url),
+        servicesDraft: [],
         sourceTextAvailable: Boolean(listingSource.bodyText),
         warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic URL draft.",
       });
@@ -124,6 +126,7 @@ export async function POST(request: Request, { params }: RouteContext) {
 
     return NextResponse.json({
       draft: textDraft(existingText, currentResort),
+      servicesDraft: [],
       sourceTextAvailable: true,
       warning: "No URL was provided, so Travelseed prepared a draft from the pasted text only.",
     });

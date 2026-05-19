@@ -10,7 +10,7 @@ import { savePreviewResort } from "@/components/create/preview-storage";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
-import type { Resort } from "@/types/resort";
+import type { Resort, ResortOfferInput } from "@/types/resort";
 
 type BuilderForm = {
   name: string;
@@ -34,6 +34,10 @@ type BuilderForm = {
 type ImportDraft = Partial<Omit<BuilderForm, "features" | "experiences" | "gallery_images" | "hero_image_url">> & {
   features?: string[];
   experiences?: string[];
+};
+
+type ServiceDraft = ResortOfferInput & {
+  draftId: string;
 };
 
 const steps = [
@@ -150,14 +154,36 @@ async function imageFileToOptimizedDataUrl(file: File) {
   }
 }
 
-async function createSiteRequest(resort: Resort, accessToken: string) {
+async function createSiteRequest(resort: Resort, services: ServiceDraft[], accessToken: string) {
   return fetch("/api/create-site", {
     method: "POST",
     headers: {
       authorization: `Bearer ${accessToken}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ resort }),
+    body: JSON.stringify({
+      resort,
+      services: services.map((service, index) => ({
+        kind: service.kind,
+        title: service.title,
+        description: service.description,
+        price_label: service.price_label,
+        capacity: service.capacity,
+        image_url: service.image_url,
+        highlight: service.highlight,
+        duration: service.duration,
+        included: service.included,
+        cta_label: service.cta_label,
+        bed_type: service.bed_type,
+        room_size: service.room_size,
+        view_type: service.view_type,
+        bathroom_info: service.bathroom_info,
+        max_guests: service.max_guests,
+        room_amenities: service.room_amenities,
+        is_active: service.is_active,
+        sort_order: index,
+      })),
+    }),
   });
 }
 
@@ -183,6 +209,39 @@ function draftList(value: string[] | undefined) {
 
 function draftNumber(value: string | undefined) {
   return value?.match(/\d+/)?.[0] ?? "";
+}
+
+function serviceDraftsFromApi(value: unknown): ServiceDraft[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((service, index) => {
+    const draft = service as Partial<ResortOfferInput>;
+    const kind = draft.kind && ["room", "package", "service"].includes(draft.kind) ? draft.kind : "service";
+
+    return {
+      draftId: `ai-service-${Date.now()}-${index}`,
+      kind,
+      title: String(draft.title ?? "").trim(),
+      description: draft.description ? String(draft.description).trim() : null,
+      price_label: draft.price_label ? String(draft.price_label).trim() : null,
+      capacity: typeof draft.capacity === "number" && Number.isFinite(draft.capacity) ? draft.capacity : null,
+      image_url: draft.image_url ? String(draft.image_url).trim() : null,
+      highlight: draft.highlight ? String(draft.highlight).trim() : null,
+      duration: draft.duration ? String(draft.duration).trim() : null,
+      included: Array.isArray(draft.included) ? draft.included.map(String).map((item) => item.trim()).filter(Boolean) : [],
+      cta_label: draft.cta_label ? String(draft.cta_label).trim() : null,
+      bed_type: kind === "room" && draft.bed_type ? String(draft.bed_type).trim() : null,
+      room_size: kind === "room" && draft.room_size ? String(draft.room_size).trim() : null,
+      view_type: kind === "room" && draft.view_type ? String(draft.view_type).trim() : null,
+      bathroom_info: kind === "room" && draft.bathroom_info ? String(draft.bathroom_info).trim() : null,
+      max_guests: kind === "room" && typeof draft.max_guests === "number" && Number.isFinite(draft.max_guests) ? draft.max_guests : null,
+      room_amenities: kind === "room" && Array.isArray(draft.room_amenities) ? draft.room_amenities.map(String).map((item) => item.trim()).filter(Boolean) : [],
+      is_active: true,
+      sort_order: index,
+    };
+  }).filter((service) => service.title);
 }
 
 function createPreviewResort(form: BuilderForm): Resort {
@@ -230,6 +289,8 @@ export function CreateSiteBuilder() {
   const [listingUrl, setListingUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [importStatus, setImportStatus] = useState("");
+  const [serviceDrafts, setServiceDrafts] = useState<ServiceDraft[]>([]);
+  const [selectedServiceDrafts, setSelectedServiceDrafts] = useState<Set<string>>(new Set());
   const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
   const [session, setSession] = useState<Session | null>(null);
   const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -332,9 +393,12 @@ export function CreateSiteBuilder() {
       }
 
       applyImportDraft(data.draft ?? {});
+      const nextServiceDrafts = serviceDraftsFromApi(data.servicesDraft);
+      setServiceDrafts(nextServiceDrafts);
+      setSelectedServiceDrafts(new Set(nextServiceDrafts.map((service) => service.draftId)));
       setBuilderStarted(true);
       setActiveStep(0);
-      setImportStatus(data.warning ?? "Draft created. Review each field before publishing.");
+      setImportStatus(data.warning ?? `Draft created${nextServiceDrafts.length ? ` with ${nextServiceDrafts.length} suggested offer items` : ""}. Review each field before publishing.`);
     } catch {
       setImportStatus("Could not import this listing. You can continue manually.");
     } finally {
@@ -457,7 +521,8 @@ export function CreateSiteBuilder() {
 
     const slug = slugify(form.slug || form.name);
     const resort = createPreviewResort({ ...form, slug });
-    const payloadSize = new Blob([JSON.stringify({ resort })]).size;
+    const services = serviceDrafts.filter((service) => selectedServiceDrafts.has(service.draftId));
+    const payloadSize = new Blob([JSON.stringify({ resort, services })]).size;
 
     if (payloadSize > publishedSitePayloadLimit) {
       setBuildStatus("Uploaded images are too large to publish at once. Remove a few photos or upload smaller images.");
@@ -469,7 +534,7 @@ export function CreateSiteBuilder() {
     setBuildStatus("Creating your direct booking site...");
 
     try {
-      let response = await createSiteRequest(resort, activeSession.access_token);
+      let response = await createSiteRequest(resort, services, activeSession.access_token);
 
       if (response.status === 401) {
         const { data: refreshedData } = await supabase.auth.refreshSession();
@@ -477,7 +542,7 @@ export function CreateSiteBuilder() {
 
         if (refreshedSession?.access_token) {
           setSession(refreshedSession);
-          response = await createSiteRequest(resort, refreshedSession.access_token);
+          response = await createSiteRequest(resort, services, refreshedSession.access_token);
         }
       }
 
@@ -600,6 +665,9 @@ export function CreateSiteBuilder() {
                   building,
                   buildStatus,
                   handleBuildSite,
+                  serviceDrafts,
+                  selectedServiceDrafts,
+                  setSelectedServiceDrafts,
                 )}
               </div>
 
@@ -833,6 +901,9 @@ function renderStep(
   building: boolean,
   buildStatus: string,
   handleBuildSite: () => Promise<void>,
+  serviceDrafts: ServiceDraft[],
+  selectedServiceDrafts: Set<string>,
+  setSelectedServiceDrafts: (value: Set<string>) => void,
 ) {
   if (activeStep === 0) {
     return (
@@ -922,24 +993,85 @@ function renderStep(
   }
 
   return (
-    <div className="rounded-md bg-[#f8f5ef] p-5">
-      <p className="text-sm font-semibold">Ready to turn this preview into a real site?</p>
-      <p className="mt-2 text-sm leading-6 text-[#51635b]">
-        Review the live preview on the right. Create or sign in to your verified account, then publish
-        the direct booking site with hosted images and a dedicated public URL.
-      </p>
-      <button
-        type="button"
-        onClick={() => void handleBuildSite()}
-        disabled={building}
-        className="mt-5 min-h-[52px] w-full rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white"
-      >
-        {building ? "Creating Site..." : "Build My Site"}
-      </button>
-      {buildStatus ? (
-        <p className="mt-3 rounded-md bg-white p-3 text-sm text-[#51635b]">{buildStatus}</p>
-      ) : null}
+    <div className="grid gap-5">
+      <ServiceDraftReview
+        services={serviceDrafts}
+        selectedIds={selectedServiceDrafts}
+        onSelectionChange={setSelectedServiceDrafts}
+      />
+      <div className="rounded-md bg-[#f8f5ef] p-5">
+        <p className="text-sm font-semibold">Ready to turn this preview into a real site?</p>
+        <p className="mt-2 text-sm leading-6 text-[#51635b]">
+          Review the live preview on the right. Create or sign in to your verified account, then publish
+          the direct booking site with hosted images and a dedicated public URL.
+        </p>
+        <button
+          type="button"
+          onClick={() => void handleBuildSite()}
+          disabled={building}
+          className="mt-5 min-h-[52px] w-full rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white"
+        >
+          {building ? "Creating Site..." : "Build My Site"}
+        </button>
+        {buildStatus ? (
+          <p className="mt-3 rounded-md bg-white p-3 text-sm text-[#51635b]">{buildStatus}</p>
+        ) : null}
+      </div>
     </div>
+  );
+}
+
+function ServiceDraftReview({
+  services,
+  selectedIds,
+  onSelectionChange,
+}: {
+  services: ServiceDraft[];
+  selectedIds: Set<string>;
+  onSelectionChange: (value: Set<string>) => void;
+}) {
+  if (services.length === 0) {
+    return null;
+  }
+
+  function toggleService(id: string) {
+    const next = new Set(selectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    onSelectionChange(next);
+  }
+
+  return (
+    <section className="rounded-md border border-[#eadfce] bg-white p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#18352f]">AI suggested rooms, packages & services</p>
+          <p className="mt-1 text-sm leading-6 text-[#51635b]">Selected items will be saved as editable offer inventory when the site is created.</p>
+        </div>
+        <span className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#7b5b24]">{selectedIds.size} selected</span>
+      </div>
+      <div className="mt-4 grid gap-3">
+        {services.map((service) => (
+          <label key={service.draftId} className="grid gap-2 rounded-md bg-[#fbf8f1] p-3 text-sm ring-1 ring-[#eadfce]">
+            <div className="flex items-start gap-3">
+              <input type="checkbox" checked={selectedIds.has(service.draftId)} onChange={() => toggleService(service.draftId)} className="mt-1 h-4 w-4 accent-[#2d6b50]" />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold capitalize text-[#1f5a45] ring-1 ring-[#d8cebb]">{service.kind}</span>
+                  {service.price_label ? <span className="text-xs font-medium text-[#6f7b74]">{service.price_label}</span> : null}
+                </div>
+                <p className="mt-2 font-semibold text-[#18352f]">{service.title}</p>
+                {service.description ? <p className="mt-1 leading-6 text-[#51635b]">{service.description}</p> : null}
+                {service.included?.length ? <p className="mt-1 text-xs text-[#6f7b74]">{service.included.join(" · ")}</p> : null}
+              </div>
+            </div>
+          </label>
+        ))}
+      </div>
+    </section>
   );
 }
 

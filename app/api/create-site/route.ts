@@ -5,7 +5,7 @@ import {
   validateResortPayload,
   verifyAuthenticatedRequest,
 } from "@/lib/server/supabase-admin";
-import type { Resort } from "@/types/resort";
+import type { Resort, ResortOfferInput } from "@/types/resort";
 
 export const runtime = "nodejs";
 
@@ -44,6 +44,39 @@ async function uploadDataUrlIfNeeded(imageUrl: string | null, slug: string, fold
 
   const { data } = supabase.storage.from("resort-images").getPublicUrl(filePath);
   return data.publicUrl;
+}
+
+function sanitizeServices(services: ResortOfferInput[], resortId: string) {
+  return services
+    .slice(0, 8)
+    .map((service, index) => {
+      const kind = ["room", "service", "package"].includes(service.kind) ? service.kind : "service";
+      const isRoom = kind === "room";
+
+      return {
+        resort_id: resortId,
+        kind,
+        title: service.title?.trim() ?? "",
+        description: service.description?.trim() || null,
+        price_label: service.price_label?.trim() || null,
+        capacity: typeof service.capacity === "number" && Number.isFinite(service.capacity) ? service.capacity : null,
+        image_url: service.image_url?.trim() || null,
+        highlight: service.highlight?.trim() || null,
+        duration: service.duration?.trim() || null,
+        included: Array.isArray(service.included) ? service.included.map((item) => String(item).trim()).filter(Boolean).slice(0, 6) : [],
+        cta_label: service.cta_label?.trim() || null,
+        bed_type: isRoom ? service.bed_type?.trim() || null : null,
+        room_size: isRoom ? service.room_size?.trim() || null : null,
+        view_type: isRoom ? service.view_type?.trim() || null : null,
+        bathroom_info: isRoom ? service.bathroom_info?.trim() || null : null,
+        max_guests: isRoom && typeof service.max_guests === "number" && Number.isFinite(service.max_guests) ? service.max_guests : null,
+        room_amenities: isRoom && Array.isArray(service.room_amenities) ? service.room_amenities.map((item) => String(item).trim()).filter(Boolean).slice(0, 8) : [],
+        sort_order: service.sort_order ?? index,
+        is_active: service.is_active ?? true,
+        updated_at: new Date().toISOString(),
+      };
+    })
+    .filter((service) => service.title);
 }
 
 // Public site creation endpoint. Supabase writes happen server-side so anon RLS can stay locked down.
@@ -89,6 +122,16 @@ export async function POST(request: Request) {
     if (error) {
       console.error("create-site insert failed", { code: error.code, message: error.message, slug: payload.slug });
       return NextResponse.json({ error: error.message }, { status: error.code === "23505" ? 409 : 500 });
+    }
+
+    const services = sanitizeServices(Array.isArray(body?.services) ? body.services : [], data.id);
+
+    if (services.length > 0) {
+      const { error: servicesError } = await supabase.from("resort_services").insert(services);
+
+      if (servicesError) {
+        console.error("create-site services insert failed", { message: servicesError.message, resortId: data.id });
+      }
     }
 
     return NextResponse.json({ resort: data as Resort }, { status: 201 });

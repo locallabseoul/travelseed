@@ -11,7 +11,7 @@ type RouteContext = {
 type GeneratedOffer = Required<Pick<ResortOfferInput, "kind" | "title">> &
   Pick<ResortOfferInput, "description" | "price_label" | "capacity" | "image_url" | "highlight" | "duration" | "included" | "cta_label" | "bed_type" | "room_size" | "view_type" | "bathroom_info" | "max_guests" | "room_amenities">;
 
-const openAiModel = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+const openAiModel = process.env.OPENAI_MODEL?.trim() || "gpt-4.1-mini";
 
 function userError(check: Awaited<ReturnType<typeof verifyAuthenticatedRequest>>) {
   return NextResponse.json({ error: check.ok ? "Unexpected session check state." : check.message }, {
