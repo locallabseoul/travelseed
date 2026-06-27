@@ -8,3 +8,4 @@ node_modules
 npm-debug.log*
 supabase/.temp
 .env*.local
+template_ref/
