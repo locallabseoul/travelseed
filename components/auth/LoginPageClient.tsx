@@ -89,27 +89,37 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f5ef] px-5 py-6 text-[#18352f] sm:px-6">
+    <main className="min-h-screen bg-slate-50 px-5 py-6 text-slate-950 sm:px-6">
       <AppHeader />
-      <section className="mx-auto mt-20 grid w-full max-w-md gap-5 rounded-md bg-white p-6 shadow-[0_24px_80px_rgba(54,43,29,0.08)]">
-        <div>
-          <h1 className="text-3xl font-semibold">
+      <section className="mx-auto mt-16 grid w-full max-w-md gap-5 rounded-xl border border-slate-200 bg-white p-6 shadow-[0_20px_40px_-10px_rgba(15,23,42,0.12)]">
+        <div className="text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 text-lg font-bold text-white shadow-lg shadow-emerald-500/20">T</div>
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">
             {authMode === "sign-in" ? t("auth.signInTitle") : t("auth.signUpTitle")}
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#51635b]">
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             {authMode === "sign-in"
               ? t("auth.signInBody")
               : t("auth.signUpBody")}
           </p>
         </div>
 
-        {!authReady ? <p className="text-sm text-[#51635b]">{t("auth.checking")}</p> : null}
+        <div className="grid grid-cols-2 rounded-xl bg-slate-100 p-1">
+          <button type="button" className="min-h-10 rounded-lg bg-white text-sm font-semibold text-slate-950 shadow-sm">
+            Email
+          </button>
+          <button type="button" className="min-h-10 rounded-lg text-sm font-semibold text-slate-500" title="WhatsApp owner login can be connected later.">
+            WhatsApp
+          </button>
+        </div>
+
+        {!authReady ? <p className="text-sm text-slate-500">{t("auth.checking")}</p> : null}
 
         {session ? (
-          <div className="grid gap-4 rounded-md border border-[#eadfce] bg-[#fbf8f1] p-4">
+          <div className="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
             <div>
-              <p className="text-sm font-semibold">{t("auth.signedIn")}</p>
-              <p className="mt-1 text-sm text-[#51635b]">{session.user.email}</p>
+              <p className="text-sm font-semibold text-slate-950">{t("auth.signedIn")}</p>
+              <p className="mt-1 text-sm text-slate-600">{session.user.email}</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
@@ -118,38 +128,38 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
                   setStatus("Checking your sites...");
                   void postLoginRedirectPath(session.access_token, redirectPath).then((path) => router.push(path));
                 }}
-                className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white"
+                className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm"
               >
                 {t("auth.continue")}
               </button>
-              <button type="button" onClick={() => void handleSignOut()} className="text-sm font-semibold text-[#0f5f6b]">
+              <button type="button" onClick={() => void handleSignOut()} className="text-sm font-semibold text-emerald-700">
                 {t("nav.signOut")}
               </button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="grid gap-4">
-            <label className="grid gap-2 text-sm font-medium">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               {t("create.account.email")}
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
-                className="min-h-11 rounded-md border border-[#d8cebb] bg-white px-3 outline-none focus:border-[#18352f]"
+                className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
               />
             </label>
-            <label className="grid gap-2 text-sm font-medium">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               {t("create.account.password")}
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
-                className="min-h-11 rounded-md border border-[#d8cebb] bg-white px-3 outline-none focus:border-[#18352f]"
+                className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
               />
             </label>
-            <button type="submit" className="min-h-12 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+            <button type="submit" className="min-h-12 rounded-md bg-emerald-600 px-5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700">
               {authMode === "sign-in" ? t("auth.signInTitle") : t("auth.signUpTitle")}
             </button>
             <button
@@ -158,14 +168,14 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
                 setAuthMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
                 setStatus("");
               }}
-              className="text-sm font-semibold text-[#0f5f6b]"
+              className="text-sm font-semibold text-emerald-700"
             >
               {authMode === "sign-in" ? t("create.account.create") : t("auth.backToSignIn")}
             </button>
           </form>
         )}
 
-        {status ? <p className="rounded-md bg-[#f8f5ef] p-3 text-sm text-[#51635b]">{status}</p> : null}
+        {status ? <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">{status}</p> : null}
       </section>
     </main>
   );

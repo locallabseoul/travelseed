@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { createServiceRoleClient, verifyAuthenticatedRequest } from "@/lib/server/supabase-admin";
 import type { Resort, ResortOfferInput } from "@/types/resort";
 
@@ -37,22 +38,147 @@ function imageFor(images: string[], index: number) {
 
 function fallbackServices(resort: Resort): GeneratedOffer[] {
   const images = [resort.hero_image_url, ...resort.gallery].filter(Boolean) as string[];
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
   const businessType = `${resort.type ?? ""} ${resort.template_id}`.toLowerCase();
   const isSurf = businessType.includes("surf");
   const isVilla = businessType.includes("villa");
+  const accommodation = category.id === "accommodation";
 
-  if (isSurf) {
+  if (category.id === "food") {
+    return [
+      {
+        kind: "service",
+        title: "Signature Menu Highlight",
+        description: `A customer-ready menu highlight from ${resort.name}, easy to ask about or reserve through WhatsApp.`,
+        price_label: "Ask for menu",
+        capacity: null,
+        image_url: imageFor(images, 0),
+        highlight: "Popular",
+        duration: "Available daily",
+        included: ["Menu details", "WhatsApp reservation", "Staff confirmation"],
+        cta_label: "Ask menu details",
+      },
+      {
+        kind: "package",
+        title: "Group Dining Package",
+        description: "A simple dining package for families, teams, or small groups that want to coordinate details in advance.",
+        price_label: "Custom quote",
+        capacity: resort.capacity,
+        image_url: imageFor(images, 1),
+        highlight: "Groups",
+        duration: "Preferred time",
+        included: ["Table reservation", "Set menu planning", "WhatsApp confirmation"],
+        cta_label: "Reserve a table",
+      },
+      {
+        kind: "service",
+        title: "Takeaway or Catering Request",
+        description: "A direct inquiry option for takeaway, catering, or special food requests.",
+        price_label: "Ask for pricing",
+        capacity: null,
+        image_url: imageFor(images, 2),
+        highlight: "Flexible",
+        duration: "By request",
+        included: ["Order details", "Pickup or delivery notes", "WhatsApp support"],
+        cta_label: "Order via WhatsApp",
+      },
+    ];
+  }
+
+  if (category.id === "tour") {
+    return [
+      {
+        kind: "package",
+        title: "Private Local Tour",
+        description: `A flexible tour package from ${resort.name} with itinerary details confirmed directly on WhatsApp.`,
+        price_label: "Ask for tour rate",
+        capacity: resort.capacity,
+        image_url: imageFor(images, 0),
+        highlight: "Popular",
+        duration: "Full day",
+        included: ["Local guide", "Trip planning", "WhatsApp coordination"],
+        cta_label: "Ask tour availability",
+      },
+      {
+        kind: "package",
+        title: "Custom Group Trip",
+        description: "A group-friendly package for customers who want pickup, route planning, or a custom itinerary.",
+        price_label: "Custom quote",
+        capacity: resort.capacity,
+        image_url: imageFor(images, 1),
+        highlight: "Groups",
+        duration: "Custom",
+        included: ["Itinerary planning", "Pickup coordination", "Local support"],
+        cta_label: "Request itinerary",
+      },
+      {
+        kind: "service",
+        title: "Pickup or Transfer Service",
+        description: "A practical transfer add-on for customers who need pickup before or after a tour.",
+        price_label: "Ask for pricing",
+        capacity: 4,
+        image_url: imageFor(images, 2),
+        highlight: "Easy pickup",
+        duration: "One way",
+        included: ["Driver coordination", "Pickup details", "WhatsApp confirmation"],
+        cta_label: "Ask pickup details",
+      },
+    ];
+  }
+
+  if (category.id === "wellness") {
+    return [
+      {
+        kind: "service",
+        title: "Signature Treatment",
+        description: `A clear treatment card for ${resort.name}, ready for appointment requests through WhatsApp.`,
+        price_label: "Ask for treatment price",
+        capacity: 1,
+        image_url: imageFor(images, 0),
+        highlight: "Popular",
+        duration: "60 minutes",
+        included: ["Treatment details", "Appointment coordination", "Aftercare notes"],
+        cta_label: "Book appointment",
+      },
+      {
+        kind: "package",
+        title: "Wellness Package",
+        description: "A bundled package for customers who want to combine treatments or plan a longer wellness visit.",
+        price_label: "Custom quote",
+        capacity: 2,
+        image_url: imageFor(images, 1),
+        highlight: "Best value",
+        duration: "Custom",
+        included: ["Treatment planning", "Staff support", "WhatsApp confirmation"],
+        cta_label: "Book package",
+      },
+      {
+        kind: "service",
+        title: "Consultation Appointment",
+        description: "A simple appointment option for customers who want guidance before choosing a treatment.",
+        price_label: "Ask for pricing",
+        capacity: 1,
+        image_url: imageFor(images, 2),
+        highlight: "Consultation",
+        duration: "30 minutes",
+        included: ["Consultation", "Treatment recommendation", "Schedule support"],
+        cta_label: "Ask treatment details",
+      },
+    ];
+  }
+
+  if (isSurf || (accommodation && businessType.includes("tour"))) {
     return [
       {
         kind: "package",
         title: "3-Night Surf & Stay Package",
-        description: `A simple package for guests who want to stay at ${resort.name}, surf nearby breaks, and coordinate everything directly with the host.`,
+        description: `A simple package for customers who want to coordinate ${resort.name} directly on WhatsApp.`,
         price_label: "Ask for seasonal rates",
         capacity: resort.capacity,
         image_url: imageFor(images, 0),
         highlight: "Most popular",
         duration: "3 nights",
-        included: ["Accommodation", "Daily breakfast", "Surf session planning", "WhatsApp booking support"],
+        included: ["Package planning", "Local guidance", "WhatsApp support"],
         cta_label: "Request package",
       },
       {
@@ -70,7 +196,7 @@ function fallbackServices(resort: Resort): GeneratedOffer[] {
       {
         kind: "service",
         title: "Airport Pickup",
-        description: "Private airport transfer arranged before arrival so guests can reach the property without extra coordination.",
+        description: "Private transfer arranged before arrival so customers can coordinate without extra back-and-forth.",
         price_label: "From IDR 350K",
         capacity: 4,
         image_url: imageFor(images, 2),
@@ -87,13 +213,13 @@ function fallbackServices(resort: Resort): GeneratedOffer[] {
       {
         kind: "room",
         title: "Private Villa Stay",
-        description: `A private stay at ${resort.name} for guests who want calm spaces, easy direct booking, and a comfortable base in ${resort.location}.`,
+        description: `A private stay at ${resort.name} for guests who want calm spaces, easy WhatsApp inquiry, and a comfortable base in ${resort.location}.`,
         price_label: "Ask for nightly rates",
         capacity: resort.capacity,
         image_url: imageFor(images, 0),
         highlight: "Best for families",
         duration: "Per night",
-        included: ["Private villa access", "Guest support", "Direct booking on WhatsApp"],
+        included: ["Private villa access", "Guest support", "Direct WhatsApp inquiry"],
         cta_label: "Ask availability",
         bed_type: resort.bedrooms ? `${resort.bedrooms} bedroom villa` : "Private villa",
         room_size: null,
@@ -140,18 +266,18 @@ function fallbackServices(resort: Resort): GeneratedOffer[] {
       highlight: "Recommended",
       duration: "Flexible",
       included: ["Direct inquiry", "WhatsApp coordination", "Local support"],
-      cta_label: "Ask now",
+      cta_label: category.primaryCta,
     },
     {
       kind: "package",
-      title: "Custom Guest Package",
-      description: "A flexible package that combines the core offer with practical support before arrival.",
+      title: "Custom Customer Package",
+      description: "A flexible package that combines the core offer with practical support before the customer visits, books, or orders.",
       price_label: "Custom quote",
       capacity: resort.capacity,
       image_url: imageFor(images, 1),
       highlight: "Flexible",
       duration: "Custom",
-      included: ["Personalized planning", "Direct booking support", "Simple confirmation"],
+      included: ["Personalized planning", "WhatsApp support", "Simple confirmation"],
       cta_label: "Request quote",
     },
   ];
@@ -159,9 +285,12 @@ function fallbackServices(resort: Resort): GeneratedOffer[] {
 
 function normalizeGeneratedServices(services: GeneratedOffer[], resort: Resort) {
   const images = [resort.hero_image_url, ...resort.gallery].filter(Boolean) as string[];
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const accommodation = category.id === "accommodation";
 
   return services.slice(0, 6).map((service, index) => {
-    const kind = ["room", "package", "service"].includes(service.kind) ? service.kind : "service";
+    const rawKind = ["room", "package", "service"].includes(service.kind) ? service.kind : "service";
+    const kind = rawKind === "room" && !accommodation ? "service" : rawKind;
     const isRoom = kind === "room";
 
     return {
@@ -174,7 +303,7 @@ function normalizeGeneratedServices(services: GeneratedOffer[], resort: Resort) 
       highlight: service.highlight ? String(service.highlight).trim() : null,
       duration: service.duration ? String(service.duration).trim() : null,
       included: Array.isArray(service.included) ? service.included.map(String).map((item) => item.trim()).filter(Boolean).slice(0, 6) : [],
-      cta_label: service.cta_label ? String(service.cta_label).trim() : "Ask availability",
+      cta_label: service.cta_label ? String(service.cta_label).trim() : (isRoom ? "Ask availability" : category.primaryCta),
       bed_type: isRoom ? service.bed_type ? String(service.bed_type).trim() : null : null,
       room_size: isRoom ? service.room_size ? String(service.room_size).trim() : null : null,
       view_type: isRoom ? service.view_type ? String(service.view_type).trim() : null : null,
@@ -202,6 +331,7 @@ async function generateWithOpenAi(resort: Resort): Promise<GeneratedOffer[] | nu
   if (!apiKey) {
     return null;
   }
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -215,15 +345,16 @@ async function generateWithOpenAi(resort: Resort): Promise<GeneratedOffer[] | nu
         {
           role: "system",
           content:
-            "You generate concise JSON for a direct booking hospitality console. Return only JSON. Do not invent unavailable facts. Use the provided gallery images only for image_url.",
+            "You generate concise JSON for a WhatsApp-first business website console. Return only JSON. Do not invent unavailable facts. Use the provided gallery images only for image_url. Prefer service and package offers; use room only when the business is clearly Resort / Villa / Hotel accommodation.",
         },
         {
           role: "user",
           content: JSON.stringify({
-            instruction: "Generate 3 to 5 rooms, packages, or services for this property. Include a practical mix for direct WhatsApp booking.",
+            instruction: "Generate 3 to 5 services, packages, products, menu items, tours, treatments, appointment options, or room offers for this business. Use rooms only for accommodation businesses. Include category-specific CTAs for direct WhatsApp inquiries.",
             resort: {
               name: resort.name,
               type: resort.type,
+              category: category.label,
               template_id: resort.template_id,
               location: resort.location,
               description: resort.description,
@@ -231,13 +362,15 @@ async function generateWithOpenAi(resort: Resort): Promise<GeneratedOffer[] | nu
               capacity: resort.capacity,
               bedrooms: resort.bedrooms,
               bathrooms: resort.bathrooms,
+              accommodation: category.id === "accommodation",
               images: [resort.hero_image_url, ...resort.gallery].filter(Boolean),
             },
+            cta_guidance: category.ctaOptions,
             schema: {
               services: [
                 {
                   kind: "room | package | service",
-                  title: "short guest-facing title",
+                  title: "short customer-facing title",
                   description: "1-2 sentence description",
                   price_label: "short display price or inquiry label",
                   capacity: "number or null",

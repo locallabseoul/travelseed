@@ -1,8 +1,8 @@
 import { CreateSiteBuilder } from "@/components/create/CreateSiteBuilder";
 
 export const metadata = {
-  title: "Create a Direct Booking Site | Travelseed",
-  description: "Preview a direct booking website for your resort or villa.",
+  title: "Create a Business Website | Travelseed",
+  description: "Preview a WhatsApp-ready business website from an existing link or manual setup.",
 };
 
 export default function CreatePage() {

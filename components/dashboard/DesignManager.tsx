@@ -45,7 +45,7 @@ function templateLibraryCopy(planType: PlanType) {
     return "All templates are available on your plan.";
   }
 
-  return "Upgrade to Seed to unlock one-page direct booking templates.";
+  return "Upgrade to Seed to unlock one-page WhatsApp-ready business templates.";
 }
 
 function defaultCatalogNameFor(templateId: string, planType: PlanType) {
@@ -184,16 +184,16 @@ export function DesignManager({
   return (
     <div className="grid gap-6">
       <Panel>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Design</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Brand style</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Choose a guided template and practical brand settings for your direct booking site.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Design</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-950">Brand style</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Choose a guided template and practical brand settings for your WhatsApp-ready business site.</p>
       </Panel>
 
       <Panel>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-[#18352f]">Template library</h2>
-            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">{templateLibraryCopy(planType)}</p>
+            <h2 className="text-xl font-semibold text-slate-950">Template library</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">{templateLibraryCopy(planType)}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone="sand">{site.plan}</Badge>
@@ -201,7 +201,7 @@ export function DesignManager({
           </div>
         </div>
         {selectedTemplateUnavailable ? (
-          <p className="mt-4 rounded-2xl bg-[#fff7e8] p-4 text-sm leading-6 text-[#7b5b24]">
+          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm leading-6 text-amber-700">
             The currently saved template belongs to a higher plan. Choose an available template before saving design settings.
           </p>
         ) : null}
@@ -221,13 +221,13 @@ export function DesignManager({
               }}
               className="text-left"
             >
-              <Panel className={selected ? "h-full ring-2 ring-[#2d6b50]" : "h-full transition hover:ring-1 hover:ring-[#d8cebb]"}>
+              <Panel className={selected ? "h-full ring-2 ring-emerald-500" : "h-full transition hover:ring-1 hover:ring-slate-200"}>
                 <TemplatePreview name={option.name} previewImageUrl={option.previewImageUrl} />
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  <h2 className="font-semibold text-[#18352f]">{option.name}</h2>
+                  <h2 className="font-semibold text-slate-950">{option.name}</h2>
                   {selected ? <Badge>Current</Badge> : null}
                 </div>
-                <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{option.description}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{option.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Badge tone="sand">{option.tags[0]}</Badge>
                   <Badge tone="gray">{option.tags[1]}</Badge>
@@ -237,8 +237,8 @@ export function DesignManager({
           );
         }) : (
           <Panel className="xl:col-span-4">
-            <h2 className="text-xl font-semibold text-[#18352f]">No templates available on this plan yet</h2>
-            <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Upgrade to Seed to unlock one-page direct booking templates.</p>
+            <h2 className="text-xl font-semibold text-slate-950">No templates available on this plan yet</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Upgrade to Seed to unlock one-page WhatsApp-ready business templates.</p>
           </Panel>
         )}
       </div>
@@ -247,23 +247,23 @@ export function DesignManager({
         <Panel>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-[#18352f]">Upgrade templates</h2>
-              <p className="mt-1 text-sm leading-6 text-[#6f7b74]">These templates require a higher plan and are shown as upgrade options only.</p>
+              <h2 className="text-xl font-semibold text-slate-950">Upgrade templates</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-600">These templates require a higher plan and are shown as upgrade options only.</p>
             </div>
             <Badge tone="gray">Locked</Badge>
           </div>
           <div className="mt-5 grid gap-3 lg:grid-cols-3">
             {upgradeTemplates.map((option) => (
-              <article key={option.name} className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+              <article key={option.name} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-semibold text-[#18352f]">{option.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{option.description}</p>
+                    <h3 className="font-semibold text-slate-950">{option.name}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{option.description}</p>
                   </div>
                   <Badge tone="gray">{option.tags[1]}</Badge>
                 </div>
-                <p className="mt-4 text-xs font-semibold text-[#7b5b24]">Upgrade to {option.tags[1]} to use this template.</p>
-                <button type="button" className="mt-4 min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                <p className="mt-4 text-xs font-semibold text-amber-700">Upgrade to {option.tags[1]} to use this template.</p>
+                <button type="button" className="mt-4 min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
                   Upgrade to {option.tags[1]}
                 </button>
               </article>
@@ -274,30 +274,30 @@ export function DesignManager({
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <Panel>
-          <h2 className="text-xl font-semibold text-[#18352f]">Brand controls</h2>
+          <h2 className="text-xl font-semibold text-slate-950">Brand controls</h2>
           <div className="mt-5 grid gap-6">
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               Logo URL
-              <input
+                <input
                 value={logoUrl}
                 onChange={(event) => setLogoUrl(event.target.value)}
                 placeholder="https://..."
-                className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]"
+                className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
               />
             </label>
 
-            <div className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-[#18352f]">Customize colors</p>
-                  <p className="mt-1 text-xs leading-5 text-[#6f7b74]">
+                  <p className="text-sm font-semibold text-slate-950">Customize colors</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
                     {isCustomColorMode ? "Custom colors override this template's default palette." : "Using this template's default palette."}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setCustomColors({})}
-                  className="min-h-9 rounded-full bg-white px-3 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]"
+                  className="min-h-9 rounded-md bg-white px-3 text-xs font-semibold text-slate-950 ring-1 ring-slate-200"
                 >
                   Reset
                 </button>
@@ -318,18 +318,18 @@ export function DesignManager({
             <SelectField label="Button style" value={buttonStyle} options={buttonStyles} onChange={setButtonStyle} />
             <SelectField label="Image style" value={imageStyle} options={imageStyles} onChange={setImageStyle} />
 
-            <button type="button" onClick={() => void saveDesignSettings()} className="min-h-12 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+            <button type="button" onClick={() => void saveDesignSettings()} className="min-h-12 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white">
               Save design settings
             </button>
-            {status ? <p className="text-sm text-[#6f7b74]">{status}</p> : null}
+            {status ? <p className="text-sm text-slate-600">{status}</p> : null}
           </div>
         </Panel>
 
         <Panel>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
             <div>
-              <h2 className="text-xl font-semibold text-[#18352f]">Responsive preview</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{selectedCatalogEntry?.name ?? selectedTemplateName} · {isCustomColorMode ? "Custom colors" : "Template default colors"} · {fontStyle}</p>
+              <h2 className="text-xl font-semibold text-slate-950">Responsive preview</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{selectedCatalogEntry?.name ?? selectedTemplateName} · {isCustomColorMode ? "Custom colors" : "Template default colors"} · {fontStyle}</p>
             </div>
             <Badge>{buttonStyle}</Badge>
           </div>
@@ -348,7 +348,7 @@ function TemplatePreview({ name, previewImageUrl }: { name: string; previewImage
 
   if (previewImageUrl && !imageFailed) {
     return (
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#f8f5ef] ring-1 ring-[#eadfce]">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200">
         <Image
           src={previewImageUrl}
           alt={`${name} template preview`}
@@ -363,28 +363,28 @@ function TemplatePreview({ name, previewImageUrl }: { name: string; previewImage
   }
 
   if (name.toLowerCase().includes("surf")) {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#0b5f6f,#f6d365)]" aria-label={`${name} template preview`} />;
+    return <div className="aspect-[4/3] rounded-lg bg-[linear-gradient(135deg,#0b5f6f,#f6d365)]" aria-label={`${name} template preview`} />;
   }
 
-  if (name.toLowerCase().includes("sunset") || name.toLowerCase().includes("minimal")) {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#fff9f5,#ffb4a2,#e85d75)] ring-1 ring-[#eadfce]" aria-label={`${name} template preview`} />;
+  if (name.toLowerCase().includes("sunset") || name.toLowerCase().includes("minimal") || name.toLowerCase().includes("local business") || name.toLowerCase().includes("cafe")) {
+    return <div className="aspect-[4/3] rounded-lg bg-[linear-gradient(135deg,#f8fafc,#a7f3d0,#0f172a)] ring-1 ring-slate-200" aria-label={`${name} template preview`} />;
   }
 
-  if (name.toLowerCase().includes("luxury")) {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#151b17,#8a6d4b,#d4af37)]" aria-label={`${name} template preview`} />;
+  if (name.toLowerCase().includes("luxury") || name.toLowerCase().includes("custom business")) {
+    return <div className="aspect-[4/3] rounded-lg bg-[linear-gradient(135deg,#151b17,#8a6d4b,#d4af37)]" aria-label={`${name} template preview`} />;
   }
 
   if (name.toLowerCase().includes("boutique resort")) {
-    return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#0f172a,#1e293b,#f97316)] ring-1 ring-[#eadfce]" aria-label={`${name} template preview`} />;
+    return <div className="aspect-[4/3] rounded-lg bg-[linear-gradient(135deg,#0f172a,#1e293b,#f97316)] ring-1 ring-slate-200" aria-label={`${name} template preview`} />;
   }
 
-  return <div className="aspect-[4/3] rounded-2xl bg-[linear-gradient(135deg,#eadfce,#f8f5ef,#2d6b50)]" aria-label={`${name} template preview`} />;
+  return <div className="aspect-[4/3] rounded-lg bg-[linear-gradient(135deg,#f8fafc,#e2e8f0,#22c55e)]" aria-label={`${name} template preview`} />;
 }
 
 function DesktopPreview({ revision }: { revision: number }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#eadfce] bg-white shadow-sm">
-      <div className="relative h-[585px] overflow-hidden bg-[#f8f5ef]">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="relative h-[585px] overflow-hidden bg-slate-100">
         <div className="pointer-events-none absolute left-1/2 top-0 h-[1230px] w-[1440px] origin-top -translate-x-1/2 scale-[0.475] [transform-style:preserve-3d]">
           <iframe
             key={`desktop-${revision}`}
@@ -515,9 +515,9 @@ function ColorField({
   const colorPickerValue = isHexColor(value) ? value : "#000000";
 
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
-      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-[#d8cebb] bg-white px-3">
+      <div className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
         <input
           type="color"
           value={colorPickerValue}
@@ -529,7 +529,7 @@ function ColorField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           maxLength={7}
-          placeholder="#18352f"
+          placeholder="#0f172a"
           className="min-w-0 flex-1 bg-transparent font-mono text-sm uppercase outline-none"
         />
       </div>
@@ -549,9 +549,9 @@ function SelectField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
         {options.map((option) => (
           <option key={option} value={option}>{option}</option>
         ))}

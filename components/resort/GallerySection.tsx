@@ -23,11 +23,11 @@ export function GallerySection({ resort }: GallerySectionProps) {
               Gallery
             </p>
             <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>
-              Spaces for sunlit days and quiet nights.
+              A closer look at the people, place, and offers.
             </h2>
           </div>
           <p className={`max-w-sm text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
-            A visual preview of the atmosphere guests can expect before they book direct.
+            A visual preview of what customers can expect before they contact you directly.
           </p>
         </div>
         <div className="mt-10 grid auto-rows-[180px] gap-4 sm:grid-cols-2 lg:grid-cols-4">

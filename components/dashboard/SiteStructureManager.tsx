@@ -33,9 +33,9 @@ type RawPage = {
 };
 
 const structureCopy = {
-  landing: "One focused page with guided sections for direct booking conversion.",
+  landing: "One focused page with guided sections for WhatsApp inquiry conversion.",
   multipage: "A brand website with dedicated content pages and SEO-ready operations.",
-  custom: "A flexible resort platform for premium campaigns and custom navigation.",
+  custom: "A flexible business website for premium campaigns and custom navigation.",
 };
 
 export function SiteStructureManager({
@@ -156,10 +156,10 @@ export function SiteStructureManager({
       <Panel>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Site structure</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">{config.structureLabel}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">{config.positioning}</p>
-            {status ? <p className="mt-3 text-sm font-medium text-[#7b5b24]">{status}</p> : null}
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Pages</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Website Pages</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{config.positioning}</p>
+            {status ? <p className="mt-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">{status}</p> : null}
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone="green">{config.label}</Badge>
@@ -233,8 +233,8 @@ function LandingSectionsView({ sections, onToggle }: { sections: SiteStructureSe
     <Panel>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">Manage Sections</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Free Trial and Seed sites are managed as one-page landing sections.</p>
+          <h2 className="text-xl font-semibold text-slate-950">Manage Sections</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Starter sites are managed as one-page landing sections.</p>
         </div>
         <Badge tone="sand">One-page</Badge>
       </div>
@@ -341,20 +341,20 @@ function PagesView({
     <Panel>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">Manage Pages</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Tree and Forest sites use page-level content, SEO, and publishing controls.</p>
+          <h2 className="text-xl font-semibold text-slate-950">Page list</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Manage page content, publishing, SEO, and public previews for this business site.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={onAddCustomPage} disabled={!isForest} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
+          <button type="button" onClick={onAddCustomPage} disabled={!isForest} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:bg-slate-200 disabled:text-slate-500">
             Add Custom Page
           </button>
-          <button type="button" onClick={() => setShowNavigation((current) => !current)} disabled={!isForest} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
+          <button type="button" onClick={() => setShowNavigation((current) => !current)} disabled={!isForest} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 disabled:text-slate-400">
             Navigation
           </button>
         </div>
       </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <nav aria-label="Page submenu" className="flex gap-2 overflow-x-auto rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-2 lg:grid lg:content-start lg:overflow-visible">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <nav aria-label="Page submenu" className="flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-2 lg:grid lg:content-start lg:overflow-visible">
           {pages.map((page) => {
             const isSelected = page.slug === selectedPage?.slug;
             return (
@@ -363,11 +363,11 @@ function PagesView({
                 type="button"
                 onClick={() => setSelectedSlug(page.slug)}
                 className={`flex min-h-11 shrink-0 items-center justify-between gap-3 rounded-xl px-3 text-left text-sm font-semibold transition ${
-                  isSelected ? "bg-[#18352f] text-white shadow-sm" : "bg-white text-[#52615a] ring-1 ring-[#eadfce] hover:text-[#18352f]"
+                  isSelected ? "bg-slate-950 text-white shadow-sm" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:text-slate-950"
                 }`}
               >
                 <span>{page.name}</span>
-                <span className={`h-2 w-2 rounded-full ${page.isPublished ? "bg-[#4f9b6b]" : "bg-[#c9b891]"} ${isSelected ? "ring-2 ring-white/30" : ""}`} />
+                <span className={`h-2 w-2 rounded-full ${page.isPublished ? "bg-emerald-500" : "bg-amber-400"} ${isSelected ? "ring-2 ring-white/30" : ""}`} />
               </button>
             );
           })}
@@ -400,42 +400,42 @@ function FeatureAccessDisclosure({ planType }: { planType: PlanType }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Panel className="bg-[#fbfaf7] shadow-none">
+    <Panel className="bg-slate-50 shadow-none">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">Plan feature access</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+          <p className="text-sm font-semibold text-slate-950">Plan feature access</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">
             {config.unlocked.length} available now · {config.locked.length > 0 ? `${config.locked.length} locked on ${config.label}` : "Everything unlocked"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Badge tone="green">{config.label}</Badge>
-          <button type="button" onClick={() => setExpanded((current) => !current)} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+          <button type="button" onClick={() => setExpanded((current) => !current)} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
             {expanded ? "Hide features" : "View plan features"}
           </button>
         </div>
       </div>
       {expanded ? (
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
-            <h3 className="text-sm font-semibold text-[#18352f]">Available now</h3>
+          <div className="rounded-lg bg-white p-4 ring-1 ring-slate-200">
+            <h3 className="text-sm font-semibold text-slate-950">Available now</h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {config.unlocked.map((feature) => (
                 <FeaturePill key={feature} feature={feature} locked={false} />
               ))}
             </div>
           </div>
-          <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+          <div className="rounded-lg bg-white p-4 ring-1 ring-slate-200">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h3 className="text-sm font-semibold text-[#18352f]">Locked features</h3>
+              <h3 className="text-sm font-semibold text-slate-950">Locked features</h3>
               {config.upgradeTarget ? (
-                <button type="button" className="min-h-9 rounded-full bg-[#18352f] px-4 text-xs font-semibold text-white">
+                <button type="button" className="min-h-9 rounded-md bg-slate-950 px-4 text-xs font-semibold text-white">
                   Upgrade to {config.upgradeTarget}
                 </button>
               ) : null}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              {config.locked.length > 0 ? config.locked.map((feature) => <FeaturePill key={feature} feature={feature} locked />) : <p className="rounded-2xl bg-[#fbfaf7] px-4 py-3 text-sm text-[#6f7b74]">Everything is unlocked on Forest.</p>}
+              {config.locked.length > 0 ? config.locked.map((feature) => <FeaturePill key={feature} feature={feature} locked />) : <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500">Everything is unlocked on Forest.</p>}
             </div>
           </div>
         </div>
@@ -447,27 +447,27 @@ function FeatureAccessDisclosure({ planType }: { planType: PlanType }) {
 function PlanStructureCard({ title, value, helper }: { title: string; value: string; helper: string }) {
   return (
     <Panel>
-      <p className="text-sm text-[#6f7b74]">{title}</p>
-      <p className="mt-3 text-2xl font-semibold text-[#18352f]">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-[#72815e]">{helper}</p>
+      <p className="text-sm text-slate-500">{title}</p>
+      <p className="mt-3 text-2xl font-semibold text-slate-950">{value}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-500">{helper}</p>
     </Panel>
   );
 }
 
 function SectionCard({ section, onToggle }: { section: SiteStructureSection; onToggle: () => void }) {
   return (
-    <article className={`rounded-2xl border p-4 ${section.locked ? "border-[#eadfce] bg-[#f4f0e7] opacity-75" : "border-[#eadfce] bg-[#fbfaf7]"}`}>
+    <article className={`rounded-lg border p-4 ${section.locked ? "border-slate-200 bg-slate-100 opacity-75" : "border-slate-200 bg-slate-50"}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-[#18352f]">{section.name}</h3>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">{section.description}</p>
+          <h3 className="font-semibold text-slate-950">{section.name}</h3>
+          <p className="mt-1 text-sm leading-6 text-slate-500">{section.description}</p>
         </div>
         {section.locked ? <Badge tone="gray">Locked</Badge> : <Badge tone={section.isEnabled ? "green" : "sand"}>{section.isEnabled ? "On" : "Off"}</Badge>}
       </div>
-      <button type="button" onClick={onToggle} disabled={section.locked} className="mt-4 min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
+      <button type="button" onClick={onToggle} disabled={section.locked} className="mt-4 min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 disabled:text-slate-400">
         {section.locked ? "Upgrade" : section.isEnabled ? "Disable Section" : "Enable Section"}
       </button>
-      {section.locked && section.lockReason ? <p className="mt-2 text-xs text-[#7b5b24]">{section.lockReason}</p> : null}
+      {section.locked && section.lockReason ? <p className="mt-2 text-xs text-amber-700">{section.lockReason}</p> : null}
     </article>
   );
 }
@@ -608,17 +608,17 @@ function PageDetail({
   }
 
   return (
-    <article className={`rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-5 ${locked ? "opacity-70" : ""}`}>
+    <article className={`rounded-xl border border-slate-200 bg-slate-50 p-5 ${locked ? "opacity-70" : ""}`}>
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-2xl font-semibold text-[#18352f]">{page.name}</h3>
+            <h3 className="text-2xl font-semibold text-slate-950">{page.name}</h3>
             <Badge tone={page.isPublished ? "green" : "gray"}>{page.isPublished ? "Published" : "Draft"}</Badge>
             {locked ? <Badge tone="sand">Forest</Badge> : null}
           </div>
-          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Manage URL, publishing, SEO, and preview for this public page.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Manage URL, publishing, SEO, and preview for this public page.</p>
         </div>
-        <button type="button" disabled={locked} onClick={onToggle} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:text-[#9aa29d]">
+        <button type="button" disabled={locked} onClick={onToggle} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 disabled:text-slate-400">
           {page.isPublished ? "Unpublish" : "Publish"}
         </button>
       </div>
@@ -629,11 +629,11 @@ function PageDetail({
         <PageMetaCard label="Visibility" value={page.isPublished ? "Live on website" : "Draft only"} />
       </div>
 
-      <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+      <div className="mt-5 grid gap-4 rounded-lg bg-white p-4 ring-1 ring-slate-200">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#18352f]">{isHome ? "Home hero image" : "Page hero image"}</p>
-            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+            <p className="text-sm font-semibold text-slate-950">{isHome ? "Home hero image" : "Page hero image"}</p>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
               {isHome
                 ? "Home uses the site hero from Page content > Hero."
                 : page.heroImageUrl
@@ -644,7 +644,7 @@ function PageDetail({
           {isHome ? (
             <Badge tone="green">Site hero</Badge>
           ) : (
-            <label className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            <label className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               {uploading ? "Uploading..." : "Upload page hero"}
               <input
                 type="file"
@@ -665,47 +665,48 @@ function PageDetail({
         {heroImageUrl ? (
           <div className="aspect-video w-full max-w-md rounded-xl bg-cover bg-center shadow-sm" style={{ backgroundImage: `linear-gradient(rgba(24, 53, 47, 0.35), rgba(24, 53, 47, 0.35)), url(${heroImageUrl})` }} />
         ) : (
-          <div className="flex aspect-video w-full max-w-md items-center justify-center rounded-xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] text-sm text-[#6f7b74]">
+          <div className="flex aspect-video w-full max-w-md items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
             {isHome ? "No home hero image selected" : "No page or main hero image selected"}
           </div>
         )}
         {isHome ? (
-          <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">
+          <p className="rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-600">
             Edit the Home hero image, title, subtitle, and CTA in the Hero section below.
           </p>
         ) : null}
-        {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-3 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
+        {uploadStatus ? <p className="rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-600">{uploadStatus}</p> : null}
       </div>
 
-      <div className="mt-5 grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+      <div className="mt-5 grid gap-4 rounded-lg bg-white p-4 ring-1 ring-slate-200">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-semibold text-[#18352f]">SEO Preview</p>
+              <p className="text-sm font-semibold text-slate-950">SEO Preview</p>
               <Badge tone={hasCustomSeo ? "green" : "sand"}>{hasCustomSeo ? "Custom SEO" : "Auto-generated"}</Badge>
             </div>
-            <p className="mt-1 text-sm leading-6 text-[#6f7b74]">You can leave this empty. Travelseed will generate SEO from your page and property details.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-500">You can leave this empty. Travelseed will generate SEO from your page and business details.</p>
           </div>
-          <button type="button" onClick={() => setShowSeoForm((current) => !current)} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+          <button type="button" onClick={() => setShowSeoForm((current) => !current)} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
             {showSeoForm ? "Hide SEO" : "Customize SEO"}
           </button>
         </div>
-        <div className="rounded-2xl bg-[#fbfaf7] p-4">
-          <p className="text-base font-semibold text-[#18352f]">{seoPreview.title}</p>
-          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{seoPreview.description}</p>
+        <div className="rounded-lg bg-slate-50 p-4">
+          <p className="text-base font-semibold text-[#1a0dab]">{seoPreview.title}</p>
+          <p className="mt-1 text-xs text-emerald-700">{publicPath}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{seoPreview.description}</p>
         </div>
         {showSeoForm ? (
           <>
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               SEO title
-              <input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} placeholder={seoPreview.autoTitle} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+              <input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} placeholder={seoPreview.autoTitle} className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
             </label>
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               SEO description
-              <textarea value={seoDescription} rows={3} onChange={(event) => setSeoDescription(event.target.value)} placeholder={seoPreview.autoDescription} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+              <textarea value={seoDescription} rows={3} onChange={(event) => setSeoDescription(event.target.value)} placeholder={seoPreview.autoDescription} className="rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
             </label>
             <div>
-              <button type="button" disabled={locked} onClick={() => onSaveSeo(seoTitle, seoDescription)} className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]">
+              <button type="button" disabled={locked} onClick={() => onSaveSeo(seoTitle, seoDescription)} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white disabled:bg-slate-200 disabled:text-slate-500">
                 Save SEO
               </button>
             </div>
@@ -713,25 +714,25 @@ function PageDetail({
         ) : null}
       </div>
 
-      <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+      <div className="mt-5 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
         {preset && presetSettings ? (
-          <div className="grid gap-4 rounded-2xl bg-[#fbfaf7] p-4 ring-1 ring-[#eadfce]">
+          <div className="grid gap-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold text-[#18352f]">Preset content</p>
+                  <p className="text-sm font-semibold text-slate-950">Preset content</p>
                   <Badge tone="sand">{preset.label}</Badge>
                 </div>
-                <p className="mt-1 text-sm leading-6 text-[#6f7b74]">{preset.description}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{preset.description}</p>
               </div>
             </div>
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               {preset.editor.titleLabel}
-              <input value={presetTitle} onChange={(event) => setPresetTitle(event.target.value)} placeholder={preset.settings.title} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+              <input value={presetTitle} onChange={(event) => setPresetTitle(event.target.value)} placeholder={preset.settings.title} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
             </label>
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               {preset.editor.introLabel}
-              <textarea value={presetIntro} rows={3} onChange={(event) => setPresetIntro(event.target.value)} placeholder={preset.settings.intro} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+              <textarea value={presetIntro} rows={3} onChange={(event) => setPresetIntro(event.target.value)} placeholder={preset.settings.intro} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
             </label>
             {supportsCards ? (
               <PresetCardsEditor
@@ -743,41 +744,41 @@ function PageDetail({
                 onUploadImage={(cardId, file) => void uploadPresetCardImage(cardId, file)}
               />
             ) : (
-              <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              <label className="grid gap-2 text-sm font-medium text-slate-950">
                 {preset.editor.itemsLabel}
-                <textarea value={presetItems} rows={4} onChange={(event) => setPresetItems(event.target.value)} placeholder={preset.settings.items.join("\n")} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
-                <span className="text-xs font-normal leading-5 text-[#6f7b74]">{preset.editor.itemsHelp}</span>
+                <textarea value={presetItems} rows={4} onChange={(event) => setPresetItems(event.target.value)} placeholder={preset.settings.items.join("\n")} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
+                <span className="text-xs font-normal leading-5 text-slate-600">{preset.editor.itemsHelp}</span>
               </label>
             )}
-            {cardUploadStatus ? <p className="rounded-2xl bg-white p-3 text-sm leading-6 text-[#52615a]">{cardUploadStatus}</p> : null}
-            <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+            {cardUploadStatus ? <p className="rounded-2xl bg-white p-3 text-sm leading-6 text-slate-600">{cardUploadStatus}</p> : null}
+            <label className="grid gap-2 text-sm font-medium text-slate-950">
               {preset.editor.ctaLabel}
-              <input value={presetCtaLabel} onChange={(event) => setPresetCtaLabel(event.target.value)} placeholder={preset.settings.ctaLabel} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+              <input value={presetCtaLabel} onChange={(event) => setPresetCtaLabel(event.target.value)} placeholder={preset.settings.ctaLabel} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
             </label>
             {preset.layout === "promotions" ? (
-              <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+              <label className="grid gap-2 text-sm font-medium text-slate-950">
                 Campaign note
-                <textarea value={presetCampaignNote} rows={3} onChange={(event) => setPresetCampaignNote(event.target.value)} placeholder={preset.settings.campaignNote} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
-                <span className="text-xs font-normal leading-5 text-[#6f7b74]">Shown near the Promotions CTA as campaign terms, availability notes, or booking guidance.</span>
+                <textarea value={presetCampaignNote} rows={3} onChange={(event) => setPresetCampaignNote(event.target.value)} placeholder={preset.settings.campaignNote} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
+                <span className="text-xs font-normal leading-5 text-slate-600">Shown near the Promotions CTA as campaign terms, availability notes, or booking guidance.</span>
               </label>
             ) : null}
             {preset.layout === "dining" ? (
-              <div className="grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+              <div className="grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <div>
-                  <p className="text-sm font-semibold text-[#18352f]">Dining details</p>
-                  <p className="mt-1 text-xs leading-5 text-[#6f7b74]">Use these fields for structured dining information on the public Dining page.</p>
+                  <p className="text-sm font-semibold text-slate-950">Dining details</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">Use these fields for structured dining information on the public Dining page.</p>
                 </div>
-                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                <label className="grid gap-2 text-sm font-medium text-slate-950">
                   Opening hours
-                  <input value={presetOpeningHours} onChange={(event) => setPresetOpeningHours(event.target.value)} placeholder={preset.settings.openingHours} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+                  <input value={presetOpeningHours} onChange={(event) => setPresetOpeningHours(event.target.value)} placeholder={preset.settings.openingHours} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
                 </label>
-                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                <label className="grid gap-2 text-sm font-medium text-slate-950">
                   Breakfast info
-                  <textarea value={presetBreakfastInfo} rows={3} onChange={(event) => setPresetBreakfastInfo(event.target.value)} placeholder={preset.settings.breakfastInfo} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                  <textarea value={presetBreakfastInfo} rows={3} onChange={(event) => setPresetBreakfastInfo(event.target.value)} placeholder={preset.settings.breakfastInfo} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
                 </label>
-                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                <label className="grid gap-2 text-sm font-medium text-slate-950">
                   Private dining note
-                  <textarea value={presetPrivateDiningNote} rows={3} onChange={(event) => setPresetPrivateDiningNote(event.target.value)} placeholder={preset.settings.privateDiningNote} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                  <textarea value={presetPrivateDiningNote} rows={3} onChange={(event) => setPresetPrivateDiningNote(event.target.value)} placeholder={preset.settings.privateDiningNote} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
                 </label>
               </div>
             ) : null}
@@ -786,7 +787,7 @@ function PageDetail({
                 type="button"
                 disabled={locked}
                 onClick={() => savePresetSettings()}
-                className="min-h-10 rounded-full bg-[#18352f] px-4 text-sm font-semibold text-white disabled:bg-[#d8cebb] disabled:text-[#6f7b74]"
+                className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white disabled:bg-slate-200 disabled:text-slate-600"
               >
                 Save preset content
               </button>
@@ -794,13 +795,13 @@ function PageDetail({
           </div>
         ) : null}
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">Page content</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">
+          <p className="text-sm font-semibold text-slate-950">Page content</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">
             Edit this page&apos;s visible content here. Content with a dedicated operations area opens the relevant manager.
           </p>
         </div>
         {locked ? (
-          <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Upgrade to Forest to edit this custom page.</p>
+          <p className="rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600">Upgrade to Forest to edit this custom page.</p>
         ) : (
           <ContentManager
             site={site}
@@ -813,7 +814,7 @@ function PageDetail({
           />
         )}
         <div>
-          <a href={publicPath} target="_blank" rel="noreferrer" className="inline-flex rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+          <a href={publicPath} target="_blank" rel="noreferrer" className="inline-flex rounded-md bg-white px-3 py-2 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
             Preview Page
           </a>
         </div>
@@ -824,9 +825,9 @@ function PageDetail({
 
 function PageMetaCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">{label}</p>
-      <p className="mt-2 break-words text-sm font-semibold text-[#18352f]">{value}</p>
+    <div className="rounded-lg bg-white p-4 ring-1 ring-slate-200">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+      <p className="mt-2 break-words text-sm font-semibold text-slate-950">{value}</p>
     </div>
   );
 }
@@ -880,24 +881,24 @@ function PresetCardsEditor({
   }
 
   return (
-    <div className="grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
+    <div className="grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">{label}</p>
-          <p className="mt-1 text-xs font-normal leading-5 text-[#6f7b74]">{help}</p>
+          <p className="text-sm font-semibold text-slate-950">{label}</p>
+          <p className="mt-1 text-xs font-normal leading-5 text-slate-600">{help}</p>
         </div>
-        <button type="button" onClick={addCard} className="min-h-9 rounded-full bg-[#18352f] px-4 text-xs font-semibold text-white">
+        <button type="button" onClick={addCard} className="min-h-9 rounded-md bg-slate-950 px-4 text-xs font-semibold text-white">
           Add card
         </button>
       </div>
 
       <div className="grid gap-3">
         {cards.map((card, index) => (
-          <article key={card.id} className="grid gap-3 rounded-2xl bg-[#fbfaf7] p-3 ring-1 ring-[#eadfce]">
+          <article key={card.id} className="grid gap-3 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200">
             <div className="flex flex-col gap-3 md:grid md:grid-cols-[160px_minmax(0,1fr)]">
               <div>
-                <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#eadfce] bg-cover bg-center" style={card.imageUrl ? { backgroundImage: `url(${card.imageUrl})` } : undefined} />
-                <label className="mt-2 inline-flex min-h-9 w-full cursor-pointer items-center justify-center rounded-full bg-white px-3 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+                <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-100 bg-cover bg-center" style={card.imageUrl ? { backgroundImage: `url(${card.imageUrl})` } : undefined} />
+                <label className="mt-2 inline-flex min-h-9 w-full cursor-pointer items-center justify-center rounded-md bg-white px-3 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
                   {uploadingCardId === card.id ? "Uploading..." : card.imageUrl ? "Replace image" : "Upload image"}
                   <input
                     type="file"
@@ -916,24 +917,24 @@ function PresetCardsEditor({
               </div>
 
               <div className="grid gap-3">
-                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                <label className="grid gap-2 text-sm font-medium text-slate-950">
                   Title
-                  <input value={card.title} onChange={(event) => updateCard(card.id, { title: event.target.value })} className="min-h-10 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+                  <input value={card.title} onChange={(event) => updateCard(card.id, { title: event.target.value })} className="min-h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
                 </label>
-                <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+                <label className="grid gap-2 text-sm font-medium text-slate-950">
                   Description
-                  <textarea value={card.description} rows={3} onChange={(event) => updateCard(card.id, { description: event.target.value })} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+                  <textarea value={card.description} rows={3} onChange={(event) => updateCard(card.id, { description: event.target.value })} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
                 </label>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => moveCard(index, -1)} disabled={index === 0} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+              <button type="button" onClick={() => moveCard(index, -1)} disabled={index === 0} className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40">
                 Up
               </button>
-              <button type="button" onClick={() => moveCard(index, 1)} disabled={index === cards.length - 1} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+              <button type="button" onClick={() => moveCard(index, 1)} disabled={index === cards.length - 1} className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40">
                 Down
               </button>
-              <button type="button" onClick={() => removeCard(card.id)} className="rounded-full bg-[#fff7f5] px-3 py-1.5 text-xs font-semibold text-[#9d3323]">
+              <button type="button" onClick={() => removeCard(card.id)} className="rounded-md bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
                 Remove
               </button>
             </div>
@@ -948,17 +949,17 @@ function NavigationPreview({ site, pages }: { site: ResortConsoleData; pages: Si
   const publishedPages = pages.filter((page) => page.isPublished);
 
   return (
-    <div className="mt-5 rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+    <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-[#18352f]">Navigation preview</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Forest navigation is generated from published pages in the current order.</p>
+          <p className="text-sm font-semibold text-slate-950">Navigation preview</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Forest navigation is generated from published pages in the current order.</p>
         </div>
         <Badge tone="sand">Forest</Badge>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {publishedPages.map((page) => (
-          <a key={page.slug} href={publicPathForPage(site, page)} target="_blank" rel="noreferrer" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+          <a key={page.slug} href={publicPathForPage(site, page)} target="_blank" rel="noreferrer" className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
             {page.name}
           </a>
         ))}
@@ -976,7 +977,7 @@ function isHomePage(page: SiteStructurePage) {
 }
 
 function seoPreviewForPage(site: ResortConsoleData, page: SiteStructurePage) {
-  const autoTitle = page.slug === "/" ? `${site.name} | Direct Booking` : `${page.name} | ${site.name}`;
+  const autoTitle = page.slug === "/" ? `${site.name} | WhatsApp Website` : `${page.name} | ${site.name}`;
   const autoDescription = site.heroSubtitle || site.about || `${page.name} at ${site.name} in ${site.location}.`;
   const title = page.seoTitle?.trim() || autoTitle;
   const description = page.seoDescription?.trim() || autoDescription;
@@ -991,7 +992,7 @@ function seoPreviewForPage(site: ResortConsoleData, page: SiteStructurePage) {
 
 function FeaturePill({ feature, locked }: { feature: string; locked: boolean }) {
   return (
-    <div className={`rounded-full px-3 py-2 text-xs font-semibold ${locked ? "bg-[#f4f0e7] text-[#7b5b24]" : "bg-[#e6f0e7] text-[#1f5a45]"}`}>
+    <div className={`rounded-full px-3 py-2 text-xs font-semibold ${locked ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>
       {locked ? "Locked · " : "Open · "}
       {feature}
     </div>

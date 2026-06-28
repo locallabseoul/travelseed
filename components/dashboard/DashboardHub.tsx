@@ -149,20 +149,20 @@ export function DashboardHub() {
   }, [accessToken, authReady]);
 
   return (
-    <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
+    <main className="min-h-screen bg-slate-50 text-slate-950">
       <DashboardHeader />
       <section className="px-5 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-6">
-          <header className="rounded-2xl border border-[#e8dfd0] bg-white p-6 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+          <header className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Travelseed Console</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Travelseed Console</p>
                 <h1 className="mt-3 text-4xl font-semibold tracking-tight">Your sites</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f7b74]">
-                  Manage each direct booking site from a focused operating console. Create a new site when you add another property or business.
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+                  Manage each WhatsApp-ready business site from a focused operating console. Create a new site when you add another business, branch, or brand.
                 </p>
               </div>
-              <Link href="/create" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#18352f] px-6 text-sm font-semibold text-white shadow-sm">
+              <Link href="/create" className="inline-flex min-h-12 items-center justify-center rounded-md bg-slate-950 px-6 text-sm font-semibold text-white shadow-sm">
                 Create new site
               </Link>
             </div>
@@ -177,7 +177,7 @@ export function DashboardHub() {
                 <SummaryCard label="Published" value={publishedCount.toString()} />
                 <SummaryCard label="Paused" value={pausedCount.toString()} />
               </div>
-              {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
+              {status ? <p className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">{status}</p> : null}
 
               {sites.length > 0 ? (
                 <div className="grid gap-4">
@@ -222,9 +222,9 @@ export function DashboardHub() {
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[#e8dfd0] bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
-      <p className="text-sm text-[#6f7b74]">{label}</p>
-      <p className="mt-3 text-3xl font-semibold text-[#18352f]">{value}</p>
+    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-sm text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-slate-950">{value}</p>
     </div>
   );
 }
@@ -244,54 +244,54 @@ function SiteCard({
   const created = formatDate(site.createdAt);
 
   return (
-    <article className="rounded-2xl border border-[#e8dfd0] bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-semibold text-[#18352f]">{site.name}</h2>
+            <h2 className="text-2xl font-semibold text-slate-950">{site.name}</h2>
             <Badge tone={site.status === "Published" ? "green" : "gray"}>{site.status}</Badge>
             <Badge tone="sand">{site.plan}</Badge>
           </div>
-          <p className="mt-2 text-sm text-[#6f7b74]">{site.location}</p>
+          <p className="mt-2 text-sm text-slate-600">{site.location}</p>
         </div>
-        <span className="rounded-full bg-[#f8f5ef] px-3 py-1 text-xs font-semibold text-[#52615a]">{site.template}</span>
+        <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{site.template}</span>
       </div>
 
-      <div className="mt-5 grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#52615a] md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-5 grid gap-3 rounded-lg bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-100 md:grid-cols-2 xl:grid-cols-5">
         <div className="grid gap-1 xl:col-span-2">
           <span>Travelseed URL</span>
-          <span className="break-all font-semibold text-[#18352f]">{site.travelseedUrl}</span>
+          <span className="break-all font-semibold text-slate-950">{site.travelseedUrl}</span>
         </div>
         <div className="grid gap-1 xl:col-span-2">
           <span>Custom domain</span>
-          <span className="break-all font-semibold text-[#18352f]">{site.customDomain || "Not connected"}</span>
+          <span className="break-all font-semibold text-slate-950">{site.customDomain || "Not connected"}</span>
         </div>
         <div className="grid gap-1">
           <span>WhatsApp</span>
-          <span className="font-semibold text-[#18352f]">{site.whatsappNumber}</span>
+          <span className="font-semibold text-slate-950">{site.whatsappNumber}</span>
         </div>
         <div className="grid gap-1">
           <span>Created</span>
-          <span className="font-semibold text-[#18352f]">{created}</span>
+          <span className="font-semibold text-slate-950">{created}</span>
         </div>
         <div className="grid gap-1">
           <span>Last updated</span>
-          <span className="font-semibold text-[#18352f]">{lastUpdated}</span>
+          <span className="font-semibold text-slate-950">{lastUpdated}</span>
         </div>
       </div>
 
       <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-end">
-        <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+        <Link href={`/dashboard/${site.id}`} className="inline-flex min-h-11 items-center justify-center rounded-md bg-slate-950 px-5 text-sm font-semibold text-white">
           Manage
         </Link>
-        <Link href={`/${site.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+        <Link href={`/${site.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
           View site
         </Link>
         <button
           type="button"
           disabled={isWorking}
           onClick={() => onStatusChange(site, !site.isActive)}
-          className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {site.isActive ? "Pause" : "Publish"}
         </button>
@@ -299,7 +299,7 @@ function SiteCard({
           type="button"
           disabled={isWorking}
           onClick={() => onDelete(site)}
-          className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#fff7f5] px-5 text-sm font-semibold text-[#9d3323] ring-1 ring-[#efc8bd] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-red-50 px-5 text-sm font-semibold text-red-700 ring-1 ring-red-200 disabled:cursor-not-allowed disabled:opacity-60"
         >
           Delete
         </button>
@@ -322,11 +322,11 @@ function formatDate(value: string | null) {
 
 function HubMessage({ text, actionHref, actionLabel }: { text: string; actionHref?: string; actionLabel?: string }) {
   return (
-    <section className="flex min-h-[360px] items-center justify-center rounded-2xl border border-[#e8dfd0] bg-white p-6 text-center shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+    <section className="flex min-h-[360px] items-center justify-center rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
       <div>
-        <p className="text-lg font-semibold text-[#18352f]">{text}</p>
+        <p className="text-lg font-semibold text-slate-950">{text}</p>
         {actionHref && actionLabel ? (
-          <Link href={actionHref} className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+          <Link href={actionHref} className="mt-5 inline-flex min-h-11 items-center rounded-md bg-slate-950 px-5 text-sm font-semibold text-white">
             {actionLabel}
           </Link>
         ) : null}

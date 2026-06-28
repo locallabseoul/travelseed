@@ -178,9 +178,9 @@ export function ImportManager({
       <Panel>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Import</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">OTA / existing info</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Bring over a public listing or existing property notes, then choose which suggested fields to save.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Import</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Existing business source</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Bring over a public website, Instagram, marketplace, OTA, or existing business notes, then choose which suggested fields to save.</p>
           </div>
           <Badge tone="sand">Setup step 2</Badge>
         </div>
@@ -190,7 +190,7 @@ export function ImportManager({
         sourceUrl={sourceUrl}
         existingText={existingText}
         generating={generating}
-        helper="Use a public Booking, Airbnb, Agoda, or property listing URL. If a listing is unavailable, paste existing descriptions, facilities, and local area notes."
+        helper="Use a public website, Instagram, marketplace, Booking, Airbnb, Agoda, or social link. If a link is unavailable, paste existing descriptions, services, offers, and operating notes."
         onSourceUrlChange={setSourceUrl}
         onExistingTextChange={setExistingText}
         onGenerate={() => void generateDraft()}
@@ -204,7 +204,7 @@ export function ImportManager({
         onApply={() => void applySelectedDraft()}
       />
 
-      {status ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a] ring-1 ring-[#eadfce]">{status}</p> : null}
+      {status ? <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-200">{status}</p> : null}
     </div>
   );
 }
@@ -238,26 +238,26 @@ function ServiceDraftReview({
     <Panel>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">Review suggested offer items</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Selected rooms, packages, and services will be added to the current offer inventory.</p>
+          <h2 className="text-xl font-semibold text-slate-950">Review suggested offer items</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Selected services, packages, rooms, products, or menu items will be added to the current offer inventory.</p>
         </div>
-        <button type="button" onClick={onApply} disabled={selectedIds.size === 0} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={onApply} disabled={selectedIds.size === 0} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           Save selected items
         </button>
       </div>
       <div className="mt-5 grid gap-3">
         {services.map((service) => (
-          <label key={service.id} className="grid gap-2 rounded-2xl bg-[#fbfaf7] p-4 ring-1 ring-[#eadfce]">
+          <label key={service.id} className="grid gap-2 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
             <div className="flex items-start gap-3">
-              <input type="checkbox" checked={selectedIds.has(service.id)} onChange={() => toggleService(service.id)} className="mt-1 h-4 w-4 accent-[#2d6b50]" />
+              <input type="checkbox" checked={selectedIds.has(service.id)} onChange={() => toggleService(service.id)} className="mt-1 h-4 w-4 accent-emerald-600" />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold capitalize text-[#1f5a45] ring-1 ring-[#eadfce]">{service.kind}</span>
-                  {service.priceLabel ? <span className="text-xs font-medium text-[#6f7b74]">{service.priceLabel}</span> : null}
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold capitalize text-emerald-700 ring-1 ring-slate-200">{service.kind}</span>
+                  {service.priceLabel ? <span className="text-xs font-medium text-slate-600">{service.priceLabel}</span> : null}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-[#18352f]">{service.title}</p>
-                {service.description ? <p className="mt-1 text-sm leading-6 text-[#52615a]">{service.description}</p> : null}
-                {service.included.length > 0 ? <p className="mt-1 text-xs text-[#6f7b74]">{service.included.join(" · ")}</p> : null}
+                <p className="mt-2 text-sm font-semibold text-slate-950">{service.title}</p>
+                {service.description ? <p className="mt-1 text-sm leading-6 text-slate-600">{service.description}</p> : null}
+                {service.included.length > 0 ? <p className="mt-1 text-xs text-slate-600">{service.included.join(" · ")}</p> : null}
               </div>
             </div>
           </label>

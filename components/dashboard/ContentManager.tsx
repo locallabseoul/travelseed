@@ -5,7 +5,7 @@ import { effectivePlanType, planConfig } from "@/components/dashboard/subscripti
 import { Badge, Panel } from "@/components/dashboard/ui";
 import type { ContentSection, DashboardTab, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
-type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Experiences" | "Booking CTA" | "Footer";
+type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Experiences" | "Inquiry CTA" | "Footer";
 type ContentPageKey = "home" | "rooms" | "experiences" | "gallery" | "reviews" | "dining" | "about" | "contact" | "promotions" | "blog";
 
 type PageContentBlock = ContentSection & {
@@ -23,7 +23,7 @@ type ContentPage = {
 };
 
 function isEditableSection(title: ContentSection["title"]): title is EditableSection {
-  return ["Hero", "About", "Features", "Gallery", "Experiences", "Booking CTA", "Footer"].includes(title);
+  return ["Hero", "About", "Features", "Gallery", "Experiences", "Inquiry CTA", "Footer"].includes(title);
 }
 
 function blockFor(section: ContentSection, overrides: Partial<PageContentBlock> = {}): PageContentBlock {
@@ -51,22 +51,22 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       slug: "/",
       blocks: [
         pageBlock("Hero", "Main homepage headline, subtitle, image, and CTA.", "Ready"),
-        pageBlock("About", "Homepage brand story and property positioning.", "Ready"),
-        pageBlock("Features", "Homepage facilities and stay highlights.", site.features.length > 0 ? "Ready" : "Needs review"),
-        pageBlock("Booking CTA", "Homepage direct-booking WhatsApp block.", "Ready"),
+        pageBlock("About", "Homepage brand story and business positioning.", "Ready"),
+        pageBlock("Features", "Homepage highlights, facilities, services, and customer benefits.", site.features.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Inquiry CTA", "Homepage WhatsApp inquiry block.", "Ready"),
       ],
     },
     {
       key: "rooms",
-      label: "Rooms",
+      label: "Offers",
       slug: "/rooms",
       blocks: [
-        pageBlock("Offers", "Rooms, packages, and services shown on the Rooms page.", site.services.length > 0 ? "Ready" : "Needs review", {
+        pageBlock("Offers", "Services, packages, products, menu items, tours, or rooms shown on the Offers page.", site.services.length > 0 ? "Ready" : "Needs review", {
           kind: "linked",
           targetTab: "offers",
-          helper: "Rooms, packages, and services are managed as Offers so pricing, images, and offer types stay consistent.",
+          helper: "Services, packages, and rooms are managed as Offers so pricing, images, and offer types stay consistent.",
         }),
-        pageBlock("Booking CTA", "Inquiry message used from room and package cards.", "Ready"),
+        pageBlock("Inquiry CTA", "Inquiry message used from offer cards.", "Ready"),
       ],
     },
     {
@@ -75,7 +75,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       slug: "/experiences",
       blocks: [
         pageBlock("Experiences", "Nearby beaches, activities, restaurants, and local attractions.", site.experiences.length > 0 ? "Ready" : "Needs review"),
-        pageBlock("Booking CTA", "Direct inquiry CTA at the bottom of the Experiences page.", "Ready"),
+        pageBlock("Inquiry CTA", "Direct inquiry CTA at the bottom of the Experiences page.", "Ready"),
       ],
     },
     {
@@ -83,7 +83,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "Gallery",
       slug: "/gallery",
       blocks: [
-        pageBlock("Gallery", "Curated photos for exterior, rooms, pool, food, and area.", site.gallery.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Gallery", "Curated photos for storefront, team, services, products, rooms, food, and area.", site.gallery.length > 0 ? "Ready" : "Needs review"),
       ],
     },
     {
@@ -114,7 +114,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "About",
       slug: "/about",
       blocks: [
-        pageBlock("About", "Property story, positioning, and location context.", "Ready"),
+        pageBlock("About", "Business story, positioning, and location context.", "Ready"),
         pageBlock("Features", "Facilities and practical selling points for the About page.", site.features.length > 0 ? "Ready" : "Needs review"),
       ],
     },
@@ -123,7 +123,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "Contact",
       slug: "/contact",
       blocks: [
-        pageBlock("Booking CTA", "WhatsApp booking message template and direct inquiry prompt.", "Ready"),
+        pageBlock("Inquiry CTA", "WhatsApp inquiry message template and direct inquiry prompt.", "Ready"),
         pageBlock("Footer", "Business name and location used in the site footer.", "Needs review"),
       ],
     },
@@ -132,7 +132,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "Promotions",
       slug: "/promotions",
       blocks: [
-        pageBlock("Promotions", "Direct booking offers shown on the Promotions page.", "Draft", {
+        pageBlock("Promotions", "WhatsApp offers shown on the Promotions page.", "Draft", {
           kind: "linked",
           targetTab: "offers",
           helper: "Offer cards are managed in Offers and can later be promoted into this public page.",
@@ -400,11 +400,11 @@ export function ContentManager({
       <Panel>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Content</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">{isLanding ? "Landing page sections" : "Page content"}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Content</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">{isLanding ? "Landing page sections" : "Page content"}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
               {isLanding
-                ? "Manage your one-page site with fixed hospitality sections. Page URLs stay simple until you upgrade to Tree."
+                ? "Manage your one-page site with fixed business sections. Page URLs stay simple until you upgrade to Tree."
                 : "Choose a public page, then manage the sections that appear on that page. Pages controls handle URL, SEO, and publish status."}
             </p>
           </div>
@@ -417,10 +417,10 @@ export function ContentManager({
         <Panel>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-[#18352f]">Select page</h2>
-              <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Edit content by public page. Use Pages for publishing and SEO settings.</p>
+              <h2 className="text-xl font-semibold text-slate-950">Select page</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-600">Edit content by public page. Use Pages for publishing and SEO settings.</p>
             </div>
-            <button type="button" onClick={() => onTabChange("structure")} className="min-h-10 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            <button type="button" onClick={() => onTabChange("structure")} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               Manage URLs & SEO
             </button>
           </div>
@@ -433,29 +433,29 @@ export function ContentManager({
                   setSelectedPageKey(page.key);
                   setEditingSection(null);
                 }}
-                className={`min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ring-1 ${
-                  selectedPage.key === page.key ? "bg-[#18352f] text-white ring-[#18352f]" : "bg-white text-[#52615a] ring-[#d8cebb]"
+                className={`min-h-11 shrink-0 rounded-md px-4 text-sm font-semibold ring-1 ${
+                  selectedPage.key === page.key ? "bg-slate-950 text-white ring-slate-950" : "bg-white text-slate-600 ring-slate-200"
                 }`}
               >
                 {page.label}
               </button>
             ))}
           </div>
-          <div className="mt-4 rounded-2xl bg-[#fbfaf7] p-4">
-            <p className="text-sm font-semibold text-[#18352f]">{selectedPage.label}</p>
-            <p className="mt-1 text-sm text-[#6f7b74]">{selectedPage.slug === "/" ? `/${site.slug}` : `/${site.slug}${selectedPage.slug}`}</p>
+          <div className="mt-4 rounded-2xl bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-950">{selectedPage.label}</p>
+            <p className="mt-1 text-sm text-slate-600">{selectedPage.slug === "/" ? `/${site.slug}` : `/${site.slug}${selectedPage.slug}`}</p>
           </div>
         </Panel>
       ) : null}
 
       {editingSection ? (
-        <Panel className="border-[#2d6b50]">
+        <Panel className="border-emerald-500">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Editing</p>
-              <h2 className="mt-2 text-2xl font-semibold text-[#18352f]">{editingSection}</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Editing</p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-950">{editingSection}</h2>
             </div>
-            <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-[#6f7b74]">
+            <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-slate-600">
               Cancel
             </button>
           </div>
@@ -483,7 +483,7 @@ export function ContentManager({
               </>
             ) : null}
             {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
-            {editingSection === "Booking CTA" ? <EditableField label="WhatsApp booking message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
+            {editingSection === "Inquiry CTA" ? <EditableField label="WhatsApp inquiry message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
             {editingSection === "Footer" ? (
               <>
                 <EditableField label="Business name" value={footerName} onChange={setFooterName} />
@@ -491,11 +491,11 @@ export function ContentManager({
               </>
             ) : null}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+              <button type="button" onClick={() => void saveSection()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white">
                 Save changes
               </button>
             </div>
-            {uploadStatus ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{uploadStatus}</p> : null}
+            {uploadStatus ? <p className="rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">{uploadStatus}</p> : null}
           </div>
         </Panel>
       ) : null}
@@ -506,10 +506,10 @@ export function ContentManager({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-xl font-semibold text-[#18352f]">{section.title}</h2>
+                  <h2 className="text-xl font-semibold text-slate-950">{section.title}</h2>
                   <Badge tone={section.status === "Ready" ? "green" : section.status === "Needs review" ? "sand" : "gray"}>{section.status}</Badge>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{section.description}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{section.description}</p>
               </div>
               <button
                 type="button"
@@ -524,65 +524,65 @@ export function ContentManager({
                   }
                 }}
                 disabled={section.kind === "comingSoon"}
-                className={`min-h-11 rounded-full px-5 text-sm font-semibold ring-1 ${
+                className={`min-h-11 rounded-md px-5 text-sm font-semibold ring-1 ${
                   editingSection === section.editTarget
-                    ? "bg-[#18352f] text-white ring-[#18352f]"
+                    ? "bg-slate-950 text-white ring-slate-950"
                     : section.kind === "comingSoon"
-                      ? "cursor-not-allowed bg-[#f4f0e7] text-[#9a8d78] ring-[#eadfce]"
-                    : "bg-white text-[#18352f] ring-[#d8cebb]"
+                      ? "cursor-not-allowed bg-slate-100 text-slate-400 ring-slate-200"
+                    : "bg-white text-slate-950 ring-slate-200"
                 }`}
               >
                 {section.kind === "linked" ? "Open" : section.kind === "comingSoon" ? "Soon" : editingSection === section.editTarget ? "Editing" : "Edit"}
               </button>
             </div>
-            {section.helper ? <p className="mt-3 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{section.helper}</p> : null}
+            {section.helper ? <p className="mt-3 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">{section.helper}</p> : null}
             {section.title === "Hero" ? (
               <div
-                className="mt-5 overflow-hidden rounded-2xl bg-[#18352f] text-white"
+                className="mt-5 overflow-hidden rounded-2xl bg-slate-950 text-white"
                 style={site.heroImageUrl ? { backgroundImage: `linear-gradient(rgba(24, 53, 47, 0.72), rgba(24, 53, 47, 0.72)), url(${site.heroImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
               >
                 <div className="p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Hero preview</p>
                   <h3 className="mt-3 text-2xl font-semibold">{site.heroTitle}</h3>
                   <p className="mt-2 text-sm leading-6 text-white/70">{site.heroSubtitle}</p>
-                  <span className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">{site.heroCta}</span>
+                  <span className="mt-4 inline-flex rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950">{site.heroCta}</span>
                 </div>
               </div>
             ) : null}
-            {section.title === "About" ? <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{site.about}</p> : null}
+            {section.title === "About" ? <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">{site.about}</p> : null}
             {section.title === "Features" ? (
               <div className="mt-5 flex flex-wrap gap-2">
                 {site.features.map((feature) => (
-                  <span key={feature} className="rounded-full bg-[#f1eadc] px-3 py-1 text-xs font-semibold text-[#18352f]">{feature}</span>
+                  <span key={feature} className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-950">{feature}</span>
                 ))}
               </div>
             ) : null}
             {section.title === "Offers" ? (
               <div className="mt-5 grid gap-3">
                 {site.services.length > 0 ? site.services.slice(0, 3).map((service) => (
-                  <div key={service.id} className="rounded-2xl bg-[#fbfaf7] p-4">
+                  <div key={service.id} className="rounded-lg bg-slate-50 p-4 ring-1 ring-slate-100">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge tone="sand">{service.kind}</Badge>
-                      <p className="font-semibold text-[#18352f]">{service.title}</p>
+                      <p className="font-semibold text-slate-950">{service.title}</p>
                     </div>
-                    {service.description ? <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{service.description}</p> : null}
+                    {service.description ? <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p> : null}
                   </div>
-                )) : <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm text-[#6f7b74]">No rooms, packages, or services yet.</p>}
+                )) : <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-100">No services, packages, products, menu items, tours, or rooms yet.</p>}
               </div>
             ) : null}
             {section.title === "Reviews" ? (
-              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Website testimonials are managed in the Reviews tab and can appear on the Reviews page or Home page.</p>
+              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">Website testimonials are managed in the Reviews tab and can appear on the Reviews page or Home page.</p>
             ) : null}
             {section.title === "Promotions" ? (
-              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Promotion content is managed in Offers and can be surfaced on the Promotions page.</p>
+              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">Promotion content is managed in Offers and can be surfaced on the Promotions page.</p>
             ) : null}
             {section.title === "Blog" ? (
-              <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">Blog authoring will be added after the page structure is stable.</p>
+              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">Blog authoring will be added after the page structure is stable.</p>
             ) : null}
             {section.title === "Experiences" ? (
               <div className="mt-5 flex flex-wrap gap-2">
                 {site.experiences.map((experience) => (
-                  <span key={experience} className="rounded-full bg-[#e6f0e7] px-3 py-1 text-xs font-semibold text-[#1f5a45]">{experience}</span>
+                  <span key={experience} className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{experience}</span>
                 ))}
               </div>
             ) : null}
@@ -598,18 +598,18 @@ export function ContentManager({
                       />
                     ))
                   : Array.from({ length: 8 }, (_, index) => (
-                      <div key={index} className="aspect-square rounded-xl bg-gradient-to-br from-[#eadfce] to-[#9eb39f]" />
+                      <div key={index} className="aspect-square rounded-xl bg-gradient-to-br from-slate-100 to-emerald-100" />
                     ))}
               </div>
             ) : null}
-            {section.title === "Booking CTA" ? (
-              <div className="mt-5 rounded-2xl bg-[#18352f] p-5 text-white">
+            {section.title === "Inquiry CTA" ? (
+              <div className="mt-5 rounded-lg bg-slate-950 p-5 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">WhatsApp message</p>
                 <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/78">{site.bookingMessageTemplate}</p>
               </div>
             ) : null}
             {section.title === "Footer" ? (
-              <div className="mt-5 rounded-2xl bg-[#11241f] p-5 text-white">
+              <div className="mt-5 rounded-lg bg-slate-950 p-5 text-white">
                 <p className="text-sm font-semibold">{site.name}</p>
                 <p className="mt-1 text-sm text-white/70">{site.location}</p>
               </div>
@@ -631,9 +631,9 @@ function HeroImagePanel({
   onUpload: (file: File) => Promise<void>;
 }) {
   return (
-    <section className="grid gap-3 rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+    <section className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-sm font-semibold text-[#18352f]">Hero image</h3>
+        <h3 className="text-sm font-semibold text-slate-950">Hero image</h3>
         <ImageUploadButton label={uploading ? "Uploading..." : "Upload hero image"} disabled={uploading} multiple={false} onUpload={(files) => {
           const file = files[0];
           if (file) {
@@ -644,7 +644,7 @@ function HeroImagePanel({
       {imageUrl ? (
         <div className="aspect-[16/9] rounded-2xl bg-cover bg-center shadow-sm" style={{ backgroundImage: `url(${imageUrl})` }} />
       ) : (
-        <div className="flex min-h-44 items-center justify-center rounded-2xl border border-dashed border-[#d8cebb] bg-white text-sm text-[#6f7b74]">
+        <div className="flex min-h-44 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-sm text-slate-600">
           No hero image selected
         </div>
       )}
@@ -668,25 +668,25 @@ function GalleryUploadPanel({
   onUseAsHero: (imageUrl: string) => Promise<void>;
 }) {
   return (
-    <section className="grid gap-3 rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+    <section className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-sm font-semibold text-[#18352f]">Gallery images</h3>
+        <h3 className="text-sm font-semibold text-slate-950">Gallery images</h3>
         <ImageUploadButton label={uploading ? "Uploading..." : "Upload gallery"} disabled={uploading} multiple onUpload={onUpload} />
       </div>
       {gallery.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {gallery.map((imageUrl, index) => (
-            <div key={`${imageUrl}-${index}`} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-[#eadfce]">
+            <div key={`${imageUrl}-${index}`} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
               <div className="aspect-[4/3] bg-cover bg-center" style={{ backgroundImage: `url(${imageUrl})` }} />
               <div className="grid gap-2 p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">Image {index + 1}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Image {index + 1}</p>
                   <div className="flex gap-1">
                     <button
                       type="button"
                       onClick={() => void onMove(index, -1)}
                       disabled={index === 0}
-                      className="rounded-full bg-[#fbfaf7] px-2 py-1 text-xs font-semibold text-[#18352f] ring-1 ring-[#eadfce] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-md bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Up
                     </button>
@@ -694,17 +694,17 @@ function GalleryUploadPanel({
                       type="button"
                       onClick={() => void onMove(index, 1)}
                       disabled={index === gallery.length - 1}
-                      className="rounded-full bg-[#fbfaf7] px-2 py-1 text-xs font-semibold text-[#18352f] ring-1 ring-[#eadfce] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-md bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Down
                     </button>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => void onUseAsHero(imageUrl)} className="rounded-full bg-[#e6f0e7] px-3 py-1 text-xs font-semibold text-[#1f5a45]">
+                  <button type="button" onClick={() => void onUseAsHero(imageUrl)} className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                     Use as hero
                   </button>
-                  <button type="button" onClick={() => void onRemove(imageUrl)} className="rounded-full bg-[#fff7f5] px-3 py-1 text-xs font-semibold text-[#9d3323]">
+                  <button type="button" onClick={() => void onRemove(imageUrl)} className="rounded-md bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                     Remove
                   </button>
                 </div>
@@ -713,7 +713,7 @@ function GalleryUploadPanel({
           ))}
         </div>
       ) : (
-        <div className="flex min-h-36 items-center justify-center rounded-2xl border border-dashed border-[#d8cebb] bg-white text-sm text-[#6f7b74]">
+        <div className="flex min-h-36 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-sm text-slate-600">
           No gallery images yet
         </div>
       )}
@@ -733,7 +733,7 @@ function ImageUploadButton({
   onUpload: (files: File[]) => void;
 }) {
   return (
-    <label className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+    <label className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
       {label}
       <input
         type="file"
@@ -768,12 +768,12 @@ function EditableField({
   rows?: number;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
       {textarea ? (
-        <textarea value={value} rows={rows} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+        <textarea value={value} rows={rows} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
       ) : (
-        <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+        <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
       )}
     </label>
   );

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { designTokensFor } from "@/lib/design-settings";
 import type { Resort, ResortOfferKind } from "@/types/resort";
 
@@ -13,23 +14,23 @@ type ServiceSectionProps = {
 
 const sectionCopy = {
   boutique: {
-    eyebrow: "Stay options",
-    title: "Choose the room, package, or service that fits your stay.",
+    eyebrow: "Offers",
+    title: "Choose the service, package, room, or offer that fits your request.",
     sectionClassName: "bg-[#fbf8f1]",
     cardClassName: "rounded-md border border-[#e9dfcf] bg-white shadow-[0_18px_50px_rgba(52,43,31,0.06)]",
     badgeClassName: "bg-[#e6f0e7] text-[#1f5a45]",
     accentClassName: "text-[#18352f]",
   },
   surf: {
-    eyebrow: "Camps & add-ons",
-    title: "Build your active beach stay around the right package.",
+    eyebrow: "Packages & add-ons",
+    title: "Build your inquiry around the right package.",
     sectionClassName: "bg-[#eef9f6]",
     cardClassName: "rounded-md border border-cyan-100 bg-white shadow-[0_18px_50px_rgba(12,47,53,0.08)]",
     badgeClassName: "bg-[#e4fbff] text-[#0b7380]",
     accentClassName: "text-[#0c2f35]",
   },
   minimal: {
-    eyebrow: "Rooms & services",
+    eyebrow: "Services & offers",
     title: "Simple options, clearly presented.",
     sectionClassName: "bg-[#f8f6f0]",
     cardClassName: "rounded-md border border-[#ddd6c9] bg-white",
@@ -38,24 +39,7 @@ const sectionCopy = {
   },
 };
 
-const groupCopy: Record<ResortOfferKind, { eyebrow: string; title: string }> = {
-  room: {
-    eyebrow: "Rooms",
-    title: "Stay options",
-  },
-  package: {
-    eyebrow: "Packages",
-    title: "Ready-made booking packages",
-  },
-  service: {
-    eyebrow: "Services",
-    title: "Add-ons and local services",
-  },
-};
-
-const groupOrder: ResortOfferKind[] = ["room", "package", "service"];
-
-function servicesByKind(services: NonNullable<Resort["services"]>) {
+function servicesByKind(services: NonNullable<Resort["services"]>, groupOrder: ResortOfferKind[]) {
   return groupOrder
     .map((kind) => ({
       kind,
@@ -65,8 +49,9 @@ function servicesByKind(services: NonNullable<Resort["services"]>) {
 }
 
 export function ServiceSection({ resort, variant = "boutique" }: ServiceSectionProps) {
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
   const services = (resort.services ?? []).filter((service) => service.is_active);
-  const groupedServices = servicesByKind(services);
+  const groupedServices = servicesByKind(services, category.offerOrder);
   const copy = sectionCopy[variant];
   const design = designTokensFor(resort.design_settings);
 
@@ -78,12 +63,12 @@ export function ServiceSection({ resort, variant = "boutique" }: ServiceSectionP
     <section id="services" className={`${copy.sectionClassName} px-5 py-16 sm:px-6 lg:py-24`} style={{ backgroundColor: design.colors.section }}>
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{copy.eyebrow}</p>
-          <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{copy.title}</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{category.landingNav.offers}</p>
+          <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{category.offerSectionTitle}</h2>
         </div>
         <div className="mt-10 grid gap-12">
           {groupedServices.map((group) => (
-            <ServiceRail key={group.kind} group={group} copy={copy} design={design} />
+            <ServiceRail key={group.kind} group={group} copy={copy} design={design} category={category} />
           ))}
         </div>
       </div>
@@ -95,10 +80,12 @@ function ServiceRail({
   group,
   copy,
   design,
+  category,
 }: {
   group: ReturnType<typeof servicesByKind>[number];
   copy: (typeof sectionCopy)[keyof typeof sectionCopy];
   design: ReturnType<typeof designTokensFor>;
+  category: ReturnType<typeof businessCategoryFromType>;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -118,17 +105,18 @@ function ServiceRail({
     <div>
       <div className="flex flex-col justify-between gap-3 border-t pt-6 sm:flex-row sm:items-end" style={{ borderColor: design.colors.accent }}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{groupCopy[group.kind].eyebrow}</p>
-          <h3 className={`mt-2 text-2xl font-semibold ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{groupCopy[group.kind].title}</h3>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>{category.landingNav.offers}</p>
+          <h3 className={`mt-2 text-2xl font-semibold ${copy.accentClassName} ${design.headingClassName}`} style={{ color: design.colors.text }}>{category.offerSections[group.kind].title}</h3>
+          <p className={`mt-2 max-w-2xl text-sm leading-6 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>{category.offerSections[group.kind].description}</p>
         </div>
         <div className="flex items-center gap-3">
           <p className="text-sm" style={{ color: design.colors.muted }}>{group.services.length} option{group.services.length === 1 ? "" : "s"}</p>
           {group.services.length > 3 ? (
             <div className="flex gap-2">
-              <button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
+              <button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${category.offerSections[group.kind].title}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
                 {"<"}
               </button>
-              <button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${groupCopy[group.kind].eyebrow}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
+              <button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${category.offerSections[group.kind].title}`} className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold shadow-sm ring-1" style={{ backgroundColor: design.colors.page, color: design.colors.text, "--tw-ring-color": design.colors.accent } as CSSProperties}>
                 {">"}
               </button>
             </div>
@@ -146,7 +134,7 @@ function ServiceRail({
             <div className="p-5">
               <div className="flex flex-wrap items-center gap-2">
                 {service.highlight ? <span className="rounded-full px-3 py-1 text-xs font-semibold text-white" style={{ backgroundColor: design.colors.primary }}>{service.highlight}</span> : null}
-                {(service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity) ? <OfferPill design={design}>{service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity} guests</OfferPill> : null}
+                {(service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity) ? <OfferPill design={design}>{service.kind === "room" ? service.max_guests ?? service.capacity : service.capacity} {service.kind === "room" ? "guests" : category.capacityLabel}</OfferPill> : null}
                 {service.duration ? <OfferPill design={design}>{service.duration}</OfferPill> : null}
                 {service.kind === "room" && service.bed_type ? <OfferPill design={design}>{service.bed_type}</OfferPill> : null}
                 {service.kind === "room" && service.room_size ? <OfferPill design={design}>{service.room_size}</OfferPill> : null}
@@ -177,7 +165,7 @@ function ServiceRail({
               ) : null}
               {service.price_label ? <p className="mt-5 text-sm font-semibold" style={{ color: design.colors.text }}>{service.price_label}</p> : null}
               <a href="#booking" className={`mt-5 inline-flex min-h-10 items-center px-4 text-sm font-semibold ${design.buttonClassName}`} style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : "white" }}>
-                {service.cta_label || "Ask availability"}
+                {service.cta_label || "Inquire on WhatsApp"}
               </a>
             </div>
           </article>

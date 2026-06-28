@@ -11,11 +11,12 @@ export type TemplateCatalogEntry = {
 };
 
 export const templateCatalog: TemplateCatalogEntry[] = [
-  { name: "Sunset Landing", description: "A fast one-page direct booking site for small properties.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
+  { name: "Local Business Landing", description: "A fast one-page WhatsApp-ready site for services, menus, products, tours, and appointments.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
+  { name: "Boutique Cafe Landing", description: "A warm one-page local commerce layout for cafes, restaurants, wellness, and shops.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
   { name: "Tropical Villa Landing", description: "Premium one-page villa presentation with booking CTA.", planType: "seed", siteType: "landing", templateId: "boutique-villa", previewImageUrl: "/template-previews/tropical-villa-landing.svg", tags: ["Landing", "Seed"] },
   { name: "Boutique Resort Multi-page", description: "Multi-page resort brand structure for rooms, dining, blog, and SEO.", planType: "tree", siteType: "multipage", templateId: "boutique-resort", previewImageUrl: "/template-previews/boutique-resort-multipage.svg", tags: ["Multi-page", "Tree"] },
-  { name: "Surf Camp Multi-page", description: "Activity-led multi-page site for camps, packages, and experiences.", planType: "tree", siteType: "multipage", templateId: "surf-camp", tags: ["Multi-page", "Tree"] },
-  { name: "Luxury Resort Platform", description: "Custom platform structure for premium resort campaigns and special pages.", planType: "forest", siteType: "custom", templateId: "boutique-villa", tags: ["Custom", "Forest"] },
+  { name: "Tour Operator Multi-page", description: "Activity-led multi-page site for tours, camps, packages, and reviews.", planType: "tree", siteType: "multipage", templateId: "surf-camp", tags: ["Multi-page", "Tree"] },
+  { name: "Custom Business Platform", description: "Custom platform structure for premium campaigns, branches, and special pages.", planType: "forest", siteType: "custom", templateId: "minimal-stay", tags: ["Custom", "Forest"] },
 ];
 
 export function canUsePlan(current: ResortPlanType, required: ResortPlanType) {

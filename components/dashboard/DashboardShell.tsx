@@ -261,7 +261,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f5ef] text-[#18352f]">
+    <main className="min-h-screen bg-slate-50 text-slate-950">
       <DashboardHeader notificationCount={notifications.total} />
       <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-8">
         <Sidebar activeTab={activeTab} site={selectedSite} notificationsByTab={notifications.byTab} onTabChange={handleTabChange} />
@@ -276,7 +276,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
                 selectedSiteId={selectedSite.id}
                 onSiteChange={(nextSiteId) => runWithUnsavedGuard(() => router.push(`/dashboard/${nextSiteId}`))}
               />
-              {status ? <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">{status}</p> : null}
+              {status ? <p className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">{status}</p> : null}
               {renderTab(activeTab, selectedSite, updateSelectedSite, handleTabChange, accessToken, operatorFetch, setUnsavedChanges, requestConfirmation, () => void loadNotifications(selectedSite.id))}
             </>
           ) : null}
@@ -298,11 +298,11 @@ export function DashboardShell({ siteId }: { siteId: string }) {
 
 function DashboardMessage({ text, actionHref, actionLabel }: { text: string; actionHref?: string; actionLabel?: string }) {
   return (
-    <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-[#e8dfd0] bg-white p-6 text-center shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+    <section className="flex min-h-[420px] items-center justify-center rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
       <div>
-        <p className="text-lg font-semibold text-[#18352f]">{text}</p>
+        <p className="text-lg font-semibold text-slate-950">{text}</p>
         {actionHref && actionLabel ? (
-          <Link href={actionHref} className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+          <Link href={actionHref} className="mt-5 inline-flex min-h-11 items-center rounded-md bg-slate-950 px-5 text-sm font-semibold text-white">
             {actionLabel}
           </Link>
         ) : null}

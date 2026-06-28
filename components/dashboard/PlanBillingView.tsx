@@ -75,16 +75,16 @@ export function PlanBillingView({
   return (
     <div className="grid gap-6">
       <Panel>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Plan</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Billing and plan</h1>
-        <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{site.plan} is the current plan for {site.name}. Site structure expands from landing page to multi-page to custom platform.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Plan</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-950">Billing and plan</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{site.plan} is the current plan for {site.name}. Site structure expands from landing page to multi-page to custom platform.</p>
       </Panel>
 
       <Panel>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-[#18352f]">Current usage</h2>
-            <p className="mt-2 text-sm text-[#6f7b74]">Usage is calculated from this site&apos;s live operational data.</p>
+            <h2 className="text-xl font-semibold text-slate-950">Current usage</h2>
+            <p className="mt-2 text-sm text-slate-600">Usage is calculated from this site&apos;s live operational data.</p>
           </div>
           <Badge tone="sand">This month</Badge>
         </div>
@@ -92,8 +92,8 @@ export function PlanBillingView({
           {usageRows.map((row) => (
             <div key={row.label}>
               <div className="mb-2 flex justify-between gap-3 text-sm">
-                <span className="font-medium text-[#18352f]">{row.label}</span>
-                <span className="text-[#6f7b74]">{row.helper}</span>
+                <span className="font-medium text-slate-950">{row.label}</span>
+                <span className="text-slate-500">{row.helper}</span>
               </div>
               <ProgressBar value={row.limit ? (row.value / row.limit) * 100 : 8} />
             </div>
@@ -104,8 +104,8 @@ export function PlanBillingView({
       <Panel>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-[#18352f]">Plan change data policy</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6f7b74]">
+            <h2 className="text-xl font-semibold text-slate-950">Plan change data policy</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               Downgrading never deletes your content. Higher-plan pages, navigation, images, SEO, reviews, and custom structures are preserved but locked or hidden until you upgrade again.
             </p>
           </div>
@@ -118,7 +118,7 @@ export function PlanBillingView({
             ))}
           </div>
         ) : (
-          <p className="mt-5 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">
+          <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-100">
             You are on the entry plan. Upgrading will unlock more structure without changing your existing content.
           </p>
         )}
@@ -126,26 +126,26 @@ export function PlanBillingView({
 
       <div className="grid gap-4 xl:grid-cols-4">
         {planOptions.map((plan) => (
-          <Panel key={plan.name} className={plan.name === site.plan ? "ring-2 ring-[#2d6b50]" : ""}>
+          <Panel key={plan.name} className={plan.name === site.plan ? "ring-2 ring-emerald-500" : ""}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold text-[#18352f]">{plan.name}</h2>
-                <p className="mt-2 text-sm text-[#6f7b74]">{plan.positioning}</p>
+                <h2 className="text-xl font-semibold text-slate-950">{plan.name}</h2>
+                <p className="mt-2 text-sm text-slate-600">{plan.positioning}</p>
               </div>
               {plan.name === site.plan ? <Badge>Current</Badge> : null}
             </div>
-            <p className="mt-5 text-2xl font-semibold text-[#18352f]">{plan.price}</p>
-            <ul className="mt-5 grid gap-3 text-sm text-[#52615a]">
+            <p className="mt-5 text-2xl font-semibold text-slate-950">{plan.price}</p>
+            <ul className="mt-5 grid gap-3 text-sm text-slate-600">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-[#2d6b50]" />
+                  <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500" />
                   {feature}
                 </li>
               ))}
             </ul>
             <div className="mt-6">
               {isDowngrade(site.plan, plan.name) ? (
-                <p className="mb-3 rounded-2xl bg-[#fff7e8] p-3 text-xs leading-5 text-[#7b5b24]">
+                <p className="mb-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-700 ring-1 ring-amber-100">
                   Downgrade impact: content is preserved, but higher-plan features become locked.
                 </p>
               ) : null}
@@ -153,10 +153,10 @@ export function PlanBillingView({
                 type="button"
                 disabled={plan.name === site.plan}
                 onClick={() => confirmPlanChange(plan.name)}
-                className={`min-h-11 rounded-full px-5 text-sm font-semibold ${
+                className={`min-h-11 rounded-md px-5 text-sm font-semibold ${
                   plan.name === site.plan
-                    ? "bg-white text-[#18352f] ring-1 ring-[#d8cebb]"
-                    : "bg-[#18352f] text-white"
+                    ? "bg-white text-slate-950 ring-1 ring-slate-200"
+                    : "bg-slate-950 text-white"
                 } disabled:cursor-not-allowed disabled:opacity-70`}
               >
                 {plan.name === site.plan ? "Current plan" : "Select plan"}
@@ -177,18 +177,18 @@ function DowngradeImpactCard({ fromPlan, toPlan }: { fromPlan: ResortConsoleData
   const impacts = downgradeImpacts(fromPlan, toPlan);
 
   return (
-    <article className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+    <article className="rounded-lg border border-slate-200 bg-slate-50 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-[#18352f]">{fromPlan} to {toPlan}</h3>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Locked but preserved</p>
+          <h3 className="font-semibold text-slate-950">{fromPlan} to {toPlan}</h3>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Locked but preserved</p>
         </div>
         <Badge tone="sand">Downgrade</Badge>
       </div>
-      <ul className="mt-4 grid gap-2 text-sm text-[#52615a]">
+      <ul className="mt-4 grid gap-2 text-sm text-slate-600">
         {impacts.map((impact) => (
           <li key={impact} className="flex gap-2">
-            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#c9a15a]" />
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-amber-500" />
             <span>{impact}</span>
           </li>
         ))}

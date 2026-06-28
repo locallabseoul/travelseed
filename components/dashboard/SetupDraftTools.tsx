@@ -153,12 +153,12 @@ export function SourceGenerator({
 }) {
   return (
     <Panel>
-      <h2 className="text-xl font-semibold text-[#18352f]">Source information</h2>
-      <p className="mt-2 text-sm leading-6 text-[#6f7b74]">{helper}</p>
+      <h2 className="text-xl font-semibold text-slate-950">Source information</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{helper}</p>
       <div className="mt-5 grid gap-4">
-        <EditableField label="OTA listing URL" value={sourceUrl} onChange={onSourceUrlChange} placeholder="https://www.booking.com/hotel/..." />
+        <EditableField label="Business source URL" value={sourceUrl} onChange={onSourceUrlChange} placeholder="https://instagram.com/yourbusiness" />
         <EditableField label="Existing info" value={existingText} onChange={onExistingTextChange} textarea rows={7} placeholder="Paste existing descriptions, amenities, local area notes, or old website copy." />
-        <button type="button" onClick={onGenerate} disabled={generating} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={onGenerate} disabled={generating} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           {generating ? "Generating..." : buttonLabel}
         </button>
       </div>
@@ -189,19 +189,19 @@ export function DraftReview({
     <Panel>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">Review suggested changes</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Select the fields you want to apply to the current site.</p>
+          <h2 className="text-xl font-semibold text-slate-950">Review suggested changes</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Select the fields you want to apply to the current site.</p>
         </div>
-        <button type="button" onClick={onApply} disabled={selectedFields.size === 0} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={onApply} disabled={selectedFields.size === 0} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           Save selected changes
         </button>
       </div>
       <div className="mt-5 grid gap-3">
         {fields.map((field) => (
-          <label key={field} className="grid gap-3 rounded-2xl bg-[#fbfaf7] p-4 ring-1 ring-[#eadfce]">
+          <label key={field} className="grid gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
             <div className="flex items-center gap-3">
-              <input type="checkbox" checked={selectedFields.has(field)} onChange={() => onToggleField(field)} className="h-4 w-4 accent-[#2d6b50]" />
-              <span className="text-sm font-semibold text-[#18352f]">{draftFieldLabels[field]}</span>
+              <input type="checkbox" checked={selectedFields.has(field)} onChange={() => onToggleField(field)} className="h-4 w-4 accent-emerald-600" />
+              <span className="text-sm font-semibold text-slate-950">{draftFieldLabels[field]}</span>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <ReadOnlyBlock label="Current" value={formatDraftValue(valueForField(site, field) as string | string[])} />
@@ -259,12 +259,12 @@ function EditableField({
   placeholder?: string;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
       {textarea ? (
-        <textarea value={value} rows={rows} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+        <textarea value={value} rows={rows} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
       ) : (
-        <input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+        <input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
       )}
     </label>
   );
@@ -273,8 +273,8 @@ function EditableField({
 function ReadOnlyBlock({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">{label}</p>
-      <pre className="mt-2 min-h-20 whitespace-pre-wrap rounded-xl bg-white p-3 text-sm leading-6 text-[#52615a]">{value || "Empty"}</pre>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">{label}</p>
+      <pre className="mt-2 min-h-20 whitespace-pre-wrap rounded-xl bg-white p-3 text-sm leading-6 text-slate-600">{value || "Empty"}</pre>
     </div>
   );
 }

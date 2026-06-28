@@ -281,20 +281,20 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
       <Panel>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Reviews</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Website Reviews</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">
-              Add and manage guest testimonials displayed on your direct booking website.
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Reviews</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Website Reviews</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Add and manage customer testimonials displayed on your public business website.
             </p>
           </div>
-          <button type="button" onClick={() => setForm(emptyForm)} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white shadow-sm">
+          <button type="button" onClick={() => setForm(emptyForm)} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
             Add Review
           </button>
         </div>
       </Panel>
 
       {status ? (
-        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6f7b74] shadow-sm">
+        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
           {usingFallback ? "Sample mode: " : ""}
           {status}
         </p>
@@ -303,9 +303,9 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryMetrics.map((metric) => (
           <Panel key={metric.label}>
-            <p className="text-sm font-medium text-[#6f7b74]">{metric.label}</p>
-            <p className="mt-3 text-3xl font-semibold text-[#18352f]">{metric.value}</p>
-            <p className="mt-2 text-xs leading-5 text-[#72815e]">{metric.helper}</p>
+            <p className="text-sm font-medium text-slate-600">{metric.label}</p>
+            <p className="mt-3 text-3xl font-semibold text-slate-950">{metric.value}</p>
+            <p className="mt-2 text-xs leading-5 text-emerald-700">{metric.helper}</p>
           </Panel>
         ))}
       </section>
@@ -342,18 +342,18 @@ function AddReviewFormCard({
     <Panel>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">{form.id ? "Edit review" : "Add review"}</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Create a manual guest testimonial for the website review section.</p>
+          <h2 className="text-xl font-semibold text-slate-950">{form.id ? "Edit review" : "Add review"}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Create a manual customer testimonial for the website review section.</p>
         </div>
         <Badge tone="green">Database backed</Badge>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <EditableField label="Guest Name" value={form.guestName} placeholder="Guest name" onChange={(guestName) => onChange({ ...form, guestName })} />
+        <EditableField label="Customer Name" value={form.guestName} placeholder="Customer name" onChange={(guestName) => onChange({ ...form, guestName })} />
         <SelectField label="Rating" value={String(form.rating)} options={["5", "4", "3", "2", "1"]} onChange={(rating) => onChange({ ...form, rating: Number(rating) })} />
         <SelectField label="Source Label" value={form.sourceLabel} options={["Manual", "Google", "Guest Message"]} onChange={(sourceLabel) => onChange({ ...form, sourceLabel: sourceLabel as WebsiteReview["sourceLabel"] })} />
-        <DatePickerField label="Stay Date" value={form.stayDate ?? ""} onChange={(stayDate) => onChange({ ...form, stayDate })} />
+        <DatePickerField label="Visit / Service Date" value={form.stayDate ?? ""} onChange={(stayDate) => onChange({ ...form, stayDate })} />
         <div className="md:col-span-2">
-          <EditableField label="Review Text" value={form.reviewText} placeholder="Paste or write the guest review..." textarea onChange={(reviewText) => onChange({ ...form, reviewText })} />
+          <EditableField label="Review Text" value={form.reviewText} placeholder="Paste or write the customer review..." textarea onChange={(reviewText) => onChange({ ...form, reviewText })} />
         </div>
       </div>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -361,7 +361,7 @@ function AddReviewFormCard({
           <Toggle checked={form.showOnWebsite} label="Show on Website" onChange={(showOnWebsite) => onChange({ ...form, showOnWebsite, status: showOnWebsite ? "published" : form.status })} />
           <Toggle checked={form.featured} label="Featured" onChange={(featured) => onChange({ ...form, featured, showOnWebsite: featured ? true : form.showOnWebsite, status: featured ? "published" : form.status })} />
         </div>
-        <button type="button" onClick={onSave} disabled={saving} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={onSave} disabled={saving} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           {saving ? "Saving..." : "Save Review"}
         </button>
       </div>
@@ -383,8 +383,8 @@ function ReviewListCard({
   return (
     <section className="grid gap-4">
       <Panel>
-        <h2 className="text-xl font-semibold text-[#18352f]">Review list</h2>
-        <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Manage which reviews are published, featured, and shown on the public website.</p>
+        <h2 className="text-xl font-semibold text-slate-950">Review list</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-600">Manage which reviews are published, featured, and shown on the public website.</p>
       </Panel>
       {reviews.length > 0 ? (
         reviews.map((review) => (
@@ -392,8 +392,8 @@ function ReviewListCard({
         ))
       ) : (
         <Panel>
-          <p className="text-sm font-semibold text-[#18352f]">No website reviews yet</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Add a guest review to start building your public testimonials section.</p>
+          <p className="text-sm font-semibold text-slate-950">No website reviews yet</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Add a customer review to start building your public testimonials section.</p>
         </Panel>
       )}
     </section>
@@ -412,11 +412,11 @@ function ReviewCard({
   onPatch: (patch: Partial<WebsiteReview>) => void;
 }) {
   return (
-    <article className="rounded-2xl border border-[#e8dfd0] bg-white p-5 shadow-[0_18px_60px_rgba(54,43,29,0.07)]">
+    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold text-[#18352f]">{review.guestName}</h3>
+            <h3 className="text-lg font-semibold text-slate-950">{review.guestName}</h3>
             <Badge tone={review.status === "published" ? "green" : "gray"}>{review.status === "published" ? "Published" : "Draft"}</Badge>
             <Badge tone="sand">{review.sourceLabel}</Badge>
           </div>
@@ -424,7 +424,7 @@ function ReviewCard({
             <span className="font-semibold tracking-[0.12em] text-[#d29735]" aria-label={`${review.rating} star rating`}>
               {ratingStars(review.rating)}
             </span>
-            <span className="text-[#6f7b74]">{review.stayDate ? formatDateLabel(review.stayDate) : "Stay date not set"}</span>
+            <span className="text-slate-600">{review.stayDate ? formatDateLabel(review.stayDate) : "Date not set"}</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-4">
@@ -432,12 +432,12 @@ function ReviewCard({
           <Toggle checked={review.featured} label="Featured" onChange={(featured) => onPatch({ featured, showOnWebsite: featured ? true : review.showOnWebsite, status: featured ? "published" : review.status })} />
         </div>
       </div>
-      <p className="mt-4 text-sm leading-6 text-[#52615a]">{review.reviewText}</p>
+      <p className="mt-4 text-sm leading-6 text-slate-600">{review.reviewText}</p>
       <div className="mt-5 flex flex-wrap gap-2">
-        <button type="button" onClick={onEdit} className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+        <button type="button" onClick={onEdit} className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
           Edit
         </button>
-        <button type="button" onClick={onDelete} className="rounded-full bg-[#fff7f5] px-4 py-2 text-sm font-semibold text-[#9d3323]">
+        <button type="button" onClick={onDelete} className="rounded-md bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
           Delete
         </button>
       </div>
@@ -458,26 +458,26 @@ function WebsiteTestimonialsCard({
     <Panel>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-[#18352f]">Website Testimonials</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Published reviews with Show on Website enabled will appear on your public website. Featured reviews appear first.</p>
+          <h2 className="text-xl font-semibold text-slate-950">Website Testimonials</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Published reviews with Show on Website enabled will appear on your public website. Featured reviews appear first.</p>
         </div>
         <Badge tone="green">{reviews.length} visible</Badge>
       </div>
       {reviews.length > 0 ? (
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {reviews.map((review, index) => (
-            <article key={review.id} className="rounded-2xl border border-[#eadfce] bg-[#fbfaf7] p-4">
+            <article key={review.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <Badge tone="green">Website</Badge>
-              <p className="mt-4 text-sm font-semibold text-[#18352f]">{review.guestName}</p>
-              <p className="mt-2 text-sm leading-6 text-[#52615a]">{`"${review.reviewText}"`}</p>
+              <p className="mt-4 text-sm font-semibold text-slate-950">{review.guestName}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{`"${review.reviewText}"`}</p>
               <div className="mt-5 flex flex-wrap gap-2">
-                <button type="button" onClick={() => onMove(review, -1)} disabled={index === 0} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+                <button type="button" onClick={() => onMove(review, -1)} disabled={index === 0} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40">
                   Move Up
                 </button>
-                <button type="button" onClick={() => onMove(review, 1)} disabled={index === reviews.length - 1} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#18352f] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed disabled:opacity-40">
+                <button type="button" onClick={() => onMove(review, 1)} disabled={index === reviews.length - 1} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-950 ring-1 ring-slate-200 disabled:cursor-not-allowed disabled:opacity-40">
                   Move Down
                 </button>
-                <button type="button" onClick={() => onRemove(review)} className="rounded-full bg-[#fff7f5] px-3 py-1 text-xs font-semibold text-[#9d3323]">
+                <button type="button" onClick={() => onRemove(review)} className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                   Remove from Website
                 </button>
               </div>
@@ -485,9 +485,9 @@ function WebsiteTestimonialsCard({
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-2xl border border-dashed border-[#d8cebb] bg-[#fbfaf7] p-5">
-          <p className="text-sm font-semibold text-[#18352f]">No website testimonials selected</p>
-          <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Turn on Show on Website for published reviews you want to display publicly.</p>
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5">
+          <p className="text-sm font-semibold text-slate-950">No website testimonials selected</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Turn on Show on Website for published reviews you want to display publicly.</p>
         </div>
       )}
     </Panel>
@@ -497,10 +497,10 @@ function WebsiteTestimonialsCard({
 function WebsitePreviewCard({ reviews }: { reviews: WebsiteReview[] }) {
   return (
     <Panel>
-      <h2 className="text-xl font-semibold text-[#18352f]">Website Preview</h2>
-      <p className="mt-1 text-sm leading-6 text-[#6f7b74]">Testimonials section preview</p>
-      <div className="mt-5 rounded-2xl bg-[#18352f] p-4 text-white">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">What guests say</p>
+      <h2 className="text-xl font-semibold text-slate-950">Website Preview</h2>
+      <p className="mt-1 text-sm leading-6 text-slate-600">Testimonials section preview</p>
+      <div className="mt-5 rounded-2xl bg-slate-950 p-4 text-white">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">What customers say</p>
         <div className="mt-4 grid gap-3">
           {reviews.slice(0, 3).map((review) => (
             <div key={review.id} className="rounded-xl bg-white/10 p-3">
@@ -512,7 +512,7 @@ function WebsitePreviewCard({ reviews }: { reviews: WebsiteReview[] }) {
           {reviews.length === 0 ? <p className="text-sm leading-6 text-white/70">Select reviews to preview the testimonials section.</p> : null}
         </div>
       </div>
-      <button type="button" className="mt-5 min-h-11 w-full rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+      <button type="button" className="mt-5 min-h-11 w-full rounded-full bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
         Preview Website
       </button>
     </Panel>
@@ -523,11 +523,11 @@ function GoogleReviewsSyncCard({ feature }: { feature: GoogleReviewsSyncFeature 
   return (
     <Panel className="bg-[#f3f0e8] opacity-80">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold text-[#18352f]">{feature.title}</h2>
+        <h2 className="text-xl font-semibold text-slate-950">{feature.title}</h2>
         <Badge tone="gray">Future</Badge>
       </div>
-      <p className="mt-3 text-sm leading-6 text-[#6f7b74]">{feature.description}</p>
-      <button type="button" disabled className="mt-5 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-[#6f7b74] ring-1 ring-[#d8cebb] disabled:cursor-not-allowed">
+      <p className="mt-3 text-sm leading-6 text-slate-600">{feature.description}</p>
+      <button type="button" disabled className="mt-5 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 disabled:cursor-not-allowed">
         Coming Soon
       </button>
     </Panel>
@@ -536,19 +536,19 @@ function GoogleReviewsSyncCard({ feature }: { feature: GoogleReviewsSyncFeature 
 
 function PlanLimitCard() {
   return (
-    <Panel className="border-[#d8cebb] bg-[#fffdf8]">
+    <Panel className="border-slate-200 bg-[#fffdf8]">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold text-[#18352f]">Tree plan review tools</h2>
+        <h2 className="text-xl font-semibold text-slate-950">Tree plan review tools</h2>
         <Badge tone="sand">Tree</Badge>
       </div>
-      <ul className="mt-4 grid gap-2 text-sm leading-6 text-[#52615a]">
+      <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-600">
         <li>Published website reviews: up to 10</li>
         <li>AI review helper: 20 uses / month</li>
         <li>Manual review management included</li>
       </ul>
-      <div className="mt-5 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce]">
-        <p className="text-sm font-semibold text-[#18352f]">Upgrade to Forest</p>
-        <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Unlock unlimited website reviews, advanced translation, Google Reviews sync, and review performance analytics.</p>
+      <div className="mt-5 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+        <p className="text-sm font-semibold text-slate-950">Upgrade to Forest</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Unlock unlimited website reviews, advanced translation, Google Reviews sync, and review performance analytics.</p>
       </div>
     </Panel>
   );
@@ -568,12 +568,12 @@ function EditableField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-[#18352f]">
+    <label className="grid gap-2 text-sm font-semibold text-slate-950">
       {label}
       {textarea ? (
-        <textarea value={value} placeholder={placeholder} rows={5} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-[#d8cebb] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#18352f]" />
+        <textarea value={value} placeholder={placeholder} rows={5} onChange={(event) => onChange(event.target.value)} className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-emerald-600" />
       ) : (
-        <input value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+        <input value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600" />
       )}
     </label>
   );
@@ -591,9 +591,9 @@ function SelectField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-[#18352f]">
+    <label className="grid gap-2 text-sm font-semibold text-slate-950">
       {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm font-medium text-[#52615a] outline-none focus:border-[#18352f]">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-600 outline-none focus:border-emerald-600">
         {options.map((option) => (
           <option key={option}>{option}</option>
         ))}
@@ -604,9 +604,9 @@ function SelectField({
 
 function Toggle({ checked, label, onChange }: { checked: boolean; label: string; onChange?: (checked: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold text-[#18352f]">
+    <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold text-slate-950">
       <span>{label}</span>
-      <span className={`flex h-7 w-12 items-center rounded-full p-1 transition ${checked ? "bg-[#2d6b50]" : "bg-[#d8cebb]"}`}>
+      <span className={`flex h-7 w-12 items-center rounded-full p-1 transition ${checked ? "bg-emerald-600" : "bg-slate-300"}`}>
         <span className={`h-5 w-5 rounded-full bg-white shadow-sm transition ${checked ? "translate-x-5" : ""}`} />
       </span>
       <input type="checkbox" checked={checked} onChange={(event) => onChange?.(event.target.checked)} className="sr-only" />

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { Panel } from "@/components/dashboard/ui";
+import { Badge, Panel } from "@/components/dashboard/ui";
+import { businessTypeOptions } from "@/lib/business-categories";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardConfirmOptions, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
+
+const languageOptions = ["English", "Bahasa Indonesia"];
 
 export function SettingsView({
   site,
@@ -136,7 +139,7 @@ export function SettingsView({
       title: nextIsActive ? "Publish site?" : "Pause site?",
       description: nextIsActive
         ? "This will make the public site available when the URL is visited."
-        : "This will pause the public site and hide it from guests.",
+        : "This will pause the public site and hide it from customers.",
       confirmLabel: nextIsActive ? "Publish site" : "Pause site",
       cancelLabel: "Cancel",
       tone: nextIsActive ? "default" : "danger",
@@ -150,9 +153,9 @@ export function SettingsView({
   return (
     <div className="grid gap-6">
       <Panel>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Settings</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Business settings</h1>
-        <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Central settings for the operator account and direct booking site.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Settings</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-950">Business settings</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Central settings for the operator account and WhatsApp-ready business site.</p>
       </Panel>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.58fr]">
@@ -161,30 +164,30 @@ export function SettingsView({
             <EditableField label="Business Name" value={name} onChange={setName} />
             <EditableField label="Location" value={location} onChange={setLocation} />
             <EditableField label="Contact Email" value={contactEmail} onChange={setContactEmail} />
-            <EditableField label="Language" value={language} onChange={setLanguage} />
+            <SelectField label="Language" value={language} onChange={setLanguage} options={languageOptions} />
             <EditableField label="Timezone" value={timezone} onChange={setTimezone} />
-            <EditableField label="Business Type" value={type} onChange={setType} />
+            <SelectField label="Business Type" value={type} onChange={setType} options={businessTypeOptions} />
           </div>
           <div className="mt-6">
-            <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+            <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
               Save settings
             </button>
           </div>
         </Panel>
 
         <Panel>
-          <h2 className="text-xl font-semibold text-[#18352f]">Preview & publish</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Review the public URL and control whether the site is visible to guests.</p>
-          <div className="mt-5 rounded-2xl bg-[#fbfaf7] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#72815e]">Public URL</p>
-            <p className="mt-2 break-all text-sm font-semibold text-[#18352f]">/{site.slug}</p>
-            <p className="mt-2 text-sm text-[#6f7b74]">{site.isActive ? "Published" : "Paused"}</p>
+          <h2 className="text-xl font-semibold text-slate-950">Preview & publish</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Review the public URL and control whether the site is visible to customers.</p>
+          <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Public URL</p>
+            <p className="mt-2 break-all text-sm font-semibold text-slate-950">/{site.slug}</p>
+            <p className="mt-2 text-sm text-slate-500">{site.isActive ? "Published" : "Paused"}</p>
           </div>
           <div className="mt-6 flex flex-col gap-3">
-            <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               Open preview
             </a>
-            <button type="button" onClick={togglePublish} className={`min-h-11 rounded-full px-5 text-sm font-semibold ${site.isActive ? "bg-red-50 text-red-700 ring-1 ring-red-200" : "bg-[#18352f] text-white"}`}>
+            <button type="button" onClick={togglePublish} className={`min-h-11 rounded-md px-5 text-sm font-semibold ${site.isActive ? "bg-red-50 text-red-700 ring-1 ring-red-200" : "bg-slate-950 text-white"}`}>
               {site.isActive ? "Pause site" : "Publish site"}
             </button>
           </div>
@@ -193,10 +196,10 @@ export function SettingsView({
         <Panel className="xl:col-span-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-[#18352f]">Account security</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Change the password for the signed-in operator account.</p>
+              <h2 className="text-xl font-semibold text-slate-950">Account security</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Change the password for the signed-in operator account.</p>
             </div>
-            <span className="rounded-full bg-[#f8f5ef] px-3 py-1 text-xs font-semibold text-[#52615a]">Email login</span>
+            <Badge tone="gray">Email login</Badge>
           </div>
           <div className="mt-5 grid gap-5 md:grid-cols-3">
             <PasswordField label="Current password" value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" />
@@ -208,18 +211,18 @@ export function SettingsView({
               type="button"
               disabled={isChangingPassword}
               onClick={() => void changePassword()}
-              className="min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isChangingPassword ? "Changing password..." : "Change password"}
             </button>
-            {passwordStatus ? <p className="text-sm text-[#6f7b74]">{passwordStatus}</p> : null}
+            {passwordStatus ? <p className="text-sm text-slate-600">{passwordStatus}</p> : null}
           </div>
         </Panel>
 
         <Panel className="xl:col-span-2">
           <h2 className="text-xl font-semibold text-red-800">Danger Zone</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Placeholder for account export and delete workflows. These actions should require confirmation after DB integration.</p>
-          <button type="button" className="mt-6 min-h-11 rounded-full bg-red-50 px-5 text-sm font-semibold text-red-700 ring-1 ring-red-200">
+          <p className="mt-2 text-sm leading-6 text-slate-600">Placeholder for account export and delete workflows. These actions should require confirmation after DB integration.</p>
+          <button type="button" className="mt-6 min-h-11 rounded-md bg-red-50 px-5 text-sm font-semibold text-red-700 ring-1 ring-red-200">
             Delete workflow coming soon
           </button>
         </Panel>
@@ -240,14 +243,14 @@ function PasswordField({
   autoComplete: string;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
       <input
         type="password"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         autoComplete={autoComplete}
-        className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]"
+        className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
       />
     </label>
   );
@@ -263,9 +266,36 @@ function EditableField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-xl border border-[#d8cebb] bg-white px-3 text-sm outline-none focus:border-[#18352f]" />
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100" />
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+}) {
+  const normalizedOptions = options.includes(value) ? options : [value, ...options].filter((option, index, list) => list.indexOf(option) === index);
+
+  return (
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
+      {label}
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+        {normalizedOptions.map((option) => (
+          <option key={option} value={option}>
+            {option || "Not specified"}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

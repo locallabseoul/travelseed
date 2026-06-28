@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { designTokensFor } from "@/lib/design-settings";
 import type { Resort } from "@/types/resort";
 
@@ -8,9 +9,11 @@ type HeroSectionProps = {
   accentClassName?: string;
 };
 
-// Displays the first visual impression for a resort website.
+// Displays the first visual impression for a public business website.
 export function HeroSection({ resort, accentClassName = "bg-forest" }: HeroSectionProps) {
   const design = designTokensFor(resort.design_settings);
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const accommodation = category.id === "accommodation";
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-neutral-900 text-white" style={{ backgroundColor: design.colors.primary }}>
@@ -53,13 +56,13 @@ export function HeroSection({ resort, accentClassName = "bg-forest" }: HeroSecti
             className={`inline-flex min-h-12 items-center border px-6 text-sm font-semibold ${design.buttonClassName}`}
             style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.accent, borderColor: design.colors.accent, color: design.buttonStyle === "Soft Outline" ? design.colors.accent : design.colors.buttonText }}
           >
-            Book Direct & Save
+            {accommodation ? "Book Direct & Save" : category.primaryCta}
           </a>
           <a
-            href="#experiences"
+            href={accommodation ? "#experiences" : "#services"}
             className={`inline-flex min-h-12 items-center border border-white/35 px-6 text-sm font-semibold text-white backdrop-blur ${design.buttonClassName}`}
           >
-            Explore the stay
+            {accommodation ? "Explore the stay" : `Explore ${category.landingNav.offers.toLowerCase()}`}
           </a>
         </div>
       </div>

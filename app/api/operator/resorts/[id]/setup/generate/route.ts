@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import {
   createAiBrandCopyDraft,
   createAiListingDraft,
@@ -88,7 +89,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     const existingText = typeof body?.existingText === "string" ? body.existingText.trim() : "";
 
     if (!url && !existingText) {
-      return NextResponse.json({ error: "Enter a public listing URL or paste existing property information." }, { status: 400 });
+      return NextResponse.json({ error: "Enter a public business link or paste existing business information." }, { status: 400 });
     }
 
     if (url) {
@@ -120,7 +121,7 @@ export async function POST(request: Request, { params }: RouteContext) {
         draft: fallbackDraft(url),
         servicesDraft: [],
         sourceTextAvailable: Boolean(listingSource.bodyText),
-        warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic URL draft.",
+        warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic source draft.",
       });
     }
 
@@ -128,7 +129,7 @@ export async function POST(request: Request, { params }: RouteContext) {
       draft: textDraft(existingText, currentResort),
       servicesDraft: [],
       sourceTextAvailable: true,
-      warning: "No URL was provided, so Travelseed prepared a draft from the pasted text only.",
+      warning: "No URL was provided, so Travelseed prepared a draft from the pasted business text only.",
     });
   }
 
@@ -136,6 +137,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     const sourceUrl = normalizeListingUrl(body?.sourceUrl);
     const existingText = typeof body?.existingText === "string" ? body.existingText.trim() : "";
     const listingSource = sourceUrl ? await fetchListingSource(sourceUrl) : null;
+    const category = businessCategoryFromType({ type: currentResort.type, templateId: currentResort.template_id });
 
     try {
       const aiDraft = await createAiBrandCopyDraft({
@@ -166,14 +168,14 @@ export async function POST(request: Request, { params }: RouteContext) {
 
     return NextResponse.json({
       draft: {
-        hero_title: currentResort.hero_title || `Book direct at ${currentResort.name}`,
-        hero_subtitle: currentResort.hero_subtitle ?? `A direct-booking stay in ${currentResort.location}.`,
-        description: currentResort.description ?? `${currentResort.name} is a direct-booking stay in ${currentResort.location}.`,
+        hero_title: currentResort.hero_title || `Contact ${currentResort.name} on WhatsApp`,
+        hero_subtitle: currentResort.hero_subtitle ?? `A WhatsApp-ready business website in ${currentResort.location}.`,
+        description: currentResort.description ?? `${currentResort.name} is a local business website in ${currentResort.location}.`,
         features: currentResort.features,
         experiences: currentResort.experiences,
         booking_message_template:
           currentResort.booking_message_template ??
-          `Hello, I would like to make a reservation at ${currentResort.name}.\nCheck-in:\nCheck-out:\nGuests:\nAirport Pickup:`,
+          category.defaultBookingMessage(currentResort.name),
       },
       sourceTextAvailable: Boolean(existingText || listingSource?.bodyText),
       warning: "OPENAI_API_KEY is not configured yet, so Travelseed prepared a copy pack from existing site fields.",

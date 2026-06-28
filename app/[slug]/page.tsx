@@ -18,7 +18,7 @@ function metadataDescriptionFor(resort: Resort) {
   return (
     resort.hero_subtitle ||
     resort.description ||
-    `${resort.name} is a direct booking stay in ${resort.location}.`
+    `${resort.name} is a WhatsApp-ready business website in ${resort.location}.`
   );
 }
 
@@ -32,11 +32,11 @@ export async function generateMetadata({ params }: SitePageProps): Promise<Metad
 
   if (!resort) {
     return {
-      title: "Resort not found | Travelseed",
+      title: "Site not found | Travelseed",
     };
   }
 
-  const title = `${resort.name} | Direct Booking`;
+  const title = `${resort.name} | Travelseed`;
   const description = metadataDescriptionFor(resort);
   const imageUrl = metadataImageFor(resort);
 

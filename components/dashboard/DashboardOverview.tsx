@@ -10,7 +10,7 @@ import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 const templateNameById: Record<string, string> = {
   "boutique-villa": "Boutique Villa",
   "surf-camp": "Surf Camp",
-  "minimal-stay": "Minimal Stay",
+  "minimal-stay": "Local Business",
 };
 
 export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
@@ -30,26 +30,26 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
                 <Badge>{site.status}</Badge>
                 <Badge tone="sand">{site.plan}</Badge>
               </div>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-[#18352f]">Welcome back, {site.name}</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f7b74]">
-                Manage your direct booking presence, content, WhatsApp flow, domain, and growth signals from one calm operations console.
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950">Welcome back, {site.name}</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+                Manage your business website, pages, offers, WhatsApp inquiries, domain, and growth signals from one focused operations console.
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
-                <span className="rounded-full bg-[#f8f5ef] px-4 py-2 font-semibold text-[#18352f]">{site.travelseedUrl}</span>
-                <span className="text-[#6f7b74]">{site.customDomain || "Custom domain not connected"}</span>
+                <span className="rounded-full bg-slate-100 px-4 py-2 font-semibold text-slate-900">{site.travelseedUrl}</span>
+                <span className="text-slate-500">{site.customDomain || "Custom domain not connected"}</span>
               </div>
             </div>
             <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:pt-8">
-              <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white shadow-sm">
+              <a href={`/${site.slug}`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
                 View Site
               </a>
-              <button type="button" onClick={() => onTabChange("setup")} className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+              <button type="button" onClick={() => onTabChange("setup")} className="inline-flex min-h-11 items-center justify-center rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
                 Continue Setup
               </button>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-[#18352f] p-4 text-white">
+          <div className="rounded-lg bg-slate-950 p-4 text-white">
             <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_260px] xl:items-center">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Launch readiness</p>
@@ -63,13 +63,13 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
               </div>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {readiness.steps.map((step) => (
-                  <div key={step.id} className="rounded-xl bg-white/10 px-4 py-3 text-sm">
+                  <div key={step.id} className="rounded-md bg-white/10 px-4 py-3 text-sm">
                     <p className="font-semibold text-white">{step.title}</p>
                     <p className={step.status === "Done" ? "mt-1 text-xs font-semibold text-[#d8f0dc]" : "mt-1 text-xs font-semibold text-[#f1e4c9]"}>{step.status === "Done" ? "Ready" : "Needs review"}</p>
                   </div>
                 ))}
               </div>
-              <div className="grid gap-2 rounded-xl bg-white/10 p-3 text-sm text-white/78">
+              <div className="grid gap-2 rounded-md bg-white/10 p-3 text-sm text-white/78">
                 <div className="flex justify-between gap-3">
                   <span>Structure</span>
                   <span className="text-right font-semibold text-white">{structure.structureLabel}</span>
@@ -100,12 +100,12 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
       </div>
 
       <Panel>
-        <h2 className="text-lg font-semibold text-[#18352f]">Recent activity</h2>
+        <h2 className="text-lg font-semibold text-slate-950">Recent activity</h2>
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {recentActivity.map((activity, index) => (
-            <div key={activity} className="rounded-2xl bg-[#fbfaf7] p-4">
-              <p className="text-sm font-semibold text-[#18352f]">{activity}</p>
-              <p className="mt-1 text-xs text-[#6f7b74]">{index + 1} day{index === 0 ? "" : "s"} ago</p>
+            <div key={activity} className="rounded-lg bg-slate-50 p-4 ring-1 ring-slate-100">
+              <p className="text-sm font-semibold text-slate-950">{activity}</p>
+              <p className="mt-1 text-xs text-slate-500">{index + 1} day{index === 0 ? "" : "s"} ago</p>
             </div>
           ))}
         </div>

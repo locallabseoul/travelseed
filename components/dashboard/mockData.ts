@@ -10,12 +10,12 @@ export function dashboardMetricsFor(site: ResortConsoleData): DashboardMetric[] 
     {
       label: "WhatsApp Clicks",
       value: `${site.whatsappClicksUsed.toLocaleString()} / ${site.whatsappClicksLimit.toLocaleString()}`,
-      helper: "Direct booking intent",
+      helper: "Direct customer intent",
     },
     {
       label: "Storage",
       value: `${site.storageUsedGb}GB / ${site.storageLimitGb}GB`,
-      helper: "Hero and gallery media",
+      helper: "Business and gallery media",
     },
     {
       label: "Conversion Signal",
@@ -38,7 +38,7 @@ export const quickActions = [
   "Edit Home Hero",
   "Update Gallery",
   "Manage Offers",
-  "Edit WhatsApp Booking",
+  "Edit WhatsApp Inquiry",
   "Connect Domain",
   "Upgrade Plan",
 ];
@@ -46,34 +46,34 @@ export const quickActions = [
 export const recentActivity = [
   "Hero copy updated",
   "New gallery image added",
-  "WhatsApp booking button clicked",
+  "WhatsApp inquiry button clicked",
   "Domain verified",
 ];
 
 export const setupSteps: SetupStep[] = [
-  { title: "Business Info", description: "Confirm property name, type, location, and contact details.", status: "Done" },
-  { title: "OTA / Existing Info", description: "Paste your current listing or bring over existing descriptions.", status: "Done" },
-  { title: "Choose Template", description: "Select a hospitality template built for direct booking.", status: "Current" },
-  { title: "AI Brand Copy", description: "Generate clear brand copy for guests without writing from scratch.", status: "Next" },
-  { title: "WhatsApp Booking", description: "Set the booking number, message format, and pickup option.", status: "Next" },
+  { title: "Business Info", description: "Confirm business name, type, location, and contact details.", status: "Done" },
+  { title: "Existing Source", description: "Paste a current website, Instagram, OTA, marketplace, or business notes.", status: "Done" },
+  { title: "Choose Template", description: "Select a business template built for WhatsApp inquiries.", status: "Current" },
+  { title: "AI Brand Copy", description: "Generate clear customer-facing copy without writing from scratch.", status: "Next" },
+  { title: "WhatsApp Inquiry", description: "Set the WhatsApp number and message format.", status: "Next" },
   { title: "Preview & Publish", description: "Review the live page experience before publishing.", status: "Next" },
 ];
 
 export const contentSections: ContentSection[] = [
   { title: "Hero", description: "Main headline, subtitle, hero image, and primary CTA.", status: "Ready" },
-  { title: "About", description: "Short property story and positioning for direct guests.", status: "Ready" },
-  { title: "Features", description: "Amenities, stay highlights, and practical selling points.", status: "Needs review" },
-  { title: "Gallery", description: "Curated photos for exterior, rooms, pool, food, and area.", status: "Ready" },
-  { title: "Experiences", description: "Nearby beaches, activities, restaurants, and local attractions.", status: "Ready" },
-  { title: "Booking CTA", description: "WhatsApp booking block and message template.", status: "Ready" },
+  { title: "About", description: "Short business story and customer positioning.", status: "Ready" },
+  { title: "Features", description: "Services, amenities, business highlights, and practical selling points.", status: "Needs review" },
+  { title: "Gallery", description: "Curated photos for storefront, team, services, products, rooms, food, or area.", status: "Ready" },
+  { title: "Services", description: "Services, products, packages, menus, treatments, tours, and customer use cases.", status: "Ready" },
+  { title: "Inquiry CTA", description: "WhatsApp inquiry block and message template.", status: "Ready" },
   { title: "Footer", description: "Contact details, location, legal notes, and brand links.", status: "Needs review" },
 ];
 
 export const templateOptions: TemplateOption[] = [
-  { name: "Boutique Villa", description: "Premium visual layout for villas and private stays.", selected: true },
+  { name: "Local Business", description: "Clean, practical layout for services, menus, products, and inquiries.", selected: true },
+  { name: "Boutique Cafe", description: "Warm local commerce layout for cafes, restaurants, wellness, and shops." },
   { name: "Surf Camp", description: "Energetic structure for camps, trips, and group packages." },
-  { name: "Minimal Stay", description: "Clean, quiet layout for small hotels and homestays." },
-  { name: "Local Business", description: "Simple direct presence for MSME products and services." },
+  { name: "Boutique Villa", description: "Premium visual layout for villas and private stays." },
 ];
 
 export const colorThemes = ["Sand", "Tropical Green", "Dark Luxury", "Minimal White"];
@@ -88,20 +88,20 @@ export const planOptions: PlanOption[] = [
   {
     name: "Seed",
     price: "IDR 99K / month",
-    positioning: "Beautiful one-page resort website",
+    positioning: "Beautiful one-page business website",
     features: ["Landing sections", "WhatsApp CTA", "Promotion banner", "Custom domain", "5,000 visitors"],
   },
   {
     name: "Tree",
     price: "IDR 199K / month",
-    positioning: "Multi-page brand website",
-    features: ["Home", "Rooms", "Experiences", "Dining", "Promotions", "Blog", "SEO controls"],
+    positioning: "Multi-page business website",
+    features: ["Home", "Offers", "Services", "Promotions", "Reviews", "Blog", "SEO controls"],
     current: true,
   },
   {
     name: "Forest",
     price: "IDR 999K+ / month",
-    positioning: "Custom resort platform",
-    features: ["Custom pages", "Navigation builder", "Event pages", "Wedding pages", "Tour pages", "Advanced settings"],
+    positioning: "Custom business platform",
+    features: ["Custom pages", "Navigation builder", "Event pages", "Tour pages", "Membership pages", "Advanced settings"],
   },
 ];

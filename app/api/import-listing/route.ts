@@ -6,13 +6,13 @@ import {
   normalizeListingUrl,
 } from "@/lib/server/listing-draft";
 
-// Imports public OTA listing details and turns them into a resort form draft.
+// Imports public business source details and turns them into a site form draft.
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const url = normalizeListingUrl(body?.url);
 
   if (!url) {
-    return NextResponse.json({ error: "Enter a valid OTA listing URL." }, { status: 400 });
+    return NextResponse.json({ error: "Enter a valid public website, Instagram, OTA, marketplace, or social link." }, { status: 400 });
   }
 
   const listingSource = await fetchListingSource(url);
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       draft: fallbackDraft(url),
       servicesDraft: [],
       sourceTextAvailable: Boolean(listingSource.bodyText),
-      warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic URL draft.",
+      warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic source draft.",
     },
     { status: 200 },
   );

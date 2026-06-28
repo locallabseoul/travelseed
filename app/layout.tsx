@@ -7,10 +7,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://travelseed.vercel.a
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Travelseed",
-  description: "Direct booking websites for resorts and villas.",
+  description: "WhatsApp-first AI website builder for Indonesian hospitality and local commerce.",
   openGraph: {
     title: "Travelseed",
-    description: "Direct booking websites for resorts and villas.",
+    description: "WhatsApp-first AI website builder for Indonesian hospitality and local commerce.",
     type: "website",
     siteName: "Travelseed",
   },

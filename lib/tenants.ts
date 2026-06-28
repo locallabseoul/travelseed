@@ -21,7 +21,7 @@ export async function getActiveResortBySlug(slug: string): Promise<Resort | null
     .single();
 
   if (error) {
-    return null;
+    return process.env.NODE_ENV === "development" ? getSampleResortBySlug(slug) : null;
   }
 
   return sortResortServices(data as Resort);

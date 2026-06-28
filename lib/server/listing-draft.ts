@@ -1,3 +1,5 @@
+import { businessCategoryFromType, isAccommodationBusiness } from "@/lib/business-categories";
+
 export type ListingDraft = {
   name?: string;
   slug?: string;
@@ -156,14 +158,17 @@ function titleFromUrl(url: URL) {
 
 export function fallbackDraft(url: URL): ListingDraft {
   const name = titleFromUrl(url);
+  const category = businessCategoryFromType(null);
 
   return {
     name,
     slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
-    template_id: "boutique-villa",
-    hero_title: `Direct booking for ${name}`,
+    type: category.label,
+    template_id: "minimal-stay",
+    hero_title: `Contact ${name} on WhatsApp`,
     hero_subtitle: "Review and refine this AI-ready draft before publishing.",
-    description: `Imported from ${url.hostname}. Add property details, photos, and booking information before launch.`,
+    description: `Imported from ${url.hostname}. Add business details, photos, services, and WhatsApp inquiry information before launch.`,
+    booking_message_template: category.defaultBookingMessage(name),
   };
 }
 
@@ -375,14 +380,18 @@ function compactList(value: unknown, limit: number) {
   return Array.isArray(value) ? value.map(String).map((item) => item.trim()).filter(Boolean).slice(0, limit) : [];
 }
 
-export function normalizeListingServices(services: unknown, imageUrls: string[] = []): ListingServiceDraft[] {
+export function normalizeListingServices(services: unknown, imageUrls: string[] = [], businessType?: string | null): ListingServiceDraft[] {
   if (!Array.isArray(services)) {
     return [];
   }
 
+  const category = businessCategoryFromType(businessType);
+  const accommodation = category.id === "accommodation";
+
   return services.slice(0, 5).map((service, index) => {
     const value = service as Partial<ListingServiceDraft>;
-    const kind = value.kind && ["room", "package", "service"].includes(value.kind) ? value.kind : "service";
+    const rawKind = value.kind && ["room", "package", "service"].includes(value.kind) ? value.kind : "service";
+    const kind = rawKind === "room" && !accommodation ? "service" : rawKind;
     const isRoom = kind === "room";
     const imageUrl = value.image_url ? String(value.image_url).trim() : imageUrls[index % imageUrls.length] ?? null;
 
@@ -390,13 +399,13 @@ export function normalizeListingServices(services: unknown, imageUrls: string[] 
       kind,
       title: String(value.title ?? "").trim(),
       description: value.description ? String(value.description).trim() : null,
-      price_label: value.price_label ? String(value.price_label).trim() : "Ask for rates",
+      price_label: value.price_label ? String(value.price_label).trim() : category.pricingFallback,
       capacity: typeof value.capacity === "number" && Number.isFinite(value.capacity) ? value.capacity : null,
       image_url: imageUrl,
       highlight: value.highlight ? String(value.highlight).trim() : null,
       duration: value.duration ? String(value.duration).trim() : null,
       included: compactList(value.included, 6),
-      cta_label: value.cta_label ? String(value.cta_label).trim() : kind === "room" ? "Check availability" : "Ask availability",
+      cta_label: value.cta_label ? String(value.cta_label).trim() : isRoom ? "Check availability" : category.primaryCta,
       bed_type: isRoom && value.bed_type ? String(value.bed_type).trim() : null,
       room_size: isRoom && value.room_size ? String(value.room_size).trim() : null,
       view_type: isRoom && value.view_type ? String(value.view_type).trim() : null,
@@ -408,39 +417,55 @@ export function normalizeListingServices(services: unknown, imageUrls: string[] 
 }
 
 export async function createAiListingDraft(url: URL, source: ListingSource): Promise<ListingImportDraft | null> {
-  const prompt = `Create a direct-booking resort website draft and bookable offer draft from this OTA listing.
+  const prompt = `Create a WhatsApp-first business website draft and editable offer draft from this public business source.
 
 Return only compact JSON with these keys:
 site, services.
 
 Rules:
+- site.type must be one of these canonical categories when possible: Resort / Villa / Hotel, Cafe / Restaurant, Tour Operator, Shop / Local Service, Wellness / Salon. Use a more specific type only when none of these fits.
 - site.template_id must be one of: boutique-villa, boutique-resort, surf-camp, minimal-stay.
+- Use minimal-stay for general local businesses unless the source is clearly a resort, villa, hotel, surf camp, or multi-page hospitality brand.
 - site.description must be a polished short description of 2-4 sentences for the form's Short description field.
-- site.hero_title must be emotional and specific, not just "Direct booking for X".
-- site.hero_subtitle must summarize the strongest stay promise in one sentence.
-- site.features must contain 6-10 guest-facing amenities or stay strengths. Use exact amenities from the source when available; otherwise infer only broad, reasonable strengths from the property type and description.
-- site.experiences must contain 4-8 nearby activities, destination themes, or guest use cases.
-- site.capacity, site.bedrooms, site.bathrooms should be numeric strings only if known. Leave blank if not present.
-- site.booking_message_template must start with "Hello, I would like to make a reservation at {property name}." and include Check-in, Check-out, Guests, and Airport Pickup fields.
-- services must contain 3-5 room, package, or service items suitable for direct WhatsApp booking.
-- Use room kind for accommodation units only. Use package kind for bundles. Use service kind for add-ons, activities, transfers, or rentals.
+- site.hero_title must be customer-facing, specific, and suitable for a homepage hero.
+- site.hero_subtitle must summarize the strongest business promise in one sentence.
+- site.features must contain 6-10 customer-facing strengths, amenities, services, or practical reasons to contact the business.
+- site.experiences must contain 4-8 services, products, packages, menu categories, treatments, tours, destination themes, or customer use cases.
+- site.capacity, site.bedrooms, site.bathrooms should be numeric strings only for accommodation businesses when known. Leave blank for cafes, restaurants, shops, salons, wellness studios, tour operators, and local services.
+- site.booking_message_template must start with "Hello, I would like to inquire about {business name}." and include Name, Contact, Request, and Preferred date or time fields. Use reservation wording only for Resort / Villa / Hotel accommodation businesses.
+- services must contain 3-5 service, package, room, product, menu, treatment, or tour items suitable for direct WhatsApp inquiry.
+- Use room kind for accommodation units only. Use package kind for bundles, menus, tours, promos, or treatment sets. Use service kind for services, products, add-ons, appointments, activities, transfers, rentals, or consultations.
+- Use category-specific CTAs when useful: Reserve a table for cafes, Ask tour availability for tours, Request quote for shops and services, Book appointment for wellness, Ask availability for accommodation.
 - Use exact price labels only if present. Otherwise use "Ask for rates" or "Ask for pricing".
-- Do not invent exact amenities, ratings, awards, room counts, distances, or prices unless present in the source.
-- Prefer structured data, meta description, OG description, and visible listing text over URL guesses.
+- Do not invent exact amenities, ratings, awards, branch counts, room counts, distances, or prices unless present in the source.
+- Prefer structured data, meta description, OG description, and visible source text over URL guesses.
 - Do not leave useful copy fields empty if the source contains enough context to create a useful draft.
-- Use polished boutique hospitality copy, not generic SaaS copy.
+- Use polished small-business copy, not generic SaaS copy.
 
-Listing source:
+Business source:
 ${summarizeSource(source)}`;
 
   const generated = await requestJsonObject<ListingImportDraft>(
     prompt,
-    "You turn OTA listing information into complete structured direct-booking website drafts. Always return valid JSON only.",
+    "You turn public business information into complete structured WhatsApp-first website drafts. Always return valid JSON only.",
     "listing_import_draft",
     listingImportSchema,
   );
 
-  return generated ? { site: generated.site, services: normalizeListingServices(generated.services, source.imageUrls) } : null;
+  if (!generated) {
+    return null;
+  }
+
+  const category = businessCategoryFromType({ type: generated.site.type, templateId: generated.site.template_id });
+  const site = {
+    ...generated.site,
+    type: category.label,
+    capacity: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.capacity : "",
+    bedrooms: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.bedrooms : "",
+    bathrooms: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.bathrooms : "",
+  };
+
+  return { site, services: normalizeListingServices(generated.services, source.imageUrls, site.type) };
 }
 
 export type BrandCopyDraft = {
@@ -460,22 +485,23 @@ export async function createAiBrandCopyDraft(input: {
   existingText?: string;
   listingSource?: ListingSource | null;
 }) {
-  const prompt = `Create a direct-booking brand copy pack for this resort.
+  const prompt = `Create a WhatsApp-first brand copy pack for this business.
 
 Return only compact JSON with these keys:
 hero_title, hero_subtitle, description, features, experiences, booking_message_template.
 
 Rules:
-- hero_title must be guest-facing, specific, and suitable for a homepage hero.
-- hero_subtitle must be one clear sentence explaining the stay promise.
-- description must be 2-4 polished hospitality sentences.
-- features must contain 6-10 practical guest-facing amenities or strengths.
-- experiences must contain 4-8 nearby activities, destination themes, or guest use cases.
-- booking_message_template must start with "Hello, I would like to make a reservation at ${input.name}." and include Check-in, Check-out, Guests, and Airport Pickup fields.
-- Preserve true operational details. Do not invent exact amenities, ratings, awards, room counts, or distances unless present in the input.
-- Use warm direct-booking hospitality copy, not generic marketing filler.
+- Treat this business as one of the Travelseed categories when possible: Resort / Villa / Hotel, Cafe / Restaurant, Tour Operator, Shop / Local Service, Wellness / Salon.
+- hero_title must be customer-facing, specific, and suitable for a homepage hero.
+- hero_subtitle must be one clear sentence explaining the strongest customer promise.
+- description must be 2-4 polished small-business sentences.
+- features must contain 6-10 practical customer-facing strengths, amenities, services, or reasons to inquire.
+- experiences must contain 4-8 services, products, packages, menu categories, treatments, tours, destination themes, or customer use cases.
+- booking_message_template must start with "Hello, I would like to inquire about ${input.name}." and include Name, Contact, Request, and Preferred date or time fields. Use reservation wording only when the business is clearly Resort / Villa / Hotel accommodation.
+- Preserve true operational details. Do not invent exact amenities, ratings, awards, room counts, branch counts, or distances unless present in the input.
+- Use warm WhatsApp-first business copy, not generic marketing filler.
 
-Property:
+Business:
 ${JSON.stringify(
   {
     name: input.name,
@@ -491,7 +517,7 @@ ${JSON.stringify(
 
   return requestJsonObject<BrandCopyDraft>(
     prompt,
-    "You create concise direct-booking resort copy packs for hospitality operators. Always return valid JSON only.",
+    "You create concise WhatsApp-first business copy packs for Indonesian hospitality and local commerce operators. Always return valid JSON only.",
     "brand_copy_draft",
     brandCopySchema,
   );

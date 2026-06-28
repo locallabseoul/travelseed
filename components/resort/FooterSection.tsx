@@ -16,7 +16,7 @@ export function FooterSection({ resort }: FooterSectionProps) {
           <p className="font-semibold">{resort.name}</p>
           <p className="text-sm opacity-70">{resort.location}</p>
         </div>
-        <p className="text-sm opacity-55">Direct booking website powered by Travelseed</p>
+        <p className="text-sm opacity-55">WhatsApp-ready business website powered by Travelseed</p>
       </div>
     </footer>
   );

@@ -2,7 +2,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
 export const metadata = {
   title: "Site Console | Travelseed",
-  description: "Manage one Travelseed direct booking site.",
+  description: "Manage one Travelseed business website.",
 };
 
 type DashboardSitePageProps = {

@@ -5,7 +5,7 @@ type FeatureSectionProps = {
   resort: Resort;
 };
 
-// Summarizes key stay details and amenities for quick scanning.
+// Summarizes key business highlights for quick scanning.
 export function FeatureSection({ resort }: FeatureSectionProps) {
   const design = designTokensFor(resort.design_settings);
 
@@ -14,7 +14,7 @@ export function FeatureSection({ resort }: FeatureSectionProps) {
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: design.colors.accent }}>
-            {resort.type ?? "Stay features"}
+            {resort.type ?? "Business highlights"}
           </p>
           <h2 className={`mt-4 text-3xl font-semibold leading-tight sm:text-4xl ${design.headingClassName}`} style={{ color: design.colors.text }}>
             Everything you need, nothing that gets in the way.

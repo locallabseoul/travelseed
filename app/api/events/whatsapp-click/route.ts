@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const guests = Number(inquiry.guests);
     const { error: inquiryError } = await supabase.from("booking_inquiries").insert({
       resort_id: resortId,
-      guest_name: String(inquiry.guestName ?? "").trim() || "Website WhatsApp guest",
+      guest_name: String(inquiry.guestName ?? "").trim() || "Website WhatsApp customer",
       guest_contact: String(inquiry.guestContact ?? "").trim() || null,
       check_in: String(inquiry.checkIn ?? "").trim() || null,
       check_out: String(inquiry.checkOut ?? "").trim() || null,

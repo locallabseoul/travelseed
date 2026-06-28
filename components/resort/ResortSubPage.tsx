@@ -8,6 +8,7 @@ import { GallerySection } from "@/components/resort/GallerySection";
 import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { designTokensFor } from "@/lib/design-settings";
 import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
 import Image from "next/image";
@@ -161,6 +162,8 @@ function imageForCard(card: SitePageContentCard, images: string[], index: number
 function SubPageHero({ resort, page }: ResortSubPageProps) {
   const design = designTokensFor(resort.design_settings);
   const heroImageUrl = page.hero_image_url || resort.hero_image_url || resort.gallery[0] || null;
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const accommodation = category.id === "accommodation";
 
   return (
     <section className={`relative overflow-hidden px-5 py-16 sm:px-6 lg:py-24 ${heroImageUrl ? "text-white" : ""}`} style={{ backgroundColor: design.colors.section }}>
@@ -176,7 +179,9 @@ function SubPageHero({ resort, page }: ResortSubPageProps) {
           {page.title}
         </h1>
         <p className={`mt-5 max-w-2xl text-base leading-8 ${design.bodyClassName}`} style={{ color: heroImageUrl ? "rgba(255,255,255,0.78)" : design.colors.muted }}>
-          {page.seo_description || `Explore ${page.title.toLowerCase()} at ${resort.name}, then continue your reservation directly with the host.`}
+          {page.seo_description || (accommodation
+            ? `Explore ${page.title.toLowerCase()} at ${resort.name}, then continue your reservation directly with the host.`
+            : `Explore ${page.title.toLowerCase()} at ${resort.name}, then ${category.primaryCta.toLowerCase()} directly on WhatsApp.`)}
         </p>
       </div>
     </section>
@@ -197,14 +202,14 @@ function EditorialPlaceholder({ resort, page }: ResortSubPageProps) {
         </div>
         <div className="rounded-2xl border p-6 shadow-[0_18px_50px_rgba(52,43,31,0.06)]" style={{ backgroundColor: design.colors.section, borderColor: design.colors.accent }}>
           <p className={`text-base leading-8 ${design.bodyClassName}`} style={{ color: design.colors.muted }}>
-            This page is published in the site structure. Add dedicated content from the Travelseed dashboard to turn it into a complete direct-booking page for {resort.name}.
+            This page is published in the site structure. Add dedicated content from the Travelseed dashboard to turn it into a complete WhatsApp-ready page for {resort.name}.
           </p>
           <a
             href={`/${resort.slug}#booking`}
             className={`mt-6 inline-flex min-h-11 items-center px-5 text-sm font-semibold ${design.buttonClassName}`}
             style={{ backgroundColor: design.buttonStyle === "Soft Outline" ? "transparent" : design.colors.primary, borderColor: design.colors.primary, color: design.buttonStyle === "Soft Outline" ? design.colors.primary : design.colors.buttonText }}
           >
-            Start a direct inquiry
+            Start a WhatsApp inquiry
           </a>
         </div>
       </div>

@@ -22,7 +22,7 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     slug: resort.slug,
     domain: resort.domain,
     name: resort.name,
-    type: resort.type ?? "Direct Booking Site",
+    type: resort.type ?? "Local Business",
     location: resort.location,
     plan,
     planType,
@@ -53,7 +53,7 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     heroTitle: resort.hero_title,
     heroSubtitle: resort.hero_subtitle ?? "",
     heroImageUrl: resort.hero_image_url ?? "",
-    heroCta: "Book Direct on WhatsApp",
+    heroCta: "Contact on WhatsApp",
     about: resort.description ?? "",
     features: resort.features,
     services: (resort.services ?? []).map((service) => ({
@@ -81,11 +81,11 @@ export function siteFromResort(resort: ResortWithMetrics): ResortConsoleData {
     experiences: resort.experiences,
     bookingMessageTemplate:
       resort.booking_message_template ??
-      `Hello, I would like to make a reservation at ${resort.name}.
-Check-in:
-Check-out:
-Guests:
-Airport Pickup:`,
+      `Hello, I would like to inquire about ${resort.name}.
+Name:
+Contact:
+Request:
+Preferred date or time:`,
     language: "English",
     timezone: "Asia/Makassar",
     contactEmail: resort.owner_email ?? "",

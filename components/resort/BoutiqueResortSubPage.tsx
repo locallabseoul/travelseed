@@ -131,7 +131,7 @@ function ExperiencesPage({ resort }: { resort: Resort }) {
     sortOrder: index,
   }));
 
-  return <CardGrid eyebrow="Guest experiences" cards={cards} images={resort.gallery} />;
+  return <CardGrid eyebrow="Customer experiences" cards={cards} images={resort.gallery} />;
 }
 
 function GalleryPage({ resort }: { resort: Resort }) {
@@ -153,8 +153,8 @@ function GalleryPage({ resort }: { resort: Resort }) {
 function ReviewsPage({ resort }: { resort: Resort }) {
   const reviews = (resort.reviews ?? []).filter((review) => review.show_on_website && review.status === "published");
   const items = reviews.length > 0 ? reviews : [
-    { id: "fallback-review-1", guest_name: "Direct booking guest", rating: 5, review_text: "A refined stay with thoughtful details and calm hospitality.", source_label: "Manual" as const },
-    { id: "fallback-review-2", guest_name: "Returning guest", rating: 5, review_text: "The booking flow was easy and the property felt exactly as promised.", source_label: "Manual" as const },
+    { id: "fallback-review-1", guest_name: "Website customer", rating: 5, review_text: "Clear details, fast WhatsApp response, and a smooth direct inquiry experience.", source_label: "Manual" as const },
+    { id: "fallback-review-2", guest_name: "Returning customer", rating: 5, review_text: "The page made it easy to understand the offer and contact the business directly.", source_label: "Manual" as const },
   ];
 
   return (

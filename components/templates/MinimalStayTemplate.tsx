@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { BookingInquiryModal } from "@/components/resort/BookingInquiryForm";
 import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { ArrowRightIcon, FacebookIcon, InstagramIcon, LocationIcon, MailIcon, MapIcon, StarIcon, WhatsAppIcon } from "@/components/templates/template-icons";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { designTokensFor, templatePaletteFor } from "@/lib/design-settings";
 import { isSiteSectionEnabled } from "@/lib/site-structure";
 import type { Resort } from "@/types/resort";
@@ -11,15 +12,17 @@ type TemplateProps = {
   resort: Resort;
 };
 
-// Seed landing template for intimate villas, guesthouses, and sunset-led stays.
+// Seed landing template for local businesses, services, menus, tours, and simple hospitality sites.
 export function MinimalStayTemplate({ resort }: TemplateProps) {
   const design = designTokensFor(resort.design_settings);
   const palette = templatePaletteFor("minimal-stay", resort.design_settings);
   const paletteStyle = templatePaletteStyle(palette);
   const heroImage = resort.hero_image_url || resort.gallery[0];
-  const rooms = (resort.services ?? []).filter((service) => service.is_active && service.kind === "room").slice(0, 3);
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const accommodation = category.id === "accommodation";
+  const offers = (resort.services ?? []).filter((service) => service.is_active).slice(0, 6);
   const gallery = [heroImage, ...resort.gallery].filter(Boolean).filter(unique).slice(0, 5) as string[];
-  const showRooms = isSiteSectionEnabled(resort, "rooms");
+  const showOffers = isSiteSectionEnabled(resort, "rooms");
   const showReviews = isSiteSectionEnabled(resort, "reviews");
   const showGallery = isSiteSectionEnabled(resort, "gallery");
   const showContact = isSiteSectionEnabled(resort, "contact");
@@ -38,7 +41,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
           </a>
           <a href="#booking" className="flex items-center gap-2 rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#1ebe5d]">
             <WhatsAppIcon className="h-4 w-4" />
-            <span>Book Direct</span>
+            <span>{category.secondaryCta}</span>
           </a>
         </div>
       </nav>
@@ -69,7 +72,7 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
             <BookingInquiryModal
               resort={resort}
               source="hero_booking"
-              triggerLabel={<span className="inline-flex items-center gap-2">Check Availability <ArrowRightIcon className="h-4 w-4" /></span>}
+              triggerLabel={<span className="inline-flex items-center gap-2">{category.primaryCta} <ArrowRightIcon className="h-4 w-4" /></span>}
               buttonClassName="rounded-full px-8 py-4 text-lg font-medium shadow-xl"
               buttonStyle={{ backgroundColor: palette.cta, color: palette.ctaText }}
             />
@@ -77,35 +80,35 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         </div>
       </section>
 
-      {showRooms && rooms.length > 0 ? (
-        <section id="rooms" className="bg-[var(--ts-page)] px-6 py-20">
+      {showOffers && offers.length > 0 ? (
+        <section id="services" className="bg-[var(--ts-page)] px-6 py-20">
           <div className="mx-auto max-w-6xl">
             <div className="mb-14 text-center">
-              <h2 className="mb-3 text-4xl font-semibold text-[var(--ts-text)] md:text-5xl [font-family:'Playfair_Display',serif]">Our Rooms</h2>
-              <p className="text-[var(--ts-muted)]">Simple comfort, warm details</p>
+              <h2 className="mb-3 text-4xl font-semibold text-[var(--ts-text)] md:text-5xl [font-family:'Playfair_Display',serif]">{category.offerSectionTitle}</h2>
+              <p className="text-[var(--ts-muted)]">{category.offerSectionBody}</p>
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {rooms.map((room) => (
-                <article key={room.id} className="overflow-hidden rounded-xl bg-white shadow-sm transition-shadow hover:shadow-lg">
+              {offers.map((offer) => (
+                <article key={offer.id} className="overflow-hidden rounded-xl bg-white shadow-sm transition-shadow hover:shadow-lg">
                   <div className="relative h-56 bg-[var(--ts-section)]">
-                    {room.image_url ? (
-                      <Image src={room.image_url} alt={room.title} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
+                    {offer.image_url ? (
+                      <Image src={offer.image_url} alt={offer.title} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover" />
                     ) : null}
                   </div>
                   <div className="p-6">
-                    <h3 className="mb-2 text-2xl font-semibold [font-family:'Playfair_Display',serif]">{room.title}</h3>
-                    <p className="mb-5 text-sm text-[var(--ts-muted)]">{roomDetailText(room)}</p>
+                    <h3 className="mb-2 text-2xl font-semibold [font-family:'Playfair_Display',serif]">{offer.title}</h3>
+                    <p className="mb-5 text-sm text-[var(--ts-muted)]">{offerDetailText(offer, category)}</p>
                     <div className="mt-5 flex items-center justify-between gap-4">
-                      {room.price_label ? (
+                      {offer.price_label ? (
                         <p className="flex items-baseline gap-1 text-[var(--ts-accent)]">
-                          <span className="text-2xl font-bold leading-none">{room.price_label}</span>
-                          {hasNightSuffix(room.price_label) ? null : <span className="text-base font-normal text-[var(--ts-muted)]">/night</span>}
+                          <span className="text-2xl font-bold leading-none">{offer.price_label}</span>
+                          {accommodation && offer.kind === "room" && !hasNightSuffix(offer.price_label) ? <span className="text-base font-normal text-[var(--ts-muted)]">/night</span> : null}
                         </p>
                       ) : (
-                        <p className="text-sm font-semibold text-[var(--ts-accent)]">Direct rate</p>
+                        <p className="text-sm font-semibold text-[var(--ts-accent)]">{category.pricingFallback}</p>
                       )}
                       <a href="#booking" className="inline-flex items-center gap-1 text-sm font-medium text-[var(--ts-accent)]">
-                        Book <ArrowRightIcon className="h-3.5 w-3.5" />
+                        {offer.cta_label || category.primaryCta} <ArrowRightIcon className="h-3.5 w-3.5" />
                       </a>
                     </div>
                   </div>
@@ -150,15 +153,15 @@ export function MinimalStayTemplate({ resort }: TemplateProps) {
         <>
           <section id="booking" className="bg-[var(--ts-page)] px-6 py-20">
             <div className="mx-auto max-w-4xl rounded-2xl p-12 text-center text-[var(--ts-cta-text)] md:p-16" style={{ background: `linear-gradient(135deg, ${palette.cta}, ${palette.accentSoft})` }}>
-              <h2 className="mb-4 text-3xl font-semibold md:text-4xl [font-family:'Playfair_Display',serif]">Book direct & save</h2>
+              <h2 className="mb-4 text-3xl font-semibold md:text-4xl [font-family:'Playfair_Display',serif]">{accommodation ? "Book direct & save" : "Contact us directly"}</h2>
               <p className="mx-auto mt-4 max-w-xl text-lg leading-8 text-white/90">
-                Skip the fees. Get the best rate and personal service when you book directly with us via WhatsApp.
+                {accommodation ? "Skip the fees. Get the best rate and personal service when you book directly with us via WhatsApp." : "Ask questions, request pricing, make a reservation, or book an appointment through a direct WhatsApp conversation."}
               </p>
               <div className="mt-8">
                 <BookingInquiryModal
                   resort={resort}
                   source="booking_cta"
-                  triggerLabel="Chat with us on WhatsApp"
+                  triggerLabel={category.secondaryCta}
                   buttonClassName="rounded-full px-8 py-4 text-lg font-semibold"
                   buttonStyle={{ backgroundColor: palette.ctaText, color: palette.cta }}
                 />
@@ -236,10 +239,14 @@ function SunsetFooter({ resort }: { resort: Resort }) {
   );
 }
 
-function roomDetailText(room: NonNullable<Resort["services"]>[number]) {
-  return [room.bed_type, room.view_type, room.max_guests ? `${room.max_guests} guests` : room.capacity ? `${room.capacity} guests` : null]
+function offerDetailText(offer: NonNullable<Resort["services"]>[number], category: ReturnType<typeof businessCategoryFromType>) {
+  const capacityLabel = offer.kind === "room"
+    ? offer.max_guests ? `${offer.max_guests} guests` : offer.capacity ? `${offer.capacity} guests` : null
+    : offer.capacity ? `${offer.capacity} ${category.capacityLabel}` : null;
+
+  return [offer.bed_type, offer.view_type, offer.duration, capacityLabel]
     .filter(Boolean)
-    .join(" - ") || room.description || "Direct booking room";
+    .join(" - ") || offer.description || "Available for direct WhatsApp inquiry";
 }
 
 function templatePaletteStyle(palette: ReturnType<typeof templatePaletteFor>) {

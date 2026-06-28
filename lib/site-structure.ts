@@ -1,4 +1,5 @@
 import type { Resort, ResortNavigationItem, ResortSitePage, ResortSiteSection } from "@/types/resort";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import { sectionPresets } from "@/lib/section-presets";
 
 type PublicNavigationLink = {
@@ -8,29 +9,33 @@ type PublicNavigationLink = {
 
 const landingNavigationSections = [
   { key: "about", href: "#about", label: "About" },
-  { key: "rooms", href: "#services", label: "Rooms" },
+  { key: "rooms", href: "#services", label: "Offers" },
   { key: "gallery", href: "#gallery", label: "Gallery" },
   { key: "reviews", href: "#reviews", label: "Reviews" },
-  { key: "experiences", href: "#experiences", label: "Experiences" },
+  { key: "experiences", href: "#experiences", label: "Services" },
 ];
 
-const defaultMultipagePages = [
-  { title: "Home", slug: "/", page_type: "Standard" as const, is_published: true },
-  { title: "Rooms", slug: "/rooms", page_type: "Standard" as const, is_published: true },
-  { title: "Experiences", slug: "/experiences", page_type: "Standard" as const, is_published: true },
-  { title: "Gallery", slug: "/gallery", page_type: "Standard" as const, is_published: true },
-  { title: "Reviews", slug: "/reviews", page_type: "Standard" as const, is_published: true },
-  { title: "Blog", slug: "/blog", page_type: "Standard" as const, is_published: false },
-  { title: "About", slug: "/about", page_type: "Standard" as const, is_published: true },
-  { title: "Contact", slug: "/contact", page_type: "Standard" as const, is_published: true },
-  ...sectionPresets.map((preset) => ({
-    title: preset.label,
-    slug: preset.slug,
-    page_type: preset.pageType,
-    is_published: preset.isPublished,
-    settings: preset.settings,
-  })),
-];
+function defaultMultipagePagesFor(resort: Resort) {
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+
+  return [
+    { title: "Home", slug: "/", page_type: "Standard" as const, is_published: true },
+    { title: category.landingNav.offers, slug: "/rooms", page_type: "Standard" as const, is_published: true },
+    { title: category.landingNav.experiences, slug: "/experiences", page_type: "Standard" as const, is_published: true },
+    { title: "Gallery", slug: "/gallery", page_type: "Standard" as const, is_published: true },
+    { title: "Reviews", slug: "/reviews", page_type: "Standard" as const, is_published: true },
+    { title: "Blog", slug: "/blog", page_type: "Standard" as const, is_published: false },
+    { title: "About", slug: "/about", page_type: "Standard" as const, is_published: true },
+    { title: "Contact", slug: "/contact", page_type: "Standard" as const, is_published: true },
+    ...sectionPresets.map((preset) => ({
+      title: preset.label,
+      slug: preset.slug,
+      page_type: preset.pageType,
+      is_published: preset.isPublished,
+      settings: preset.settings,
+    })),
+  ];
+}
 
 function sortByOrder<T extends { sort_order: number }>(items: T[] | undefined) {
   return [...(items ?? [])].sort((first, second) => first.sort_order - second.sort_order);
@@ -73,7 +78,7 @@ export function publishedSitePages(resort: Resort) {
   }
 
   const savedBySlug = new Map(savedPages.map((page) => [normalizeSlug(page.slug), page]));
-  const defaults = defaultMultipagePages.map((page, index): ResortSitePage => ({
+  const defaults = defaultMultipagePagesFor(resort).map((page, index): ResortSitePage => ({
     id: `default-${resort.id}-${normalizeSlug(page.slug)}`,
     resort_id: resort.id,
     title: page.title,
@@ -117,11 +122,16 @@ export function findPublishedPage(resort: Resort, pageSlug: string) {
 }
 
 export function publicNavigationLinks(resort: Resort): PublicNavigationLink[] {
+  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+
   if (!isMultipageResort(resort)) {
     return landingNavigationSections
       .filter((link) => link.key === "experiences" ? resort.experiences.length > 0 : isSiteSectionEnabled(resort, link.key))
       .filter((link) => link.key !== "gallery" || resort.gallery.length > 0)
-      .map(({ href, label }) => ({ href, label }));
+      .map(({ href, label, key }) => ({
+        href,
+        label: key === "rooms" ? category.landingNav.offers : key === "experiences" ? category.landingNav.experiences : label,
+      }));
   }
 
   const navigationItems = activeNavigationItems(resort);

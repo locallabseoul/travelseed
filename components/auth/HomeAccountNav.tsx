@@ -40,10 +40,13 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
     return (
       <div className="flex items-center gap-2">
         <LanguageToggle />
-        <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#18352f]">
+        <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 sm:inline-flex">
+          {t("nav.pricing")}
+        </Link>
+        <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200">
           {t("nav.login")}
         </Link>
-        <Link href="/create" className="rounded-full bg-[#18352f] px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/create" className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-500/10 hover:bg-neutral-800">
           {t("nav.build")}
         </Link>
       </div>
@@ -53,23 +56,26 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
   return (
     <div className="flex items-center gap-2">
       <LanguageToggle className="hidden sm:inline-flex" />
+      <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 md:inline-flex">
+        {t("nav.pricing")}
+      </Link>
       <details className="group relative">
-        <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#18352f] shadow-sm">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#18352f] text-xs text-white">
+        <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">
             {(session.user.email ?? "U").slice(0, 1).toUpperCase()}
           </span>
           {t("nav.profile")}
           {hasNotifications ? <NotificationCountBadge count={notificationCount} className="-right-1 -top-1" /> : null}
         </summary>
-        <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-md border border-[#eadfce] bg-white p-2 text-sm shadow-[0_18px_55px_rgba(54,43,29,0.16)]">
-          <p className="truncate px-3 py-2 text-xs font-medium text-[#51635b]">{session.user.email}</p>
+        <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-2xl border border-slate-200 bg-white p-2 text-sm shadow-[0_18px_55px_rgba(15,23,42,0.12)]">
+          <p className="truncate px-3 py-2 text-xs font-medium text-slate-500">{session.user.email}</p>
           <div className="px-3 py-2 sm:hidden">
             <LanguageToggle />
           </div>
-          <Link href="/dashboard" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
+          <Link href="/dashboard" className="rounded-xl px-3 py-2 font-semibold text-slate-900 hover:bg-slate-50">
             {t("nav.management")}
           </Link>
-          <Link href="/create" className="rounded-md px-3 py-2 font-semibold text-[#18352f] hover:bg-[#f8f5ef]">
+          <Link href="/create" className="rounded-xl px-3 py-2 font-semibold text-slate-900 hover:bg-slate-50">
             {t("nav.newSite")}
           </Link>
           <button
@@ -88,8 +94,9 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
 export function AppHeader({ className = "", notificationCount = 0 }: { className?: string; notificationCount?: number }) {
   return (
     <header className={`mx-auto flex max-w-7xl items-center justify-between ${className}`}>
-      <Link href="/" className="text-sm font-semibold tracking-[0.22em] text-[#18352f]">
-        TRAVELSEED
+      <Link href="/" className="flex items-center gap-2 text-sm font-bold tracking-tight text-slate-950">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-xs text-white shadow-lg shadow-emerald-500/25">T</span>
+        <span>Travelseed</span>
       </Link>
       <HomeAccountNav notificationCount={notificationCount} />
     </header>

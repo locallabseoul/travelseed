@@ -6,7 +6,7 @@ const actionTargets: Record<string, DashboardTab> = {
   "Edit Home Hero": "content",
   "Update Gallery": "content",
   "Manage Offers": "offers",
-  "Edit WhatsApp Booking": "whatsapp",
+  "Edit WhatsApp Inquiry": "whatsapp",
   "Connect Domain": "domain",
   "Upgrade Plan": "plan",
 };
@@ -14,17 +14,17 @@ const actionTargets: Record<string, DashboardTab> = {
 export function QuickActionCard({ actions, onTabChange }: { actions: string[]; onTabChange: (tab: DashboardTab) => void }) {
   return (
     <Panel>
-      <h2 className="text-lg font-semibold text-[#18352f]">Quick actions</h2>
+      <h2 className="text-lg font-semibold text-slate-950">Quick actions</h2>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {actions.map((action) => (
           <button
             key={action}
             type="button"
             onClick={() => onTabChange(actionTargets[action] ?? "dashboard")}
-            className="flex min-h-14 items-center justify-between rounded-xl border border-[#eadfce] bg-[#fbfaf7] px-4 text-left text-sm font-semibold text-[#18352f] transition hover:border-[#2d6b50] hover:bg-white"
+            className="flex min-h-14 items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 text-left text-sm font-semibold text-slate-950 transition hover:border-emerald-300 hover:bg-white"
           >
             {action}
-            <span className="text-[#8a7560]">→</span>
+            <span className="text-emerald-600">→</span>
           </button>
         ))}
       </div>

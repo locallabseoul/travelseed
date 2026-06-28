@@ -3,11 +3,13 @@ import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import type { DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 import type { Resort } from "@/types/resort";
 
-const dnsRows = [
-  { type: "CNAME", name: "www", value: "sites.travelseed.app", status: "Verified" },
-  { type: "A Record", name: "@", value: "76.76.21.21", status: "Pending" },
-  { type: "TXT Verification", name: "_travelseed", value: "ts-villa-jeruk-verify", status: "Active" },
-];
+function dnsRowsFor(site: ResortConsoleData) {
+  return [
+    { type: "CNAME", name: "www", value: "sites.travelseed.app", status: site.domainStatus === "active" || site.domainStatus === "verified" ? "Verified" : "Pending" },
+    { type: "A Record", name: "@", value: "76.76.21.21", status: site.domainStatus === "active" || site.domainStatus === "verified" ? "Verified" : "Pending" },
+    { type: "TXT Verification", name: "_travelseed", value: `ts-${site.slug}-verify`, status: site.customDomain ? "Active" : "Not set" },
+  ];
+}
 
 export function DomainManager({
   site,
@@ -83,15 +85,16 @@ export function DomainManager({
 
   const dnsProgress = site.domainStatus === "active" || site.domainStatus === "verified" ? 100 : hasCustomDomain ? 55 : 0;
   const sslProgress = site.sslStatus === "active" ? 100 : hasCustomDomain ? 50 : 0;
+  const dnsRows = dnsRowsFor(site);
 
   return (
     <div className="grid gap-6">
       <Panel>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">Domain</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">Connect your domain</h1>
-            <p className="mt-2 text-sm leading-6 text-[#6f7b74]">Keep Travelseed operations behind a branded guest-facing address.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Domain</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Connect your domain</h1>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Put your WhatsApp-ready business site behind a branded customer-facing address.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone={site.domainStatus === "active" || site.domainStatus === "verified" ? "green" : hasCustomDomain ? "sand" : "gray"}>{labelForStatus(site.domainStatus)}</Badge>
@@ -100,23 +103,24 @@ export function DomainManager({
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <EditableField label="Travelseed Slug" value={slug} onChange={setSlug} prefix="https://" suffix=".travelseed.app" />
-          <EditableField label="Custom Domain" value={customDomain} onChange={setCustomDomain} placeholder="villajeruk.com" />
+          <EditableField label="Custom Domain" value={customDomain} onChange={setCustomDomain} placeholder="yourbusiness.com" />
         </div>
-        <button type="button" onClick={() => void saveDomainSettings()} className="mt-6 min-h-11 rounded-full bg-[#18352f] px-5 text-sm font-semibold text-white">
+        <button type="button" onClick={() => void saveDomainSettings()} className="mt-6 min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
           Save domain settings
         </button>
-        {status ? <p className="mt-4 rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a]">{status}</p> : null}
+        {status ? <p className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">{status}</p> : null}
       </Panel>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.58fr]">
         <Panel>
-          <h2 className="text-xl font-semibold text-[#18352f]">DNS settings</h2>
-          <div className="mt-5 overflow-hidden rounded-2xl border border-[#eadfce]">
+          <h2 className="text-xl font-semibold text-slate-950">DNS settings</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Add these records at your domain provider, then recheck DNS when propagation starts.</p>
+          <div className="mt-5 overflow-hidden rounded-lg border border-slate-200">
             {dnsRows.map((row) => (
-              <div key={row.type} className="grid gap-3 border-b border-[#eadfce] bg-white p-4 last:border-b-0 md:grid-cols-[0.8fr_0.8fr_1.4fr_0.7fr]">
-                <p className="text-sm font-semibold text-[#18352f]">{row.type}</p>
-                <p className="text-sm text-[#6f7b74]">{row.name}</p>
-                <p className="break-all text-sm text-[#6f7b74]">{row.value}</p>
+              <div key={row.type} className="grid gap-3 border-b border-slate-200 bg-white p-4 last:border-b-0 md:grid-cols-[0.8fr_0.8fr_1.4fr_0.7fr]">
+                <p className="text-sm font-semibold text-slate-950">{row.type}</p>
+                <p className="text-sm text-slate-600">{row.name}</p>
+                <p className="break-all text-sm text-slate-600">{row.value}</p>
                 <Badge tone={statusTone(row.status)}>{row.status}</Badge>
               </div>
             ))}
@@ -124,26 +128,27 @@ export function DomainManager({
         </Panel>
 
         <Panel>
-          <h2 className="text-xl font-semibold text-[#18352f]">Connection health</h2>
+          <h2 className="text-xl font-semibold text-slate-950">Connection health</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Track DNS and SSL readiness before sending customers to the custom URL.</p>
           <div className="mt-6 grid gap-5">
             <div>
-              <div className="mb-2 flex justify-between text-sm">
+              <div className="mb-2 flex justify-between text-sm text-slate-600">
                 <span>DNS</span>
-                <span>{dnsProgress}%</span>
+                <span className="font-semibold text-slate-950">{dnsProgress}%</span>
               </div>
               <ProgressBar value={dnsProgress} />
             </div>
             <div>
-              <div className="mb-2 flex justify-between text-sm">
+              <div className="mb-2 flex justify-between text-sm text-slate-600">
                 <span>SSL</span>
-                <span>{sslProgress}%</span>
+                <span className="font-semibold text-slate-950">{sslProgress}%</span>
               </div>
               <ProgressBar value={sslProgress} />
             </div>
-            <button type="button" onClick={() => void recheckDns()} className="min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-[#18352f] ring-1 ring-[#d8cebb]">
+            <button type="button" onClick={() => void recheckDns()} className="min-h-11 rounded-md bg-white px-5 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               Recheck DNS
             </button>
-            {site.domainVerifiedAt ? <p className="text-xs text-[#6f7b74]">Last verified {formatDateTime(site.domainVerifiedAt)}</p> : null}
+            {site.domainVerifiedAt ? <p className="text-xs text-slate-500">Last verified {formatDateTime(site.domainVerifiedAt)}</p> : null}
           </div>
         </Panel>
       </div>
@@ -187,17 +192,17 @@ function EditableField({
   placeholder?: string;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-[#18352f]">
+    <label className="grid gap-2 text-sm font-medium text-slate-950">
       {label}
-      <div className="flex min-h-11 overflow-hidden rounded-xl border border-[#d8cebb] bg-white focus-within:border-[#18352f]">
-        {prefix ? <span className="flex items-center bg-[#fbfaf7] px-3 text-sm text-[#6f7b74]">{prefix}</span> : null}
+      <div className="flex min-h-11 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+        {prefix ? <span className="flex items-center bg-slate-50 px-3 text-sm text-slate-500">{prefix}</span> : null}
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
           className="min-w-0 flex-1 px-3 text-sm outline-none"
         />
-        {suffix ? <span className="flex items-center bg-[#fbfaf7] px-3 text-sm text-[#6f7b74]">{suffix}</span> : null}
+        {suffix ? <span className="flex items-center bg-slate-50 px-3 text-sm text-slate-500">{suffix}</span> : null}
       </div>
     </label>
   );

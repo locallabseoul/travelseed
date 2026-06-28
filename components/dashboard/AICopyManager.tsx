@@ -48,7 +48,7 @@ export function AICopyManager({
 
   async function generateDraft() {
     setGenerating(true);
-    setStatus("Generating direct-booking copy pack...");
+    setStatus("Generating WhatsApp-ready copy pack...");
 
     try {
       const data = await operatorFetch(`/api/operator/resorts/${site.id}/setup/generate`, {
@@ -80,19 +80,19 @@ export function AICopyManager({
       <Panel>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#72815e]">AI Copy</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#18352f]">AI Brand Copy</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f7b74]">Generate a direct-booking copy pack for hero, about, features, experiences, and WhatsApp booking text.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">AI Copy</p>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950">AI Brand Copy</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Generate a WhatsApp-ready copy pack for hero, about, business highlights, services, and inquiry message text.</p>
           </div>
           <Badge tone="sand">Setup step 4</Badge>
         </div>
       </Panel>
 
       <Panel>
-        <h2 className="text-xl font-semibold text-[#18352f]">Copy pack output</h2>
+        <h2 className="text-xl font-semibold text-slate-950">Copy pack output</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {["Hero", "About", "Guest highlights", "Experiences", "WhatsApp message"].map((item) => (
-            <div key={item} className="rounded-2xl bg-[#fbfaf7] p-4 text-sm font-semibold text-[#18352f] ring-1 ring-[#eadfce]">{item}</div>
+          {["Hero", "About", "Business highlights", "Services", "WhatsApp message"].map((item) => (
+            <div key={item} className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">{item}</div>
           ))}
         </div>
       </Panel>
@@ -102,7 +102,7 @@ export function AICopyManager({
         existingText={existingText}
         generating={generating}
         buttonLabel="Generate copy pack"
-        helper="Optional: add a listing URL or paste notes to give the AI more context. It will not generate offers, rooms, packages, services, or SEO metadata in this version."
+        helper="Optional: add a public business link or paste notes to give the AI more context. It will not generate offer inventory or SEO metadata in this version."
         onSourceUrlChange={setSourceUrl}
         onExistingTextChange={setExistingText}
         onGenerate={() => void generateDraft()}
@@ -110,7 +110,7 @@ export function AICopyManager({
 
       <DraftReview site={site} draft={draft} selectedFields={selectedFields} onToggleField={toggleDraftField} onApply={() => void applySelectedDraft()} />
 
-      {status ? <p className="rounded-2xl bg-[#fbfaf7] p-4 text-sm leading-6 text-[#52615a] ring-1 ring-[#eadfce]">{status}</p> : null}
+      {status ? <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600 ring-1 ring-slate-200">{status}</p> : null}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { PreviewSite } from "@/components/create/PreviewSite";
 
 export const metadata = {
-  title: "Preview Direct Booking Site | Travelseed",
-  description: "Preview your generated Travelseed direct booking website.",
+  title: "Preview Business Site | Travelseed",
+  description: "Preview your generated Travelseed WhatsApp-ready business website.",
 };
 
 export default function PreviewPage() {

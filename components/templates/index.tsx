@@ -8,10 +8,10 @@ import type { Resort, ResortTemplateId } from "@/types/resort";
 type TemplateComponent = ComponentType<{ resort: Resort }>;
 
 export const resortTemplateOptions: Array<{ id: ResortTemplateId; label: string }> = [
+  { id: "minimal-stay", label: "Local business" },
   { id: "boutique-villa", label: "Boutique villa" },
   { id: "boutique-resort", label: "Boutique resort" },
-  { id: "surf-camp", label: "Surf camp" },
-  { id: "minimal-stay", label: "Minimal stay" },
+  { id: "surf-camp", label: "Tour or surf camp" },
 ];
 
 export function isResortTemplateId(value: string): value is ResortTemplateId {

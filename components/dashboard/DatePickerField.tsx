@@ -34,34 +34,34 @@ export function DatePickerField({
   }
 
   return (
-    <div className="relative grid gap-2 text-sm font-semibold text-[#18352f]">
+    <div className="relative grid gap-2 text-sm font-semibold text-slate-950">
       <span>{label}</span>
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="flex min-h-11 items-center justify-between rounded-xl border border-[#d8cebb] bg-white px-3 text-left text-sm font-medium text-[#52615a] outline-none focus:border-[#18352f]"
+        className="flex min-h-11 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 text-left text-sm font-medium text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
       >
         <span>{formatDateLabel(value) || placeholder}</span>
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#72815e]">Date</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">Date</span>
       </button>
 
       {open ? (
-        <div className="absolute left-0 top-full z-20 mt-2 w-full min-w-[280px] rounded-2xl border border-[#e8dfd0] bg-white p-4 shadow-[0_24px_70px_rgba(54,43,29,0.16)]">
+        <div className="absolute left-0 top-full z-20 mt-2 w-full min-w-[280px] rounded-xl border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.16)]">
           <div className="flex items-center justify-between gap-3">
-            <button type="button" onClick={() => setVisibleMonth(addMonths(visibleMonth, -1))} className="h-9 w-9 rounded-full bg-[#fbfaf7] text-sm font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+            <button type="button" onClick={() => setVisibleMonth(addMonths(visibleMonth, -1))} className="h-9 w-9 rounded-md bg-slate-50 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               {"<"}
             </button>
-            <p className="text-sm font-semibold text-[#18352f]">
+            <p className="text-sm font-semibold text-slate-950">
               {monthNames[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}
             </p>
-            <button type="button" onClick={() => setVisibleMonth(addMonths(visibleMonth, 1))} className="h-9 w-9 rounded-full bg-[#fbfaf7] text-sm font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+            <button type="button" onClick={() => setVisibleMonth(addMonths(visibleMonth, 1))} className="h-9 w-9 rounded-md bg-slate-50 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">
               {">"}
             </button>
           </div>
 
           <div className="mt-4 grid grid-cols-7 gap-1 text-center">
             {dayNames.map((day) => (
-              <span key={day} className="py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b958f]">
+              <span key={day} className="py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                 {day}
               </span>
             ))}
@@ -76,10 +76,10 @@ export function DatePickerField({
                   onClick={() => selectDate(day)}
                   className={`h-9 rounded-full text-sm font-semibold transition ${
                     isSelected
-                      ? "bg-[#18352f] text-white"
+                      ? "bg-emerald-600 text-white"
                       : isCurrentMonth
-                        ? "text-[#18352f] hover:bg-[#edf0ea]"
-                        : "text-[#b0b8b2] hover:bg-[#fbfaf7]"
+                        ? "text-slate-950 hover:bg-emerald-50"
+                        : "text-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   {day.getDate()}
@@ -88,8 +88,8 @@ export function DatePickerField({
             })}
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#eadfce] pt-3">
-            <button type="button" onClick={() => setVisibleMonth(new Date())} className="rounded-full bg-[#fbfaf7] px-3 py-2 text-xs font-semibold text-[#18352f] ring-1 ring-[#eadfce]">
+          <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-200 pt-3">
+            <button type="button" onClick={() => setVisibleMonth(new Date())} className="rounded-md bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
               Today
             </button>
             <button
@@ -98,7 +98,7 @@ export function DatePickerField({
                 onChange("");
                 setOpen(false);
               }}
-              className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#9d3323] ring-1 ring-[#eadfce]"
+              className="rounded-md bg-white px-3 py-2 text-xs font-semibold text-red-700 ring-1 ring-slate-200"
             >
               Clear
             </button>

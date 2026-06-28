@@ -5,7 +5,7 @@ export function voucherPublicPath(resortSlug: string, publicToken: string) {
 }
 
 export function createVoucherWhatsAppMessage(resortName: string, voucherUrl: string) {
-  return `Hi, ${resortName}. I received my booking voucher: ${voucherUrl}`;
+  return `Hi, ${resortName}. I received my confirmation link: ${voucherUrl}`;
 }
 
 export function createVoucherWhatsAppUrl(phoneNumber: string, resortName: string, voucherUrl: string) {

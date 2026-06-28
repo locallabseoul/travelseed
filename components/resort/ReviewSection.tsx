@@ -14,18 +14,18 @@ export function ReviewSection({ resort, variant = "boutique" }: { resort: Resort
 
   const copy = {
     boutique: {
-      eyebrow: "Guest reviews",
-      title: "Loved by guests who book direct.",
+      eyebrow: "Customer reviews",
+      title: "Loved by customers who contact direct.",
       section: "bg-white",
     },
     surf: {
-      eyebrow: "Guest stories",
-      title: "What guests say after their stay.",
+      eyebrow: "Customer stories",
+      title: "What customers say after their experience.",
       section: "bg-white",
     },
     minimal: {
       eyebrow: "Testimonials",
-      title: "A few words from recent guests.",
+      title: "A few words from recent customers.",
       section: "bg-[#f8f6f0]",
     },
   }[variant];

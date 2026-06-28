@@ -31,26 +31,26 @@ export function setupStepsFor(site: ResortConsoleData): SetupReadinessStep[] {
   ].filter(Boolean);
   const whatsappMissing = [
     hasText(site.whatsappNumber) ? "" : "WhatsApp number",
-    hasText(site.bookingMessageTemplate) ? "" : "booking message",
+    hasText(site.bookingMessageTemplate) ? "" : "WhatsApp inquiry message",
   ].filter(Boolean);
   const publishMissing = [
     site.isActive ? "" : "published status",
     hasText(site.slug) ? "" : "public slug",
-    copyMissing.length === 0 ? "" : "guest-facing copy",
+    copyMissing.length === 0 ? "" : "customer-facing copy",
   ].filter(Boolean);
   const rawSteps = [
     {
       id: "business",
       title: "Business Info",
-      description: "Confirm property name, type, location, and account context.",
+      description: "Confirm business name, type, location, and account context.",
       missing: businessMissing,
       targetTab: "settings" as const,
       ctaLabel: "Open Settings",
     },
     {
       id: "ota",
-      title: "OTA / Existing Info",
-      description: "Import a public listing or paste existing property information.",
+      title: "Existing Source",
+      description: "Import a public business link or paste existing business information.",
       missing: copyMissing.length === 0 ? [] : ["imported or reviewed source content"],
       targetTab: "import" as const,
       ctaLabel: "Open Import",
@@ -58,7 +58,7 @@ export function setupStepsFor(site: ResortConsoleData): SetupReadinessStep[] {
     {
       id: "template",
       title: "Choose Template",
-      description: "Confirm the hospitality template and visual direction for the direct-booking site.",
+      description: "Confirm the business template and visual direction for the WhatsApp-ready site.",
       missing: hasText(site.template) ? [] : ["template"],
       targetTab: "design" as const,
       ctaLabel: "Open Design",
@@ -66,15 +66,15 @@ export function setupStepsFor(site: ResortConsoleData): SetupReadinessStep[] {
     {
       id: "copy",
       title: "AI Brand Copy",
-      description: "Generate a direct-booking copy pack from your property details.",
+      description: "Generate a customer-facing copy pack from your business details.",
       missing: copyMissing,
       targetTab: "aiCopy" as const,
       ctaLabel: "Open AI Copy",
     },
     {
       id: "whatsapp",
-      title: "WhatsApp Booking",
-      description: "Set the booking number, message format, and pickup option.",
+      title: "WhatsApp Inquiry",
+      description: "Set the WhatsApp number and message format.",
       missing: whatsappMissing,
       targetTab: "whatsapp" as const,
       ctaLabel: "Open WhatsApp",
