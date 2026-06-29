@@ -11,6 +11,7 @@ import {
   useSelectableDraft,
   type DraftField,
 } from "@/components/dashboard/SetupDraftTools";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import type { DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
 const contentOnlyFields: DraftField[] = [
@@ -37,6 +38,7 @@ export function AICopyManager({
   const [existingText, setExistingText] = useState("");
   const [generating, setGenerating] = useState(false);
   const [status, setStatus] = useState("");
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const { draft, selectedFields, setNextDraft, clearDraft, toggleDraftField } = useSelectableDraft();
 
   useDraftDirtyGuard({
@@ -91,7 +93,7 @@ export function AICopyManager({
       <Panel>
         <h2 className="text-xl font-semibold text-slate-950">Copy pack output</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {["Hero", "About", "Business highlights", "Services", "WhatsApp message"].map((item) => (
+          {["Hero", "About", "Business highlights", dashboardCopy.pages.offersLabel, "WhatsApp message"].map((item) => (
             <div key={item} className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200">{item}</div>
           ))}
         </div>

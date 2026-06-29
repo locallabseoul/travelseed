@@ -263,7 +263,7 @@ export function fallbackDraft(url: URL, source?: ListingSource | null): ListingD
       name,
       slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
       type: category.label,
-      template_id: "boutique-villa",
+      template_id: "minimal-stay",
       hero_title: `Direct booking for ${name}`,
       hero_subtitle: "Review and refine this AI-ready draft before publishing.",
       description: `Imported from ${url.hostname}. Add property details, photos, and booking information before launch.`,
@@ -636,7 +636,7 @@ site, services.
 Rules:
 - If page title, body text, or metadata is sparse, blocked, or platform-branded, use urlNameCandidate as the property name.
 - Never use Agoda, Booking.com, Airbnb, Tripadvisor, or another platform name as site.name.
-- site.template_id must be one of: boutique-villa, boutique-resort, surf-camp, minimal-stay.
+- site.template_id must be minimal-stay for newly generated sites. Other legacy ids are kept only for existing site compatibility.
 - site.description must be a polished short description of 2-4 sentences for the form's Short description field.
 - site.hero_title must be emotional and specific, not just "Direct booking for X".
 - site.hero_subtitle must summarize the strongest stay promise in one sentence.
@@ -667,8 +667,7 @@ Rules:
 - Never use Agoda, Booking.com, Airbnb, Tripadvisor, Instagram, Google, or another platform name as site.name.
 - If source text is sparse, still produce useful baseline hero_title, hero_subtitle, and description from the business name, but keep concrete claims broad unless present.
 - site.type must be one of these canonical categories when possible: Resort / Villa / Hotel, Cafe / Restaurant, Tour Operator, Shop / Local Service, Wellness / Salon. Use a more specific type only when none of these fits.
-- site.template_id must be one of: boutique-villa, boutique-resort, surf-camp, minimal-stay.
-- Use minimal-stay for general local businesses unless the source is clearly a resort, villa, hotel, surf camp, or multi-page hospitality brand.
+- site.template_id must be minimal-stay for newly generated sites. Other legacy ids are kept only for existing site compatibility.
 - site.description must be a polished short description of 2-4 sentences for the form's Short description field.
 - site.hero_title must be customer-facing, specific, and suitable for a homepage hero.
 - site.hero_subtitle must summarize the strongest business promise in one sentence.
@@ -718,6 +717,7 @@ export async function createAiListingDraft(url: URL, source: ListingSource): Pro
     name: siteName,
     slug: siteName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
     type: accommodation ? businessCategoryFromType("Resort / Villa / Hotel").label : category.label,
+    template_id: "minimal-stay",
     hero_title: !accommodation && weakSourceCopy(generated.site.hero_title, url) ? fallbackCopy.hero_title : generated.site.hero_title,
     hero_subtitle: !accommodation && weakSourceCopy(generated.site.hero_subtitle, url) ? fallbackCopy.hero_subtitle : generated.site.hero_subtitle,
     description: !accommodation && weakSourceCopy(generated.site.description, url) ? fallbackCopy.description : generated.site.description,

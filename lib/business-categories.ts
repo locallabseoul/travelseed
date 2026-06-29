@@ -514,7 +514,11 @@ export function businessCategoryFromType(input: string | BusinessCategoryInput |
     return businessCategories.wellness;
   }
 
-  if (templateHas(["boutique-villa", "boutique-resort", "surf-camp"])) {
+  if (templateHas(["surf-camp"])) {
+    return businessCategories.tour;
+  }
+
+  if (templateHas(["boutique-villa", "boutique-resort"])) {
     return businessCategories.accommodation;
   }
 

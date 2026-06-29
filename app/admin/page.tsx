@@ -36,7 +36,7 @@ const emptyForm: ResortFormState = {
   name: "",
   slug: "",
   domain: "",
-  template_id: "boutique-villa",
+  template_id: "minimal-stay",
   location: "",
   type: "",
   description: "",

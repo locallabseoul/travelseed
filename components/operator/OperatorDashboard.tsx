@@ -29,7 +29,7 @@ const emptyForm: SiteForm = {
   name: "",
   slug: "",
   location: "",
-  template_id: "boutique-villa",
+  template_id: "minimal-stay",
   hero_title: "",
   hero_subtitle: "",
   hero_image_url: "",

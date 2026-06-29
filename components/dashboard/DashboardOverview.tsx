@@ -5,12 +5,14 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { UsageCard } from "@/components/dashboard/UsageCard";
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
 const templateNameById: Record<string, string> = {
-  "boutique-villa": "Boutique Villa",
-  "surf-camp": "Surf Camp",
-  "minimal-stay": "Local Business",
+  "boutique-villa": "Legacy Hospitality",
+  "boutique-resort": "Legacy Hospitality",
+  "surf-camp": "Legacy Tour",
+  "minimal-stay": "Category Website",
 };
 
 export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleData; onTabChange: (tab: DashboardTab) => void }) {
@@ -18,6 +20,7 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
   const usageMetrics = usageMetricsFor(site);
   const structure = planConfig[effectivePlanType(site)];
   const readiness = setupReadinessFor(site);
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const templateName = templateNameById[site.template] ?? site.template;
 
   return (
@@ -32,7 +35,7 @@ export function DashboardOverview({ site, onTabChange }: { site: ResortConsoleDa
               </div>
               <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950">Welcome back, {site.name}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                Manage your business website, pages, offers, WhatsApp inquiries, domain, and growth signals from one focused operations console.
+                Manage your business website, {dashboardCopy.setup.contentFocus}, WhatsApp inquiries, domain, and growth signals from one focused operations console.
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
                 <span className="rounded-full bg-slate-100 px-4 py-2 font-semibold text-slate-900">{site.travelseedUrl}</span>

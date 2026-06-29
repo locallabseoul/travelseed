@@ -35,10 +35,11 @@ export function usageMetricsFor(site: ResortConsoleData): UsageMetric[] {
 
 export const quickActions = [
   "Continue Setup",
-  "Edit Home Hero",
-  "Update Gallery",
   "Manage Offers",
   "Edit WhatsApp Inquiry",
+  "Edit Page Content",
+  "Review Inquiries",
+  "Update Gallery",
   "Connect Domain",
   "Upgrade Plan",
 ];
@@ -70,10 +71,10 @@ export const contentSections: ContentSection[] = [
 ];
 
 export const templateOptions: TemplateOption[] = [
-  { name: "Local Business", description: "Clean, practical layout for services, menus, products, and inquiries.", selected: true },
-  { name: "Boutique Cafe", description: "Warm local commerce layout for cafes, restaurants, wellness, and shops." },
-  { name: "Surf Camp", description: "Energetic structure for camps, trips, and group packages." },
-  { name: "Boutique Villa", description: "Premium visual layout for villas and private stays." },
+  { name: "Category Website", description: "Clean WhatsApp-ready structure selected from the business category.", selected: true },
+  { name: "Cafe & Restaurant Website", description: "Menu, reservation, catering, and customer proof structure." },
+  { name: "Tour Operator Website", description: "Tour packages, itinerary, pickup, and group planning structure." },
+  { name: "Wellness & Salon Website", description: "Treatments, packages, appointments, and staff note structure." },
 ];
 
 export const colorThemes = ["Sand", "Tropical Green", "Dark Luxury", "Minimal White"];

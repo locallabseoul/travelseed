@@ -1,3 +1,5 @@
+import type { BusinessCategoryId } from "@/lib/business-categories";
+import { isLegacyTemplate } from "@/lib/category-templates";
 import type { ResortPlanType, ResortSiteType, ResortUpsert } from "@/types/resort";
 
 export type TemplateCatalogEntry = {
@@ -8,15 +10,16 @@ export type TemplateCatalogEntry = {
   templateId: string;
   previewImageUrl?: string;
   tags: [string, string];
+  categoryIds: BusinessCategoryId[];
 };
 
 export const templateCatalog: TemplateCatalogEntry[] = [
-  { name: "Local Business Landing", description: "A fast one-page WhatsApp-ready site for services, menus, products, tours, and appointments.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
-  { name: "Boutique Cafe Landing", description: "A warm one-page local commerce layout for cafes, restaurants, wellness, and shops.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Landing", "Seed"] },
-  { name: "Tropical Villa Landing", description: "Premium one-page villa presentation with booking CTA.", planType: "seed", siteType: "landing", templateId: "boutique-villa", previewImageUrl: "/template-previews/tropical-villa-landing.svg", tags: ["Landing", "Seed"] },
-  { name: "Boutique Resort Multi-page", description: "Multi-page resort brand structure for rooms, dining, blog, and SEO.", planType: "tree", siteType: "multipage", templateId: "boutique-resort", previewImageUrl: "/template-previews/boutique-resort-multipage.svg", tags: ["Multi-page", "Tree"] },
-  { name: "Tour Operator Multi-page", description: "Activity-led multi-page site for tours, camps, packages, and reviews.", planType: "tree", siteType: "multipage", templateId: "surf-camp", tags: ["Multi-page", "Tree"] },
-  { name: "Custom Business Platform", description: "Custom platform structure for premium campaigns, branches, and special pages.", planType: "forest", siteType: "custom", templateId: "minimal-stay", tags: ["Custom", "Forest"] },
+  { name: "Hospitality Website", description: "Rooms, packages, amenities, location, and WhatsApp availability for resorts, villas, hotels, and stays.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/tropical-villa-landing.svg", tags: ["Hospitality", "Seed"], categoryIds: ["accommodation"] },
+  { name: "Cafe & Restaurant Website", description: "Menu highlights, set menus, reservations, catering, location, and WhatsApp table requests.", planType: "seed", siteType: "landing", templateId: "minimal-stay", previewImageUrl: "/template-previews/sunset-landing.svg", tags: ["Food", "Seed"], categoryIds: ["food"] },
+  { name: "Tour Operator Website", description: "Tour packages, itinerary notes, pickup details, group planning, reviews, and WhatsApp availability.", planType: "seed", siteType: "landing", templateId: "minimal-stay", tags: ["Tours", "Seed"], categoryIds: ["tour"] },
+  { name: "Local Services Website", description: "Products, services, delivery or pickup notes, consultation flow, customer proof, and quote requests.", planType: "seed", siteType: "landing", templateId: "minimal-stay", tags: ["Services", "Seed"], categoryIds: ["local_service"] },
+  { name: "Wellness & Salon Website", description: "Treatments, packages, appointment details, staff notes, customer proof, and WhatsApp booking.", planType: "seed", siteType: "landing", templateId: "minimal-stay", tags: ["Wellness", "Seed"], categoryIds: ["wellness"] },
+  { name: "Custom Business Platform", description: "Custom platform structure for premium campaigns, branches, special pages, and advanced operations.", planType: "forest", siteType: "custom", templateId: "minimal-stay", tags: ["Custom", "Forest"], categoryIds: ["accommodation", "food", "tour", "local_service", "wellness"] },
 ];
 
 export function canUsePlan(current: ResortPlanType, required: ResortPlanType) {
@@ -36,7 +39,29 @@ export function siteTypeForPlanType(planType: ResortPlanType): ResortSiteType {
   return "multipage";
 }
 
-export function defaultTemplateCatalogNameFor(templateId: string, planType: ResortPlanType) {
+export function templateCatalogForCategory(categoryId: BusinessCategoryId, planType?: ResortPlanType) {
+  return templateCatalog.filter((option) => (
+    option.categoryIds.includes(categoryId) &&
+    (planType ? canUsePlan(planType, option.planType) : true)
+  ));
+}
+
+export function defaultTemplateCatalogEntryForCategory(categoryId: BusinessCategoryId, planType: ResortPlanType) {
+  return templateCatalogForCategory(categoryId, planType)[0] ??
+    templateCatalog.find((option) => option.categoryIds.includes(categoryId)) ??
+    templateCatalog.find((option) => option.name === "Local Services Website") ??
+    templateCatalog[0];
+}
+
+export function defaultTemplateCatalogNameFor(templateId: string, planType: ResortPlanType, categoryId?: BusinessCategoryId) {
+  if (categoryId) {
+    const categoryDefault = defaultTemplateCatalogEntryForCategory(categoryId, planType);
+
+    if (categoryDefault?.templateId === templateId && canUsePlan(planType, categoryDefault.planType)) {
+      return categoryDefault.name;
+    }
+  }
+
   return templateCatalog.find((option) => option.templateId === templateId && canUsePlan(planType, option.planType))?.name ??
     templateCatalog.find((option) => option.templateId === templateId)?.name ??
     "";
@@ -76,6 +101,10 @@ export function validateTemplateEntitlement(payload: ResortUpsert, existing?: { 
     catalogName === existingCatalogName;
 
   if (unchangedExistingTemplate) {
+    return null;
+  }
+
+  if (existing && payload.template_id === existing.template_id && isLegacyTemplate(payload.template_id)) {
     return null;
   }
 

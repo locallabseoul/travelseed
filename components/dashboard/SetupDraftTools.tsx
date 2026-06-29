@@ -14,7 +14,7 @@ const draftFieldLabels: Record<DraftField, string> = {
   heroSubtitle: "Hero subtitle",
   about: "About copy",
   features: "Features",
-  experiences: "Experiences",
+  experiences: "Supporting highlights",
   bookingMessageTemplate: "WhatsApp message",
 };
 
@@ -157,7 +157,7 @@ export function SourceGenerator({
       <p className="mt-2 text-sm leading-6 text-slate-600">{helper}</p>
       <div className="mt-5 grid gap-4">
         <EditableField label="Business source URL" value={sourceUrl} onChange={onSourceUrlChange} placeholder="https://instagram.com/yourbusiness" />
-        <EditableField label="Existing info" value={existingText} onChange={onExistingTextChange} textarea rows={7} placeholder="Paste existing descriptions, amenities, local area notes, or old website copy." />
+        <EditableField label="Existing info" value={existingText} onChange={onExistingTextChange} textarea rows={7} placeholder="Paste existing descriptions, services, menu items, products, treatments, tour notes, or old website copy." />
         <button type="button" onClick={onGenerate} disabled={generating} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           {generating ? "Generating..." : buttonLabel}
         </button>

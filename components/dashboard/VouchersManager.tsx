@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { businessCategoryFromType } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import { createVoucherWhatsAppUrl, voucherPublicPath } from "@/lib/vouchers";
 import type { BookingVoucher, ResortConsoleData, ResortOfferData, VoucherStatus } from "@/types/dashboard";
 
@@ -36,6 +37,7 @@ export function VouchersManager({
 
   const selectedVoucher = vouchers.find((voucher) => voucher.id === selectedId) ?? null;
   const category = businessCategoryFromType({ type: site.type, templateId: site.template });
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const accommodation = category.id === "accommodation";
   const roomOptions = useMemo(() => site.services.filter((offer) => offer.kind === "room" && offer.isActive), [site.services]);
   const summary = useMemo(() => ({
@@ -85,14 +87,14 @@ export function VouchersManager({
 
   async function createManualVoucher() {
     setSaving(true);
-    setStatus(accommodation ? "Creating voucher..." : "Creating confirmation...");
+    setStatus(`Creating ${accommodation ? "voucher" : "confirmation"}...`);
     try {
       const data = await operatorFetch(`/api/operator/resorts/${site.id}/vouchers`, {
         method: "POST",
         body: JSON.stringify({
           guestName: accommodation ? "Guest name" : "Customer name",
-          includedNotes: accommodation ? "Accommodation booking confirmation." : `${category.shortLabel} inquiry confirmation.`,
-          policyNotes: accommodation ? "Please contact the business if your arrival time changes." : "Please contact the business if your request details change.",
+          includedNotes: dashboardCopy.confirmation.includedDefault,
+          policyNotes: dashboardCopy.confirmation.policyDefault,
         }),
       }) as { voucher?: RawVoucher };
 
@@ -100,7 +102,7 @@ export function VouchersManager({
         const nextVoucher = voucherFromApi(data.voucher);
         setVouchers((current) => [nextVoucher, ...current]);
         setSelectedId(nextVoucher.id);
-        setStatus(accommodation ? "Voucher draft created." : "Confirmation draft created.");
+        setStatus(dashboardCopy.confirmation.createdStatus);
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not create voucher.");
@@ -115,7 +117,7 @@ export function VouchersManager({
     }
 
     setSaving(true);
-    setStatus("Saving voucher...");
+    setStatus(`Saving ${accommodation ? "voucher" : "confirmation"}...`);
     try {
       const data = await operatorFetch(`/api/operator/resorts/${site.id}/vouchers/${selectedVoucher.id}`, {
         method: "PATCH",
@@ -125,7 +127,7 @@ export function VouchersManager({
       if (data.voucher) {
         const updated = voucherFromApi(data.voucher);
         setVouchers((current) => current.map((voucher) => (voucher.id === updated.id ? updated : voucher)));
-        setStatus("Voucher saved.");
+        setStatus(dashboardCopy.confirmation.savedStatus);
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Could not save voucher.");
@@ -181,7 +183,7 @@ export function VouchersManager({
   async function copyPublicLink(voucher: BookingVoucher) {
     const url = `${window.location.origin}${voucherPublicPath(site.slug, voucher.publicToken)}`;
     await navigator.clipboard.writeText(url);
-    setStatus("Public voucher link copied.");
+    setStatus(accommodation ? "Public voucher link copied." : "Public confirmation link copied.");
   }
 
   function selectRoomOffer(roomOfferId: string) {
@@ -203,18 +205,16 @@ export function VouchersManager({
   return (
     <div className="grid gap-6">
       <Panel>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">{accommodation ? "Vouchers" : "Confirmations"}</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">{dashboardCopy.confirmation.eyebrow}</p>
         <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold text-slate-950">{accommodation ? "Booking vouchers" : "Inquiry confirmations"}</h1>
+            <h1 className="text-3xl font-semibold text-slate-950">{dashboardCopy.confirmation.title}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              {accommodation
-                ? "Create a guest-facing booking confirmation after a direct inquiry is confirmed."
-                : "Create a customer-facing follow-up link after a WhatsApp inquiry is confirmed."}
+              {dashboardCopy.confirmation.body}
             </p>
           </div>
           <button type="button" disabled={saving} onClick={() => void createManualVoucher()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
-            {saving ? "Working..." : accommodation ? "New manual voucher" : "New confirmation"}
+            {saving ? "Working..." : dashboardCopy.confirmation.createLabel}
           </button>
         </div>
       </Panel>
@@ -227,7 +227,7 @@ export function VouchersManager({
 
       <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
         <Panel>
-          <h2 className="text-xl font-semibold text-slate-950">{accommodation ? "Voucher list" : "Confirmation list"}</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{dashboardCopy.confirmation.listLabel}</h2>
           <div className="mt-5 grid gap-3">
             {vouchers.length > 0 ? (
               vouchers.map((voucher) => (
@@ -253,7 +253,7 @@ export function VouchersManager({
               ))
             ) : (
               <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-                {accommodation ? "No vouchers yet. Create one from a confirmed inquiry or start a manual voucher." : "No confirmations yet. Create one from a confirmed inquiry or start a manual confirmation."}
+                {dashboardCopy.confirmation.emptyList}
               </p>
             )}
           </div>
@@ -296,19 +296,19 @@ export function VouchersManager({
                 {accommodation ? <DatePickerField label="Check-out" value={draft.checkOut} onChange={(checkOut) => setDraft((current) => ({ ...current, checkOut }))} /> : null}
                 <EditableField label={category.inquiry.sizeLabel} type="number" value={draft.guests} onChange={(guests) => setDraft((current) => ({ ...current, guests }))} disabled={isVoided} />
                 {accommodation ? <RoomSelect rooms={roomOptions} value={draft.roomOfferId ?? ""} onChange={selectRoomOffer} disabled={isVoided} /> : null}
-                <EditableField label="Offer title" value={draft.offerTitle} onChange={(offerTitle) => setDraft((current) => ({ ...current, offerTitle }))} disabled={isVoided} />
+                <EditableField label={dashboardCopy.confirmation.offerTitleLabel} value={draft.offerTitle} onChange={(offerTitle) => setDraft((current) => ({ ...current, offerTitle }))} disabled={isVoided} />
                 {accommodation ? <EditableField label="Room label" value={draft.roomLabel} onChange={(roomLabel) => setDraft((current) => ({ ...current, roomLabel, roomOfferId: null }))} disabled={isVoided} /> : null}
-                <EditableField label="Amount note" value={draft.amountNote} onChange={(amountNote) => setDraft((current) => ({ ...current, amountNote }))} disabled={isVoided} />
+                <EditableField label={dashboardCopy.confirmation.amountNoteLabel} value={draft.amountNote} onChange={(amountNote) => setDraft((current) => ({ ...current, amountNote }))} disabled={isVoided} />
               </div>
               <EditableField label="Included notes" value={draft.includedNotes} onChange={(includedNotes) => setDraft((current) => ({ ...current, includedNotes }))} textarea disabled={isVoided} />
               <EditableField label="Policy notes" value={draft.policyNotes} onChange={(policyNotes) => setDraft((current) => ({ ...current, policyNotes }))} textarea disabled={isVoided} />
               <button type="button" disabled={saving || isVoided} onClick={() => void saveVoucher()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
-                {saving ? "Saving..." : accommodation ? "Save voucher" : "Save confirmation"}
+                {saving ? "Saving..." : dashboardCopy.confirmation.saveLabel}
               </button>
             </div>
           ) : (
             <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-500">
-              {accommodation ? "Select a voucher to edit guest details and issue a public confirmation link." : "Select a confirmation to edit customer details and issue a public follow-up link."}
+              {dashboardCopy.confirmation.emptyDetail}
             </p>
           )}
           {status ? <p className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">{status}</p> : null}

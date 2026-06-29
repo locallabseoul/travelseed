@@ -3,6 +3,7 @@ import { FeatureSelector } from "@/components/dashboard/FeatureSelector";
 import { contentSections } from "@/components/dashboard/mockData";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
+import { dashboardCategoryCopyFor, dashboardPageNameFor } from "@/lib/dashboard-category-copy";
 import type { ContentSection, DashboardTab, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
 type EditableSection = "Hero" | "About" | "Features" | "Gallery" | "Experiences" | "Inquiry CTA" | "Footer";
@@ -10,6 +11,8 @@ type ContentPageKey = "home" | "rooms" | "experiences" | "gallery" | "reviews" |
 
 type PageContentBlock = ContentSection & {
   kind: "editable" | "linked" | "comingSoon";
+  displayTitle?: string;
+  displayDescription?: string;
   editTarget?: EditableSection;
   targetTab?: DashboardTab;
   helper?: string;
@@ -35,8 +38,27 @@ function blockFor(section: ContentSection, overrides: Partial<PageContentBlock> 
   };
 }
 
-function landingBlocks() {
-  return contentSections.map((section) => blockFor(section));
+function landingBlocks(site: ResortConsoleData) {
+  const dashboardCopy = dashboardCategoryCopyFor(site);
+
+  return contentSections.map((section) => {
+    if (section.title === "Features") {
+      return blockFor(section, { displayDescription: dashboardCopy.pages.featuresDescription });
+    }
+
+    if (section.title === "Gallery") {
+      return blockFor(section, { displayDescription: dashboardCopy.pages.galleryDescription });
+    }
+
+    if (section.title === "Services") {
+      return blockFor(section, {
+        displayTitle: dashboardCopy.pages.offersLabel,
+        displayDescription: dashboardCopy.pages.offersDescription,
+      });
+    }
+
+    return blockFor(section);
+  });
 }
 
 function pageBlock(title: PageContentBlock["title"], description: string, status: ContentSection["status"], overrides: Partial<PageContentBlock> = {}): PageContentBlock {
@@ -44,6 +66,8 @@ function pageBlock(title: PageContentBlock["title"], description: string, status
 }
 
 function pagesForSite(site: ResortConsoleData): ContentPage[] {
+  const dashboardCopy = dashboardCategoryCopyFor(site);
+
   return [
     {
       key: "home",
@@ -52,30 +76,33 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       blocks: [
         pageBlock("Hero", "Main homepage headline, subtitle, image, and CTA.", "Ready"),
         pageBlock("About", "Homepage brand story and business positioning.", "Ready"),
-        pageBlock("Features", "Homepage highlights, facilities, services, and customer benefits.", site.features.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Features", dashboardCopy.pages.featuresDescription, site.features.length > 0 ? "Ready" : "Needs review"),
         pageBlock("Inquiry CTA", "Homepage WhatsApp inquiry block.", "Ready"),
       ],
     },
     {
       key: "rooms",
-      label: "Offers",
+      label: dashboardCopy.pages.offersLabel,
       slug: "/rooms",
       blocks: [
-        pageBlock("Offers", "Services, packages, products, menu items, tours, or rooms shown on the Offers page.", site.services.length > 0 ? "Ready" : "Needs review", {
+        pageBlock("Offers", dashboardCopy.pages.offersDescription, site.services.length > 0 ? "Ready" : "Needs review", {
+          displayTitle: dashboardCopy.pages.offersLabel,
           kind: "linked",
           targetTab: "offers",
-          helper: "Services, packages, and rooms are managed as Offers so pricing, images, and offer types stay consistent.",
+          helper: `${dashboardCopy.pages.offersLabel} are managed in Offers so pricing, images, and CTA labels stay consistent.`,
         }),
         pageBlock("Inquiry CTA", "Inquiry message used from offer cards.", "Ready"),
       ],
     },
     {
       key: "experiences",
-      label: "Experiences",
+      label: dashboardCopy.pages.secondaryLabel,
       slug: "/experiences",
       blocks: [
-        pageBlock("Experiences", "Nearby beaches, activities, restaurants, and local attractions.", site.experiences.length > 0 ? "Ready" : "Needs review"),
-        pageBlock("Inquiry CTA", "Direct inquiry CTA at the bottom of the Experiences page.", "Ready"),
+        pageBlock("Experiences", dashboardCopy.pages.secondaryDescription, site.experiences.length > 0 ? "Ready" : "Needs review", {
+          displayTitle: dashboardCopy.pages.secondaryLabel,
+        }),
+        pageBlock("Inquiry CTA", `Direct inquiry CTA at the bottom of the ${dashboardCopy.pages.secondaryLabel} page.`, "Ready"),
       ],
     },
     {
@@ -83,7 +110,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       label: "Gallery",
       slug: "/gallery",
       blocks: [
-        pageBlock("Gallery", "Curated photos for storefront, team, services, products, rooms, food, and area.", site.gallery.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Gallery", dashboardCopy.pages.galleryDescription, site.gallery.length > 0 ? "Ready" : "Needs review"),
       ],
     },
     {
@@ -100,12 +127,13 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
     },
     {
       key: "dining",
-      label: "Dining",
+      label: dashboardCopy.pages.specialLabel,
       slug: "/dining",
       blocks: [
-        pageBlock("Dining", "Restaurant, bar, breakfast, and culinary content.", "Draft", {
+        pageBlock("Dining", dashboardCopy.pages.secondaryDescription, "Draft", {
+          displayTitle: dashboardCopy.pages.specialLabel,
           kind: "comingSoon",
-          helper: "Dining CMS is planned for a later content operations phase.",
+          helper: `${dashboardCopy.pages.specialLabel} CMS is planned for a later content operations phase.`,
         }),
       ],
     },
@@ -115,7 +143,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
       slug: "/about",
       blocks: [
         pageBlock("About", "Business story, positioning, and location context.", "Ready"),
-        pageBlock("Features", "Facilities and practical selling points for the About page.", site.features.length > 0 ? "Ready" : "Needs review"),
+        pageBlock("Features", dashboardCopy.pages.featuresDescription, site.features.length > 0 ? "Ready" : "Needs review"),
       ],
     },
     {
@@ -135,7 +163,7 @@ function pagesForSite(site: ResortConsoleData): ContentPage[] {
         pageBlock("Promotions", "WhatsApp offers shown on the Promotions page.", "Draft", {
           kind: "linked",
           targetTab: "offers",
-          helper: "Offer cards are managed in Offers and can later be promoted into this public page.",
+          helper: dashboardCopy.pages.promotionsDescription,
         }),
       ],
     },
@@ -181,6 +209,11 @@ function pageLabelFromSlug(slug?: string) {
     .join(" ");
 }
 
+function editingSectionLabel(section: EditableSection, site: ResortConsoleData) {
+  const dashboardCopy = dashboardCategoryCopyFor(site);
+  return section === "Experiences" ? dashboardCopy.pages.secondaryLabel : section;
+}
+
 export function ContentManager({
   site,
   accessToken,
@@ -200,12 +233,13 @@ export function ContentManager({
 }) {
   const planType = effectivePlanType(site);
   const isLanding = planConfig[planType].siteType === "landing";
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const pages = pagesForSite(site);
   const [selectedPageKey, setSelectedPageKey] = useState<ContentPageKey>(pageKeyFromSlug(selectedPageSlug));
   const effectivePageKey = embedded ? pageKeyFromSlug(selectedPageSlug) : selectedPageKey;
   const selectedPage = pages.find((page) => page.key === effectivePageKey && (!embedded || page.slug === (selectedPageSlug ?? page.slug))) ?? {
     key: effectivePageKey,
-    label: pageLabelFromSlug(selectedPageSlug),
+    label: dashboardPageNameFor(selectedPageSlug ?? "/", dashboardCopy) || pageLabelFromSlug(selectedPageSlug),
     slug: selectedPageSlug ?? "/",
     blocks: [
       pageBlock("Custom page", "Content editing for this custom page will be added in a later Forest content phase.", "Draft", {
@@ -453,7 +487,7 @@ export function ContentManager({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Editing</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">{editingSection}</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-950">{editingSectionLabel(editingSection, site)}</h2>
             </div>
             <button type="button" onClick={() => setEditingSection(null)} className="text-sm font-semibold text-slate-600">
               Cancel
@@ -482,7 +516,7 @@ export function ContentManager({
                 />
               </>
             ) : null}
-            {editingSection === "Experiences" ? <EditableField label="Experiences, one per line" value={experiences} onChange={setExperiences} textarea /> : null}
+            {editingSection === "Experiences" ? <EditableField label={dashboardCopy.pages.secondaryInputLabel} value={experiences} onChange={setExperiences} textarea /> : null}
             {editingSection === "Inquiry CTA" ? <EditableField label="WhatsApp inquiry message template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea rows={8} /> : null}
             {editingSection === "Footer" ? (
               <>
@@ -501,15 +535,19 @@ export function ContentManager({
       ) : null}
 
       <div className={embedded ? "grid gap-4" : "grid gap-4 xl:grid-cols-2"}>
-        {(isLanding ? landingBlocks() : selectedPage.blocks).map((section) => (
+        {(isLanding ? landingBlocks(site) : selectedPage.blocks).map((section) => {
+          const sectionTitle = section.displayTitle ?? section.title;
+          const sectionDescription = section.displayDescription ?? section.description;
+
+          return (
           <Panel key={section.title}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-xl font-semibold text-slate-950">{section.title}</h2>
+                  <h2 className="text-xl font-semibold text-slate-950">{sectionTitle}</h2>
                   <Badge tone={section.status === "Ready" ? "green" : section.status === "Needs review" ? "sand" : "gray"}>{section.status}</Badge>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{section.description}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{sectionDescription}</p>
               </div>
               <button
                 type="button"
@@ -562,12 +600,12 @@ export function ContentManager({
                 {site.services.length > 0 ? site.services.slice(0, 3).map((service) => (
                   <div key={service.id} className="rounded-lg bg-slate-50 p-4 ring-1 ring-slate-100">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="sand">{service.kind}</Badge>
+                      <Badge tone="sand">{dashboardCopy.offers.kindLabels[service.kind].badgeLabel}</Badge>
                       <p className="font-semibold text-slate-950">{service.title}</p>
                     </div>
                     {service.description ? <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p> : null}
                   </div>
-                )) : <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-100">No services, packages, products, menu items, tours, or rooms yet.</p>}
+                )) : <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-100">No {dashboardCopy.pages.offersLabel.toLowerCase()} yet.</p>}
               </div>
             ) : null}
             {section.title === "Reviews" ? (
@@ -581,9 +619,11 @@ export function ContentManager({
             ) : null}
             {section.title === "Experiences" ? (
               <div className="mt-5 flex flex-wrap gap-2">
-                {site.experiences.map((experience) => (
-                  <span key={experience} className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{experience}</span>
-                ))}
+                {site.experiences.length > 0
+                  ? site.experiences.map((experience) => (
+                      <span key={experience} className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">{experience}</span>
+                    ))
+                  : <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-100">{dashboardCopy.pages.secondaryEmptyText}</p>}
               </div>
             ) : null}
             {section.title === "Gallery" ? (
@@ -615,7 +655,8 @@ export function ContentManager({
               </div>
             ) : null}
           </Panel>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

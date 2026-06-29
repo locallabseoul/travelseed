@@ -9,9 +9,11 @@ import { AppHeader } from "@/components/auth/HomeAccountNav";
 import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
-import { renderResortTemplate, resortTemplateOptions } from "@/components/templates";
+import { renderResortTemplate } from "@/components/templates";
 import { businessCategories, businessCategoryFromType, businessTypeOptions } from "@/lib/business-categories";
+import { defaultTemplateIdForBusinessType } from "@/lib/category-templates";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { templateCatalogForCategory } from "@/lib/template-catalog";
 import type { Resort, ResortOfferInput } from "@/types/resort";
 
 type BuilderForm = {
@@ -364,6 +366,16 @@ export function CreateSiteBuilder() {
         return { ...current, slug: slugify(String(value)) };
       }
 
+      if (key === "type") {
+        const nextType = String(value);
+
+        return {
+          ...current,
+          type: nextType,
+          template_id: defaultTemplateIdForBusinessType(nextType),
+        };
+      }
+
       return { ...current, [key]: value };
     });
   }
@@ -372,14 +384,15 @@ export function CreateSiteBuilder() {
     setForm((current) => {
       const nextName = draft.name?.trim() || current.name;
       const nextSlug = draft.slug?.trim() || (nextName ? slugify(nextName) : current.slug);
+      const nextType = draft.type?.trim() || current.type;
 
       return {
         ...current,
         name: nextName,
         slug: nextSlug,
         location: draft.location?.trim() || current.location,
-        type: draft.type?.trim() || current.type,
-        template_id: draft.template_id?.trim() || current.template_id,
+        type: nextType,
+        template_id: defaultTemplateIdForBusinessType({ type: nextType, templateId: draft.template_id?.trim() || current.template_id }),
         hero_title: draft.hero_title?.trim() || current.hero_title,
         hero_subtitle: draft.hero_subtitle?.trim() || current.hero_subtitle,
         capacity: draftNumber(draft.capacity) || current.capacity,
@@ -1287,6 +1300,8 @@ function renderStep(
   }
 
   if (activeStep === 2) {
+    const categoryTemplates = templateCatalogForCategory(category.id).filter((template) => template.planType === "seed");
+
     return (
       <section className="grid flex-1 grid-cols-1 gap-8 xl:grid-cols-12 xl:items-start">
         <div className="flex min-h-[760px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm xl:col-span-5">
@@ -1298,43 +1313,46 @@ function renderStep(
           <div className="flex-1 space-y-8 overflow-y-auto p-6">
             <div>
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-950">Template Gallery</h3>
+                <h3 className="text-sm font-semibold text-slate-950">Site Structure</h3>
                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{category.shortLabel}</span>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {resortTemplateOptions.map((template, index) => {
-                  const selected = form.template_id === template.id;
+              <div className="grid gap-4">
+                {categoryTemplates.map((template) => {
+                  const selected = form.template_id === template.templateId;
                   return (
                     <button
-                      key={template.id}
+                      key={template.name}
                       type="button"
-                      onClick={() => updateField("template_id", template.id)}
+                      onClick={() => updateField("template_id", template.templateId)}
                       className="group text-left"
                     >
                       <div
-                        className={`relative aspect-[3/4] overflow-hidden rounded-2xl border-2 shadow-sm transition ${
+                        className={`relative overflow-hidden rounded-2xl border-2 bg-white p-4 shadow-sm transition ${
                           selected ? "border-emerald-500" : "border-transparent group-hover:border-emerald-300"
                         }`}
                       >
-                        <div className={`h-full w-full ${index % 2 === 0 ? "bg-gradient-to-br from-emerald-100 via-white to-slate-200" : "bg-gradient-to-br from-amber-100 via-white to-slate-200"}`}>
-                          <div className="h-1/2 bg-slate-300/60" />
-                          <div className="space-y-2 p-3">
-                            <div className="h-3 w-3/4 rounded bg-slate-800/70" />
-                            <div className="h-2 w-full rounded bg-slate-300" />
-                            <div className="h-2 w-2/3 rounded bg-slate-300" />
-                            <div className="mt-4 grid grid-cols-2 gap-2">
-                              <span className="h-10 rounded-lg bg-white/80" />
-                              <span className="h-10 rounded-lg bg-white/80" />
+                        <div className="rounded-xl bg-gradient-to-br from-emerald-50 via-white to-slate-100 p-4 ring-1 ring-slate-100">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600 text-xs font-bold text-white">{category.icon}</span>
+                            <span className="rounded-full bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700 ring-1 ring-emerald-100">{template.tags[0]}</span>
+                          </div>
+                          <div className="mt-5 space-y-2">
+                            <div className="h-3 w-3/4 rounded bg-slate-900/80" />
+                            <div className="h-2 w-full rounded bg-slate-200" />
+                            <div className="h-2 w-2/3 rounded bg-slate-200" />
+                            <div className="mt-4 grid grid-cols-3 gap-2">
+                              {category.pageLabels.slice(1, 4).map((label) => (
+                                <span key={label} className="rounded-lg bg-white px-2 py-3 text-center text-[10px] font-semibold text-slate-500 ring-1 ring-slate-100">{label}</span>
+                              ))}
                             </div>
                           </div>
                         </div>
                         {selected ? (
                           <span className="absolute right-2 top-2 rounded-full bg-emerald-500 px-2 py-1 text-[10px] font-bold text-white">Selected</span>
                         ) : null}
+                        <h4 className={`mt-4 text-sm font-semibold ${selected ? "text-slate-950" : "text-slate-700"}`}>{template.name}</h4>
+                        <p className="mt-2 text-xs leading-5 text-slate-500">{template.description}</p>
                       </div>
-                      <p className={`mt-2 text-center text-sm font-medium ${selected ? "text-slate-950" : "text-slate-600 group-hover:text-slate-950"}`}>
-                        {template.label}
-                      </p>
                     </button>
                   );
                 })}

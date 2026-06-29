@@ -1,6 +1,7 @@
 import { AboutSection } from "@/components/resort/AboutSection";
 import { BookingSection } from "@/components/resort/BookingSection";
 import { BoutiqueResortSubPage } from "@/components/resort/BoutiqueResortSubPage";
+import { CategoryBusinessSubPage } from "@/components/templates/CategoryBusinessTemplate";
 import { ExperienceSection } from "@/components/resort/ExperienceSection";
 import { FloatingWhatsAppButton } from "@/components/resort/FloatingWhatsAppButton";
 import { FooterSection } from "@/components/resort/FooterSection";
@@ -9,6 +10,7 @@ import { ReviewSection } from "@/components/resort/ReviewSection";
 import { ResortNavigation } from "@/components/resort/ResortNavigation";
 import { ServiceSection } from "@/components/resort/ServiceSection";
 import { businessCategoryFromType } from "@/lib/business-categories";
+import { resolveCategoryTemplate } from "@/lib/category-templates";
 import { designTokensFor } from "@/lib/design-settings";
 import { presetForSlug, presetSettingsFrom } from "@/lib/section-presets";
 import Image from "next/image";
@@ -25,6 +27,12 @@ function slugKeyFor(page: ResortSitePage) {
 }
 
 export function ResortSubPage({ resort, page }: ResortSubPageProps) {
+  const resolvedTemplate = resolveCategoryTemplate(resort);
+
+  if (resolvedTemplate.mode === "category") {
+    return <CategoryBusinessSubPage resort={resort} page={page} />;
+  }
+
   if (resort.template_id === "boutique-resort") {
     return <BoutiqueResortSubPage resort={resort} page={page} />;
   }

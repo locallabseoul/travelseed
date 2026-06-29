@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { businessCategoryFromType } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import type { BookingInquiry, DashboardTab, InquiryStatus, ResortConsoleData } from "@/types/dashboard";
 
 const statusOptions: InquiryStatus[] = ["new", "contacted", "confirmed", "cancelled"];
@@ -35,6 +36,7 @@ export function InquiriesManager({
   const [saving, setSaving] = useState(false);
 
   const category = businessCategoryFromType({ type: site.type, templateId: site.template });
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const accommodation = category.id === "accommodation";
   const selectedInquiry = inquiries.find((inquiry) => inquiry.id === selectedId) ?? inquiries[0] ?? null;
   const filteredInquiries = useMemo(
@@ -203,6 +205,7 @@ export function InquiriesManager({
               <InquiryDetail
                 inquiry={selectedInquiry}
                 category={category}
+                quickReplyLabels={dashboardCopy.inquiries.quickReplyLabels}
                 saving={saving}
                 onStatusChange={(nextStatus) => void updateStatus(selectedInquiry, nextStatus)}
                 onCreateVoucher={() => void createVoucherFromInquiry(selectedInquiry)}
@@ -255,12 +258,14 @@ export function InquiriesManager({
 function InquiryDetail({
   inquiry,
   category,
+  quickReplyLabels,
   saving,
   onStatusChange,
   onCreateVoucher,
 }: {
   inquiry: BookingInquiry;
   category: ReturnType<typeof businessCategoryFromType>;
+  quickReplyLabels: string[];
   saving: boolean;
   onStatusChange: (status: InquiryStatus) => void;
   onCreateVoucher: () => void;
@@ -322,15 +327,16 @@ function InquiryDetail({
       <section className="mt-6">
         <p className="text-sm font-semibold text-slate-950">Quick replies</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {category.inquiry.quickReplies.map((reply) => {
+          {category.inquiry.quickReplies.map((reply, index) => {
             const replyUrl = whatsappReplyUrl(inquiry, reply);
+            const label = quickReplyLabels[index] ?? replyLabel(reply);
             return replyUrl ? (
               <a key={reply} href={replyUrl} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
-                {replyLabel(reply)}
+                {label}
               </a>
             ) : (
               <span key={reply} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400">
-                {replyLabel(reply)}
+                {label}
               </span>
             );
           })}

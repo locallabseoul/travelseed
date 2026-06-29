@@ -10,6 +10,7 @@ import {
   useDraftDirtyGuard,
   useSelectableDraft,
 } from "@/components/dashboard/SetupDraftTools";
+import { dashboardCategoryCopyFor, type DashboardCategoryCopy } from "@/lib/dashboard-category-copy";
 import type { DashboardUnsavedChanges, ResortConsoleData, ResortOfferData } from "@/types/dashboard";
 import type { ResortOffer } from "@/types/resort";
 
@@ -95,6 +96,7 @@ export function ImportManager({
   const [existingText, setExistingText] = useState("");
   const [generating, setGenerating] = useState(false);
   const [status, setStatus] = useState("");
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const { draft, selectedFields, setNextDraft, clearDraft, toggleDraftField } = useSelectableDraft();
   const [serviceDrafts, setServiceDrafts] = useState<ResortOfferData[]>([]);
   const [selectedServiceDraftIds, setSelectedServiceDraftIds] = useState<Set<string>>(new Set());
@@ -190,7 +192,7 @@ export function ImportManager({
         sourceUrl={sourceUrl}
         existingText={existingText}
         generating={generating}
-        helper="Use a public website, Instagram, marketplace, Booking, Airbnb, Agoda, or social link. If a link is unavailable, paste existing descriptions, services, offers, and operating notes."
+        helper={`Use a public website, Instagram, marketplace, OTA, or social link. If a link is unavailable, paste existing descriptions for ${dashboardCopy.setup.contentFocus}.`}
         onSourceUrlChange={setSourceUrl}
         onExistingTextChange={setExistingText}
         onGenerate={() => void generateDraft()}
@@ -199,6 +201,7 @@ export function ImportManager({
       <DraftReview site={site} draft={draft} selectedFields={selectedFields} onToggleField={toggleDraftField} onApply={() => void applySelectedDraft()} />
       <ServiceDraftReview
         services={serviceDrafts}
+        dashboardCopy={dashboardCopy}
         selectedIds={selectedServiceDraftIds}
         onSelectionChange={setSelectedServiceDraftIds}
         onApply={() => void applySelectedDraft()}
@@ -211,11 +214,13 @@ export function ImportManager({
 
 function ServiceDraftReview({
   services,
+  dashboardCopy,
   selectedIds,
   onSelectionChange,
   onApply,
 }: {
   services: ResortOfferData[];
+  dashboardCopy: DashboardCategoryCopy;
   selectedIds: Set<string>;
   onSelectionChange: (value: Set<string>) => void;
   onApply: () => void;
@@ -239,7 +244,7 @@ function ServiceDraftReview({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-slate-950">Review suggested offer items</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Selected services, packages, rooms, products, or menu items will be added to the current offer inventory.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Selected {dashboardCopy.pages.offersLabel.toLowerCase()} will be added to the current offer inventory.</p>
         </div>
         <button type="button" onClick={onApply} disabled={selectedIds.size === 0} className="min-h-11 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
           Save selected items
@@ -252,7 +257,7 @@ function ServiceDraftReview({
               <input type="checkbox" checked={selectedIds.has(service.id)} onChange={() => toggleService(service.id)} className="mt-1 h-4 w-4 accent-emerald-600" />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold capitalize text-emerald-700 ring-1 ring-slate-200">{service.kind}</span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold capitalize text-emerald-700 ring-1 ring-slate-200">{dashboardCopy.offers.kindLabels[service.kind].badgeLabel}</span>
                   {service.priceLabel ? <span className="text-xs font-medium text-slate-600">{service.priceLabel}</span> : null}
                 </div>
                 <p className="mt-2 text-sm font-semibold text-slate-950">{service.title}</p>

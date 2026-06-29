@@ -1,7 +1,9 @@
 import { Badge, Panel, ProgressBar } from "@/components/dashboard/ui";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import type { ResortConsoleData } from "@/types/dashboard";
 
 export function AnalyticsView({ site }: { site: ResortConsoleData }) {
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const conversion = site.monthlyVisitorsUsed > 0 ? ((site.whatsappClicksUsed / site.monthlyVisitorsUsed) * 100).toFixed(1) : "0.0";
   const maxDailyActivity = Math.max(...site.analytics.dailyClicks.map((point) => Math.max(point.whatsappClicks, point.pageViews)), 1);
   const sourceCounts = sourceCountsFor(site);
@@ -24,9 +26,9 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
       <div className="grid gap-4 md:grid-cols-4">
         {[
           ["Page Views", site.monthlyVisitorsUsed.toLocaleString(), "Customers landing on the site"],
-          ["WhatsApp Clicks", site.analytics.whatsappClicks30d.toLocaleString(), "CTA taps and chat intent"],
-          ["Customer Inquiries", site.inquiriesUsed.toLocaleString(), "Saved inbox conversations"],
-          ["CTA Conversion", `${conversion}%`, "Clicks divided by page views"],
+          ["WhatsApp Clicks", site.analytics.whatsappClicks30d.toLocaleString(), dashboardCopy.analytics.whatsappHelper],
+          ["Customer Inquiries", site.inquiriesUsed.toLocaleString(), dashboardCopy.analytics.inquiriesHelper],
+          ["CTA Conversion", `${conversion}%`, dashboardCopy.analytics.conversionHelper],
         ].map(([label, value, helper]) => (
           <Panel key={label}>
             <p className="text-sm font-medium text-slate-500">{label}</p>
@@ -41,7 +43,7 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-slate-950">Traffic and WhatsApp activity</h2>
-              <p className="mt-1 text-sm text-slate-500">Daily page views compared with customer chat intent.</p>
+              <p className="mt-1 text-sm text-slate-500">{dashboardCopy.analytics.chartDescription}</p>
             </div>
             <Badge tone="gray">{site.analytics.dailyClicks.length || 0} days</Badge>
           </div>
@@ -86,7 +88,7 @@ export function AnalyticsView({ site }: { site: ResortConsoleData }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-slate-950">CTA sources</h2>
-            <p className="mt-1 text-sm text-slate-500">See which buttons and pages drive WhatsApp intent.</p>
+            <p className="mt-1 text-sm text-slate-500">{dashboardCopy.analytics.ctaSourceDescription}</p>
           </div>
           <Badge tone="gray">{sourceCounts.length} sources</Badge>
         </div>

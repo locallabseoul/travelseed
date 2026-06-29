@@ -4,9 +4,11 @@ import type { DashboardTab } from "@/types/dashboard";
 const actionTargets: Record<string, DashboardTab> = {
   "Continue Setup": "setup",
   "Edit Home Hero": "content",
+  "Edit Page Content": "content",
   "Update Gallery": "content",
   "Manage Offers": "offers",
   "Edit WhatsApp Inquiry": "whatsapp",
+  "Review Inquiries": "inquiries",
   "Connect Domain": "domain",
   "Upgrade Plan": "plan",
 };

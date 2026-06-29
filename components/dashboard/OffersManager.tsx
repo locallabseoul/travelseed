@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { businessCategoryFromType, offerSectionsForCategory } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor, type DashboardCategoryCopy } from "@/lib/dashboard-category-copy";
 import type { DashboardUnsavedChanges, ResortConsoleData, ResortOfferData } from "@/types/dashboard";
 import type { ResortOffer } from "@/types/resort";
 
@@ -37,9 +38,6 @@ type OfferSectionConfig = {
 const bedTypeOptions = ["King bed", "Queen bed", "Twin beds", "Double bed", "Bunk beds", "Sofa bed", "Mixed beds"];
 const viewTypeOptions = ["Ocean view", "Garden view", "Pool view", "Mountain view", "Rice field view", "Courtyard view", "No view / Interior"];
 const bathroomOptions = ["Private bathroom", "Shared bathroom", "Ensuite bathroom", "Outdoor bathroom", "Bathtub", "Shower only"];
-const durationOptions = ["Per night", "2 nights", "3 days / 2 nights", "Half day", "Full day"];
-const highlightOptions = ["Best value", "Popular", "Limited offer", "Family friendly", "Private", "New"];
-const priceLabelOptions = ["From IDR ...", "Per night", "Per person", "Per package", "Contact for price"];
 const roomAmenityOptions = ["Air conditioning", "WiFi", "Hot water", "Private balcony", "Mini fridge", "Safe", "Desk", "Wardrobe", "Coffee/tea", "Smart TV"];
 const defaultPromotionBadge = "WhatsApp offer";
 
@@ -77,6 +75,7 @@ export function OffersManager({
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const category = businessCategoryFromType({ type: site.type, templateId: site.template });
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const offerSections = category.id === "accommodation" || offers.some((offer) => offer.kind === "room")
     ? offerSectionsForCategory(category).some((section) => section.kind === "room")
       ? offerSectionsForCategory(category)
@@ -94,11 +93,11 @@ export function OffersManager({
     onUnsavedChangesChange?.({
       isDirty,
       title: "Discard offer changes?",
-      description: "You have service, package, or room changes that have not been saved. Continue without saving them?",
+      description: dashboardCopy.offers.unsavedDescription,
     });
 
     return () => onUnsavedChangesChange?.({ isDirty: false, title: "", description: "" });
-  }, [offers, onUnsavedChangesChange, site.services]);
+  }, [dashboardCopy.offers.unsavedDescription, offers, onUnsavedChangesChange, site.services]);
 
   async function uploadImage(file: File) {
     if (!accessToken) {
@@ -338,7 +337,7 @@ export function OffersManager({
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-slate-950">Offer inventory</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-500">{category.offerSectionBody}. Use rooms only for accommodation businesses.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-500">{category.offerSectionBody}. {dashboardCopy.offers.roomSelectHint}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => void generateSampleOffers()} disabled={generating} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
@@ -360,6 +359,7 @@ export function OffersManager({
             onUploadImage={uploadOfferImage}
             offerSections={offerSections}
             category={category}
+            dashboardCopy={dashboardCopy}
           />
         </div>
 
@@ -410,6 +410,7 @@ function OfferManager({
   onUploadImage,
   offerSections,
   category,
+  dashboardCopy,
 }: {
   offers: ResortOfferData[];
   selectedIndex: number;
@@ -422,6 +423,7 @@ function OfferManager({
   onUploadImage: (index: number, file: File) => void;
   offerSections: OfferSectionConfig[];
   category: ReturnType<typeof businessCategoryFromType>;
+  dashboardCopy: DashboardCategoryCopy;
 }) {
   const selectedOffer = offers[selectedIndex] ?? null;
 
@@ -435,6 +437,7 @@ function OfferManager({
             <OfferKindSection
               key={section.kind}
               section={section}
+              dashboardCopy={dashboardCopy}
               offers={sectionOffers}
               selectedIndex={selectedIndex}
               onAdd={() => onAdd(section.kind)}
@@ -454,6 +457,7 @@ function OfferManager({
           onChange={(patch) => onChange(selectedIndex, patch)}
           onUploadImage={(file) => onUploadImage(selectedIndex, file)}
           category={category}
+          dashboardCopy={dashboardCopy}
         />
       ) : (
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-600">
@@ -466,6 +470,7 @@ function OfferManager({
 
 function OfferKindSection({
   section,
+  dashboardCopy,
   offers,
   selectedIndex,
   onAdd,
@@ -474,6 +479,7 @@ function OfferKindSection({
   onRemove,
 }: {
   section: OfferSectionConfig;
+  dashboardCopy: DashboardCategoryCopy;
   offers: Array<{ offer: ResortOfferData; index: number }>;
   selectedIndex: number;
   onAdd: () => void;
@@ -502,6 +508,7 @@ function OfferKindSection({
             <OfferListItem
               key={offer.id}
               offer={offer}
+              dashboardCopy={dashboardCopy}
               sectionIndex={sectionIndex}
               sectionTotal={offers.length}
               selected={index === selectedIndex}
@@ -523,6 +530,7 @@ function OfferKindSection({
 
 function OfferListItem({
   offer,
+  dashboardCopy,
   sectionIndex,
   sectionTotal,
   selected,
@@ -531,6 +539,7 @@ function OfferListItem({
   onRemove,
 }: {
   offer: ResortOfferData;
+  dashboardCopy: DashboardCategoryCopy;
   sectionIndex: number;
   sectionTotal: number;
   selected: boolean;
@@ -546,7 +555,7 @@ function OfferListItem({
       <div className="min-w-0">
         <button type="button" onClick={onSelect} className="block w-full text-left">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold capitalize text-emerald-700">{offer.kind}</span>
+            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold capitalize text-emerald-700">{dashboardCopy.offers.kindLabels[offer.kind].badgeLabel}</span>
             {!offer.isActive ? <span className="rounded-md bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700">Inactive</span> : null}
             {isShownOnPromotions(offer) ? <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Promotions page</span> : null}
           </div>
@@ -579,6 +588,7 @@ function OfferDetailEditor({
   onChange,
   onUploadImage,
   category,
+  dashboardCopy,
 }: {
   offer: ResortOfferData;
   index: number;
@@ -586,7 +596,11 @@ function OfferDetailEditor({
   onChange: (patch: Partial<ResortOfferData>) => void;
   onUploadImage: (file: File) => void;
   category: ReturnType<typeof businessCategoryFromType>;
+  dashboardCopy: DashboardCategoryCopy;
 }) {
+  const kindCopy = dashboardCopy.offers.kindLabels[offer.kind];
+  const kindOptions = category.offerOrder.includes(offer.kind) ? category.offerOrder : [offer.kind, ...category.offerOrder];
+
   return (
     <div className="grid content-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -599,9 +613,11 @@ function OfferDetailEditor({
           onChange={(event) => onChange({ kind: event.target.value as ResortOfferData["kind"] })}
           className="min-h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-600"
         >
-          <option value="service">Service</option>
-          <option value="package">Package</option>
-          <option value="room">Room</option>
+          {kindOptions.map((kind) => (
+            <option key={kind} value={kind}>
+              {dashboardCopy.offers.kindLabels[kind].selectLabel}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -609,7 +625,7 @@ function OfferDetailEditor({
         <div className="grid content-start gap-4">
           <OfferImagePanel imageUrl={offer.imageUrl} uploading={uploading} onUpload={onUploadImage} onClear={() => onChange({ imageUrl: "" })} />
           {canShowOnPromotions(offer) ? (
-            <PromotionPlacementPanel offer={offer} onChange={onChange} />
+            <PromotionPlacementPanel offer={offer} kindLabel={kindCopy.label.toLowerCase()} onChange={onChange} />
           ) : null}
           <PresetGroup
             label="Starter templates"
@@ -624,16 +640,16 @@ function OfferDetailEditor({
           />
           <div className="grid gap-4 md:grid-cols-2">
             <EditableField label="Title" value={offer.title} onChange={(value) => onChange({ title: value })} />
-            <EditableField label="Price label" value={offer.priceLabel} onChange={(value) => onChange({ priceLabel: value })} placeholder={offer.kind === "room" ? "From IDR 750K / night" : "From IDR 75K"} />
-            <EditableField label="Capacity" value={offer.capacity} onChange={(value) => onChange({ capacity: value })} type="number" placeholder="2" />
-            <EditableField label="Duration" value={offer.duration} onChange={(value) => onChange({ duration: value })} placeholder={offer.kind === "room" ? "Per night" : "30 minutes"} />
+            <EditableField label="Price label" value={offer.priceLabel} onChange={(value) => onChange({ priceLabel: value })} placeholder={kindCopy.pricePlaceholder} />
+            <EditableField label={kindCopy.capacityLabel} value={offer.capacity} onChange={(value) => onChange({ capacity: value })} type="number" placeholder={kindCopy.capacityPlaceholder} />
+            <EditableField label="Duration" value={offer.duration} onChange={(value) => onChange({ duration: value })} placeholder={kindCopy.durationPlaceholder} />
             <EditableField label={canShowOnPromotions(offer) ? "Campaign badge" : "Highlight badge"} value={offer.highlight} onChange={(value) => onChange({ highlight: value })} placeholder={canShowOnPromotions(offer) ? defaultPromotionBadge : "Popular"} />
             <EditableField label="CTA label" value={offer.ctaLabel} onChange={(value) => onChange({ ctaLabel: value })} placeholder={offer.kind === "room" ? "Ask availability" : category.primaryCta} />
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <PresetGroup label="Price presets" options={priceLabelOptions} selected={offer.priceLabel ? [offer.priceLabel] : []} onSelect={(value) => onChange({ priceLabel: value })} />
-            <PresetGroup label="Duration presets" options={durationOptions} selected={offer.duration ? [offer.duration] : []} onSelect={(value) => onChange({ duration: value })} />
-            <PresetGroup label={canShowOnPromotions(offer) ? "Campaign badge presets" : "Highlight presets"} options={canShowOnPromotions(offer) ? [defaultPromotionBadge, ...highlightOptions] : highlightOptions} selected={offer.highlight ? [offer.highlight] : []} onSelect={(value) => onChange({ highlight: value })} />
+            <PresetGroup label="Price presets" options={kindCopy.pricePresets} selected={offer.priceLabel ? [offer.priceLabel] : []} onSelect={(value) => onChange({ priceLabel: value })} />
+            <PresetGroup label="Duration presets" options={kindCopy.durationPresets} selected={offer.duration ? [offer.duration] : []} onSelect={(value) => onChange({ duration: value })} />
+            <PresetGroup label={canShowOnPromotions(offer) ? "Campaign badge presets" : "Highlight presets"} options={canShowOnPromotions(offer) ? [defaultPromotionBadge, ...kindCopy.highlightPresets] : kindCopy.highlightPresets} selected={offer.highlight ? [offer.highlight] : []} onSelect={(value) => onChange({ highlight: value })} />
             <PresetGroup label="CTA presets" options={category.ctaOptions[offer.kind]} selected={offer.ctaLabel ? [offer.ctaLabel] : []} onSelect={(value) => onChange({ ctaLabel: value })} />
           </div>
           {offer.kind === "room" ? (
@@ -661,7 +677,7 @@ function OfferDetailEditor({
             Active
           </label>
         </div>
-        <OfferCardPreview offer={offer} category={category} />
+        <OfferCardPreview offer={offer} category={category} dashboardCopy={dashboardCopy} />
       </div>
     </div>
   );
@@ -669,9 +685,11 @@ function OfferDetailEditor({
 
 function PromotionPlacementPanel({
   offer,
+  kindLabel,
   onChange,
 }: {
   offer: ResortOfferData;
+  kindLabel: string;
   onChange: (patch: Partial<ResortOfferData>) => void;
 }) {
   const hasPlacement = hasPromotionPlacement(offer);
@@ -683,7 +701,7 @@ function PromotionPlacementPanel({
         <div>
           <p className="text-sm font-semibold text-slate-950">Promotions page</p>
           <p className="mt-1 text-xs leading-5 text-slate-600">
-            Feature this {offer.kind} on the public Promotions page as a WhatsApp campaign card.
+            Feature this {kindLabel} on the public Promotions page as a WhatsApp campaign card.
           </p>
         </div>
         <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-slate-50 px-4 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
@@ -747,7 +765,7 @@ function OfferImagePanel({
   );
 }
 
-function OfferCardPreview({ offer, category }: { offer: ResortOfferData; category: ReturnType<typeof businessCategoryFromType> }) {
+function OfferCardPreview({ offer, category, dashboardCopy }: { offer: ResortOfferData; category: ReturnType<typeof businessCategoryFromType>; dashboardCopy: DashboardCategoryCopy }) {
   const guestLabel = offer.kind === "room" ? offer.maxGuests || offer.capacity : offer.capacity;
   const capacityText = guestLabel ? `${guestLabel} ${offer.kind === "room" ? "guests" : category.capacityLabel}` : "";
   const roomDetails = offer.kind === "room"
@@ -768,7 +786,7 @@ function OfferCardPreview({ offer, category }: { offer: ResortOfferData; categor
         )}
         <div className="p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold capitalize text-emerald-700">{offer.kind}</span>
+            <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold capitalize text-emerald-700">{dashboardCopy.offers.kindLabels[offer.kind].badgeLabel}</span>
             {!offer.isActive ? <span className="rounded-md bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">Inactive</span> : null}
             {isShownOnPromotions(offer) ? <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-amber-700">Promotions page</span> : null}
             {offer.highlight ? <span className="rounded-md bg-slate-950 px-3 py-1 text-xs font-semibold text-white">{offer.highlight}</span> : null}

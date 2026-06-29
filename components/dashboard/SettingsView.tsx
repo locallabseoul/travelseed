@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { businessTypeOptions } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { DashboardConfirmOptions, DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
@@ -28,6 +29,7 @@ export function SettingsView({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordStatus, setPasswordStatus] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const selectedTypeCopy = dashboardCategoryCopyFor({ type, template: site.template });
 
   useEffect(() => {
     setName(site.name);
@@ -166,7 +168,7 @@ export function SettingsView({
             <EditableField label="Contact Email" value={contactEmail} onChange={setContactEmail} />
             <SelectField label="Language" value={language} onChange={setLanguage} options={languageOptions} />
             <EditableField label="Timezone" value={timezone} onChange={setTimezone} />
-            <SelectField label="Business Type" value={type} onChange={setType} options={businessTypeOptions} />
+            <SelectField label="Business Type" value={type} onChange={setType} options={businessTypeOptions} helper={selectedTypeCopy.settings.typeHelper} />
           </div>
           <div className="mt-6">
             <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
@@ -278,11 +280,13 @@ function SelectField({
   value,
   onChange,
   options,
+  helper,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  helper?: string;
 }) {
   const normalizedOptions = options.includes(value) ? options : [value, ...options].filter((option, index, list) => list.indexOf(option) === index);
 
@@ -296,6 +300,7 @@ function SelectField({
           </option>
         ))}
       </select>
+      {helper ? <span className="text-xs font-normal leading-5 text-slate-500">{helper}</span> : null}
     </label>
   );
 }

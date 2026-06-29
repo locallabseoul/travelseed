@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { canUsePlan, effectivePlanType, templateCatalog } from "@/components/dashboard/subscriptionConfig";
+import { canUsePlan, defaultTemplateCatalogEntryForCategory, effectivePlanType, templateCatalog, templateCatalogForCategory } from "@/components/dashboard/subscriptionConfig";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { savePreviewResort } from "@/components/create/preview-storage";
+import { businessCategoryFromType, type BusinessCategoryId } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import { defaultEditableColorsForTemplate } from "@/lib/design-settings";
 import type { DashboardUnsavedChanges, PlanType, ResortConsoleData } from "@/types/dashboard";
 import type { Resort } from "@/types/resort";
@@ -12,10 +14,10 @@ const buttonStyles = ["Rounded", "Pill", "Sharp", "Soft Outline"];
 const imageStyles = ["Soft Corners", "Square Editorial", "Full Bleed", "Postcard"];
 
 const templateNameById: Record<string, string> = {
-  "boutique-villa": "Boutique Villa",
-  "boutique-resort": "Boutique Resort",
-  "surf-camp": "Surf Camp",
-  "minimal-stay": "Minimal Stay",
+  "boutique-villa": "Legacy Hospitality",
+  "boutique-resort": "Legacy Hospitality Multi-page",
+  "surf-camp": "Legacy Tour",
+  "minimal-stay": "Category Website",
 };
 
 const colorControlLabels = {
@@ -48,20 +50,26 @@ function templateLibraryCopy(planType: PlanType) {
   return "Upgrade to Seed to unlock one-page WhatsApp-ready business templates.";
 }
 
-function defaultCatalogNameFor(templateId: string, planType: PlanType) {
-  return templateCatalog.find((option) => option.templateId === templateId && canUsePlan(planType, option.planType))?.name ??
+function defaultCatalogNameFor(templateId: string, planType: PlanType, categoryId: BusinessCategoryId) {
+  const categoryDefault = defaultTemplateCatalogEntryForCategory(categoryId, planType);
+
+  if (categoryDefault?.templateId === templateId && canUsePlan(planType, categoryDefault.planType)) {
+    return categoryDefault.name;
+  }
+
+  return templateCatalog.find((option) => option.templateId === templateId && option.categoryIds.includes(categoryId) && canUsePlan(planType, option.planType))?.name ??
     templateCatalog.find((option) => option.templateId === templateId)?.name ??
     "";
 }
 
-function validCatalogNameFor(catalogName: string, templateId: string, planType: PlanType) {
+function validCatalogNameFor(catalogName: string, templateId: string, planType: PlanType, categoryId: BusinessCategoryId) {
   const savedCatalog = templateCatalog.find((option) => option.name === catalogName);
 
-  if (savedCatalog && savedCatalog.templateId === templateId && canUsePlan(planType, savedCatalog.planType)) {
+  if (savedCatalog && savedCatalog.templateId === templateId && savedCatalog.categoryIds.includes(categoryId) && canUsePlan(planType, savedCatalog.planType)) {
     return savedCatalog.name;
   }
 
-  return defaultCatalogNameFor(templateId, planType);
+  return defaultCatalogNameFor(templateId, planType, categoryId);
 }
 
 function normalizedCustomColors(colors: CustomColors) {
@@ -86,8 +94,10 @@ export function DesignManager({
   onSiteUpdate: (site: ResortConsoleData) => Promise<void>;
   onUnsavedChangesChange?: (state: DashboardUnsavedChanges) => void;
 }) {
+  const planType = effectivePlanType(site);
+  const category = businessCategoryFromType({ type: site.type, templateId: site.template });
   const [template, setTemplate] = useState(site.template);
-  const [templateCatalogName, setTemplateCatalogName] = useState(() => validCatalogNameFor(site.designSettings.templateCatalogName, site.template, effectivePlanType(site)));
+  const [templateCatalogName, setTemplateCatalogName] = useState(() => validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType, category.id));
   const [customColors, setCustomColors] = useState<CustomColors>(site.designSettings.customColors);
   const [logoUrl, setLogoUrl] = useState(site.designSettings.logoUrl);
   const [fontStyle, setFontStyle] = useState(site.designSettings.fontStyle);
@@ -95,20 +105,20 @@ export function DesignManager({
   const [imageStyle, setImageStyle] = useState(site.designSettings.imageStyle);
   const [status, setStatus] = useState("");
   const [previewRevision, setPreviewRevision] = useState(0);
-  const planType = effectivePlanType(site);
+  const dashboardCopy = dashboardCategoryCopyFor(site);
 
   useEffect(() => {
     setTemplate(site.template);
-    setTemplateCatalogName(validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType));
+    setTemplateCatalogName(validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType, category.id));
     setCustomColors(site.designSettings.customColors);
     setLogoUrl(site.designSettings.logoUrl);
     setFontStyle(site.designSettings.fontStyle);
     setButtonStyle(site.designSettings.buttonStyle);
     setImageStyle(site.designSettings.imageStyle);
-  }, [planType, site.designSettings, site.template]);
+  }, [category.id, planType, site.designSettings, site.template]);
 
   const isDirty = template !== site.template ||
-    templateCatalogName !== validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType) ||
+    templateCatalogName !== validCatalogNameFor(site.designSettings.templateCatalogName, site.template, planType, category.id) ||
     !customColorsEqual(customColors, site.designSettings.customColors) ||
     logoUrl !== site.designSettings.logoUrl ||
     fontStyle !== site.designSettings.fontStyle ||
@@ -148,9 +158,13 @@ export function DesignManager({
   }
 
   const selectedTemplateName = templateNameById[template] ?? template;
-  const availableTemplates = templateCatalog.filter((option) => canUsePlan(planType, option.planType));
-  const upgradeTemplates = templateCatalog.filter((option) => !canUsePlan(planType, option.planType));
-  const selectedCatalogEntry = templateCatalog.find((option) => option.name === templateCatalogName) ?? templateCatalog.find((option) => option.templateId === template);
+  const recommendedTemplateNames = new Set(dashboardCopy.design.recommendedTemplateNames);
+  const availableTemplates = templateCatalogForCategory(category.id)
+    .filter((option) => canUsePlan(planType, option.planType))
+    .sort((left, right) => Number(recommendedTemplateNames.has(right.name)) - Number(recommendedTemplateNames.has(left.name)));
+  const upgradeTemplates = templateCatalogForCategory(category.id).filter((option) => !canUsePlan(planType, option.planType));
+  const selectedCatalogEntry = templateCatalog.find((option) => option.name === templateCatalogName) ??
+    templateCatalog.find((option) => option.templateId === template && option.categoryIds.includes(category.id));
   const selectedTemplateUnavailable = selectedCatalogEntry ? !canUsePlan(planType, selectedCatalogEntry.planType) : false;
   const savedColorTheme = site.designSettings.colorTheme || "Tropical Green";
   const previewResort = useMemo(
@@ -193,7 +207,7 @@ export function DesignManager({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-slate-950">Template library</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-600">{templateLibraryCopy(planType)}</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">{templateLibraryCopy(planType)} {dashboardCopy.design.recommendation}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone="sand">{site.plan}</Badge>
@@ -211,6 +225,7 @@ export function DesignManager({
         {availableTemplates.length > 0 ? availableTemplates.map((option) => {
           const templateId = option.templateId;
           const selected = option.name === templateCatalogName;
+          const recommended = recommendedTemplateNames.has(option.name);
           return (
             <button
               key={option.name}
@@ -225,7 +240,10 @@ export function DesignManager({
                 <TemplatePreview name={option.name} previewImageUrl={option.previewImageUrl} />
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <h2 className="font-semibold text-slate-950">{option.name}</h2>
-                  {selected ? <Badge>Current</Badge> : null}
+                  <div className="flex flex-wrap gap-2">
+                    {recommended ? <Badge tone="green">Recommended</Badge> : null}
+                    {selected ? <Badge>Current</Badge> : null}
+                  </div>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{option.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">

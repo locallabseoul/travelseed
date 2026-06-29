@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { Badge, Panel } from "@/components/dashboard/ui";
 import { businessCategoryFromType } from "@/lib/business-categories";
+import { dashboardCategoryCopyFor } from "@/lib/dashboard-category-copy";
 import { createWhatsAppBookingUrl } from "@/lib/whatsapp";
 import type { DashboardUnsavedChanges, ResortConsoleData } from "@/types/dashboard";
 
 const languageOptions = ["English", "Bahasa Indonesia"] as const;
-
-const messagePresets = [
-  { label: "General inquiry", fields: ["Name:", "Contact:", "Request:", "Preferred date or time:"] },
-  { label: "Appointment", fields: ["Name:", "Contact:", "Service:", "Preferred date or time:"] },
-  { label: "Stay booking", fields: ["Check-in:", "Check-out:", "Guests:", "Airport Pickup:"] },
-];
 
 function defaultBookingTemplate(siteName: string, airportPickupEnabled = true, category = businessCategoryFromType(null)) {
   const lines = category.defaultBookingMessage(siteName).split("\n");
@@ -46,10 +41,10 @@ export function WhatsAppManager({
   const [whatsappNumber, setWhatsappNumber] = useState(site.whatsappNumber);
   const [language, setLanguage] = useState(site.language);
   const category = businessCategoryFromType({ type: site.type, templateId: site.template });
+  const dashboardCopy = dashboardCategoryCopyFor(site);
   const [bookingMessageTemplate, setBookingMessageTemplate] = useState(site.bookingMessageTemplate || defaultBookingTemplate(site.name, true, category));
   const [airportPickupEnabled, setAirportPickupEnabled] = useState(templateHasAirportPickup(site.bookingMessageTemplate || ""));
-  const accommodation = category.id === "accommodation";
-  const availablePresets = accommodation ? messagePresets : messagePresets.filter((preset) => preset.label !== "Stay booking");
+  const availablePresets = dashboardCopy.whatsapp.presets;
 
   useEffect(() => {
     setWhatsappNumber(site.whatsappNumber);
@@ -128,7 +123,7 @@ export function WhatsAppManager({
           <EditableField label="Inquiry Message Template" value={bookingMessageTemplate} onChange={setBookingMessageTemplate} textarea />
           <div className="grid gap-4 sm:grid-cols-2">
             <SelectField label="Language" value={language} options={languageOptions} onChange={setLanguage} />
-            <ToggleField label="Additional Notes Field" enabled={airportPickupEnabled} onChange={toggleAirportPickup} />
+            <ToggleField label={dashboardCopy.whatsapp.additionalFieldLabel} enabled={airportPickupEnabled} onChange={toggleAirportPickup} />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => void saveSettings()} className="min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm">
@@ -170,7 +165,7 @@ export function WhatsAppManager({
                 ))}
               </div>
               <div className="ml-auto max-w-[80%] rounded-lg rounded-br-sm bg-emerald-600 p-3 text-sm text-white">
-                Thanks. Please send your request details and preferred time.
+                {dashboardCopy.whatsapp.previewReply}
               </div>
             </div>
           </div>

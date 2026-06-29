@@ -3,6 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { DatePickerField, formatDateLabel } from "@/components/dashboard/DatePickerField";
 import { Badge, Panel } from "@/components/dashboard/ui";
+import {
+  categoryReviewSamples,
+  dashboardCategoryCopyFor,
+  reviewSourceDisplayLabel,
+  reviewSourceDisplayOptions,
+  reviewSourceValueFromDisplay,
+  type DashboardCategoryCopy,
+} from "@/lib/dashboard-category-copy";
 import type { GoogleReviewsSyncFeature, ResortConsoleData, WebsiteReview } from "@/types/dashboard";
 
 type ReviewForm = Omit<WebsiteReview, "id" | "resortId" | "createdAt" | "updatedAt"> & {
@@ -24,82 +32,6 @@ type RawWebsiteReview = {
   created_at: string | null;
   updated_at: string | null;
 };
-
-// TODO: Remove fallback data after the website_reviews table is deployed in all environments.
-const fallbackReviews: WebsiteReview[] = [
-  {
-    id: "review-1",
-    guestName: "Maya T.",
-    rating: 5,
-    reviewText: "Villa Jeruk was a peaceful tropical villa with the perfect private pool for our family. We felt relaxed from the moment we arrived.",
-    sourceLabel: "Guest Message",
-    stayDate: "Apr 2026",
-    status: "published",
-    showOnWebsite: true,
-    featured: true,
-    sortOrder: 0,
-  },
-  {
-    id: "review-2",
-    guestName: "Daniel R.",
-    rating: 5,
-    reviewText: "Beautiful location near Selong Belanak Beach. The host was helpful, fast to respond, and made our Lombok trip easy.",
-    sourceLabel: "Manual",
-    stayDate: "Apr 2026",
-    status: "published",
-    showOnWebsite: true,
-    featured: true,
-    sortOrder: 1,
-  },
-  {
-    id: "review-3",
-    guestName: "Alex K.",
-    rating: 5,
-    reviewText: "Our kids loved the garden and private pool. The villa felt family friendly while still being quiet and private.",
-    sourceLabel: "Manual",
-    stayDate: "Mar 2026",
-    status: "published",
-    showOnWebsite: true,
-    featured: true,
-    sortOrder: 2,
-  },
-  {
-    id: "review-4",
-    guestName: "Sari N.",
-    rating: 4,
-    reviewText: "Clean rooms, fast WiFi, and a calm atmosphere for a work-friendly stay. We would come back for a longer visit.",
-    sourceLabel: "Google",
-    stayDate: "Mar 2026",
-    status: "draft",
-    showOnWebsite: false,
-    featured: false,
-    sortOrder: 3,
-  },
-  {
-    id: "review-5",
-    guestName: "Hannah L.",
-    rating: 5,
-    reviewText: "The host gave clear recommendations and helped us plan beach time around Selong Belanak. The villa was private and comfortable.",
-    sourceLabel: "Guest Message",
-    stayDate: "Feb 2026",
-    status: "draft",
-    showOnWebsite: false,
-    featured: false,
-    sortOrder: 4,
-  },
-  {
-    id: "review-6",
-    guestName: "Rizky A.",
-    rating: 5,
-    reviewText: "Great stay for a small family. The pool, WiFi, and quiet tropical setting made Villa Jeruk feel like a real break.",
-    sourceLabel: "Manual",
-    stayDate: "Feb 2026",
-    status: "draft",
-    showOnWebsite: false,
-    featured: false,
-    sortOrder: 5,
-  },
-];
 
 const googleReviewsSync: GoogleReviewsSyncFeature = {
   title: "Google Reviews Sync",
@@ -125,6 +57,8 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
   const [status, setStatus] = useState("Loading website reviews...");
   const [saving, setSaving] = useState(false);
   const [usingFallback, setUsingFallback] = useState(false);
+  const dashboardCopy = dashboardCategoryCopyFor(site);
+  const fallbackReviews = useMemo(() => categoryReviewSamples({ type: site.type, template: site.template }), [site.template, site.type]);
 
   async function apiRequest(path: string, init: RequestInit = {}) {
     if (!accessToken) {
@@ -181,7 +115,7 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
     }
 
     void loadReviews();
-  }, [accessToken, site.id]);
+  }, [accessToken, fallbackReviews, site.id]);
 
   async function saveReview() {
     setSaving(true);
@@ -312,7 +246,7 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <main className="grid gap-6">
-          <AddReviewFormCard form={form} saving={saving} onChange={setForm} onSave={saveReview} />
+          <AddReviewFormCard form={form} dashboardCopy={dashboardCopy} saving={saving} onChange={setForm} onSave={saveReview} />
           <ReviewListCard reviews={reviews} onEdit={setForm} onDelete={deleteReview} onPatch={patchReview} />
           <WebsiteTestimonialsCard reviews={featuredReviews} onMove={moveFeaturedReview} onRemove={(review) => patchReview(review, { showOnWebsite: false, featured: false })} />
         </main>
@@ -329,11 +263,13 @@ export function ReviewsView({ site, accessToken }: { site: ResortConsoleData; ac
 
 function AddReviewFormCard({
   form,
+  dashboardCopy,
   saving,
   onChange,
   onSave,
 }: {
   form: ReviewForm;
+  dashboardCopy: DashboardCategoryCopy;
   saving: boolean;
   onChange: (form: ReviewForm) => void;
   onSave: () => void;
@@ -350,8 +286,8 @@ function AddReviewFormCard({
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <EditableField label="Customer Name" value={form.guestName} placeholder="Customer name" onChange={(guestName) => onChange({ ...form, guestName })} />
         <SelectField label="Rating" value={String(form.rating)} options={["5", "4", "3", "2", "1"]} onChange={(rating) => onChange({ ...form, rating: Number(rating) })} />
-        <SelectField label="Source Label" value={form.sourceLabel} options={["Manual", "Google", "Guest Message"]} onChange={(sourceLabel) => onChange({ ...form, sourceLabel: sourceLabel as WebsiteReview["sourceLabel"] })} />
-        <DatePickerField label="Visit / Service Date" value={form.stayDate ?? ""} onChange={(stayDate) => onChange({ ...form, stayDate })} />
+        <SelectField label="Source Label" value={reviewSourceDisplayLabel(form.sourceLabel)} options={reviewSourceDisplayOptions} onChange={(sourceLabel) => onChange({ ...form, sourceLabel: reviewSourceValueFromDisplay(sourceLabel) })} />
+        <DatePickerField label={dashboardCopy.reviews.dateLabel} value={form.stayDate ?? ""} onChange={(stayDate) => onChange({ ...form, stayDate })} />
         <div className="md:col-span-2">
           <EditableField label="Review Text" value={form.reviewText} placeholder="Paste or write the customer review..." textarea onChange={(reviewText) => onChange({ ...form, reviewText })} />
         </div>
@@ -418,7 +354,7 @@ function ReviewCard({
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-semibold text-slate-950">{review.guestName}</h3>
             <Badge tone={review.status === "published" ? "green" : "gray"}>{review.status === "published" ? "Published" : "Draft"}</Badge>
-            <Badge tone="sand">{review.sourceLabel}</Badge>
+            <Badge tone="sand">{reviewSourceDisplayLabel(review.sourceLabel)}</Badge>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold tracking-[0.12em] text-[#d29735]" aria-label={`${review.rating} star rating`}>
@@ -587,7 +523,7 @@ function SelectField({
 }: {
   label: string;
   value: string;
-  options: string[];
+  options: readonly string[];
   onChange: (value: string) => void;
 }) {
   return (

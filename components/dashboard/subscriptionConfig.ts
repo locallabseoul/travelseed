@@ -1,8 +1,8 @@
 import type { PlanType, ResortConsoleData, SiteStructurePage, SiteStructureSection, SiteType } from "@/types/dashboard";
-import { canUsePlan, templateCatalog } from "@/lib/template-catalog";
+import { canUsePlan, defaultTemplateCatalogEntryForCategory, templateCatalog, templateCatalogForCategory } from "@/lib/template-catalog";
 import { sectionPresets } from "@/lib/section-presets";
 
-export { canUsePlan, templateCatalog };
+export { canUsePlan, defaultTemplateCatalogEntryForCategory, templateCatalog, templateCatalogForCategory };
 
 export const currentPlanPreviewOverride: PlanType | null = null;
 
@@ -45,7 +45,7 @@ export const planConfig: Record<PlanType, {
     positioning: "Beautiful one-page business website.",
     upgradeTarget: "Tree",
     unlocked: ["All landing sections", "WhatsApp CTA", "Promotion Banner", "Custom Domain", "Remove Travelseed Branding"],
-    locked: ["Blog", "Detailed Experiences Pages", "Custom Page Add", "Navigation Builder"],
+    locked: ["Blog", "Detailed offer pages", "Custom Page Add", "Navigation Builder"],
   },
   tree: {
     label: "Tree",

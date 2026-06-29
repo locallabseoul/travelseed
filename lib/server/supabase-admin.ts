@@ -105,7 +105,7 @@ export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUps
     name: String(payload.name ?? "").trim(),
     slug: String(payload.slug ?? "").trim(),
     domain: payload.domain ? String(payload.domain).trim() : null,
-    template_id: String(payload.template_id ?? "boutique-villa"),
+    template_id: String(payload.template_id ?? "minimal-stay"),
     location: String(payload.location ?? "").trim(),
     type: payload.type ? String(payload.type).trim() : null,
     description: payload.description ? String(payload.description).trim() : null,
