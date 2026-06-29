@@ -1,4 +1,4 @@
-import { businessCategoryFromType, isAccommodationBusiness } from "@/lib/business-categories";
+import { businessCategoryFromType } from "@/lib/business-categories";
 
 export type ListingDraft = {
   name?: string;
@@ -148,17 +148,128 @@ function sourceFromHtml(url: URL, html: string): ListingSource {
   };
 }
 
-function titleFromUrl(url: URL) {
-  const lastPath = url.pathname.split("/").filter(Boolean).at(-1) ?? url.hostname;
-  return lastPath
+function humanizePathSegment(value: string) {
+  return decodeURIComponent(value)
     .replace(/\.[a-z0-9]+$/i, "")
     .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-export function fallbackDraft(url: URL): ListingDraft {
+function titleFromUrl(url: URL) {
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  const pathParts = url.pathname.split("/").filter(Boolean);
+  const ignoredParts = new Set([
+    "en",
+    "en-us",
+    "ko",
+    "ko-kr",
+    "id",
+    "id-id",
+    "th",
+    "vi",
+    "ja",
+    "hotel",
+    "hotels",
+    "property",
+    "rooms",
+    "search",
+  ]);
+  const looksLikeName = (part: string) => {
+    const normalized = part.toLowerCase();
+    return (
+      !ignoredParts.has(normalized) &&
+      !/^\d+$/.test(normalized) &&
+      !/^hotelid[-=]?\d+/.test(normalized) &&
+      !/^cid[-=]?\d+/.test(normalized) &&
+      !normalized.includes("checkout") &&
+      !normalized.includes("checkin")
+    );
+  };
+
+  if (host.includes("agoda.")) {
+    const hotelIndex = pathParts.findIndex((part) => part.toLowerCase() === "hotel");
+    const agodaName = pathParts.slice(0, hotelIndex > 0 ? hotelIndex : pathParts.length).findLast(looksLikeName);
+
+    if (agodaName) {
+      return humanizePathSegment(agodaName);
+    }
+  }
+
+  const namePart = pathParts.findLast(looksLikeName) ?? host;
+  return humanizePathSegment(namePart);
+}
+
+function detectAccommodationSource(url: URL, source?: ListingSource | null) {
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  const hostSignals = [
+    "airbnb.",
+    "agoda.",
+    "booking.",
+    "expedia.",
+    "hotels.",
+    "hotel.",
+    "hostelworld.",
+    "tripadvisor.",
+    "trivago.",
+    "vrbo.",
+  ];
+
+  if (hostSignals.some((signal) => host.includes(signal))) {
+    return true;
+  }
+
+  const jsonLdText = source?.jsonLd.length ? JSON.stringify(source.jsonLd).toLowerCase() : "";
+  const sourceText = [
+    source?.title,
+    source?.metaDescription,
+    source?.ogTitle,
+    source?.ogDescription,
+    source?.bodyText.slice(0, 5000),
+    jsonLdText,
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  const strongSignals = [
+    "lodgingbusiness",
+    "hotelroom",
+    "hotel",
+    "resort",
+    "villa",
+    "guesthouse",
+    "guest house",
+    "homestay",
+    "hostel",
+    "accommodation",
+  ];
+  const staySignals = ["check-in", "check in", "check-out", "check out", "room", "rooms", "nightly", "stay", "guest", "guests"];
+  const nonAccommodationSignals = ["restaurant", "cafe", "menu", "salon", "spa", "tour operator", "shop"];
+
+  if (strongSignals.some((signal) => sourceText.includes(signal))) {
+    return true;
+  }
+
+  const staySignalCount = staySignals.filter((signal) => sourceText.includes(signal)).length;
+  const nonAccommodationSignalCount = nonAccommodationSignals.filter((signal) => sourceText.includes(signal)).length;
+  return staySignalCount >= 3 && nonAccommodationSignalCount === 0;
+}
+
+export function fallbackDraft(url: URL, source?: ListingSource | null): ListingDraft {
   const name = titleFromUrl(url);
-  const category = businessCategoryFromType(null);
+  const category = detectAccommodationSource(url, source) ? businessCategoryFromType("Resort / Villa / Hotel") : businessCategoryFromType(null);
+
+  if (category.id === "accommodation") {
+    return {
+      name,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+      type: category.label,
+      template_id: "boutique-villa",
+      hero_title: `Direct booking for ${name}`,
+      hero_subtitle: "Review and refine this AI-ready draft before publishing.",
+      description: `Imported from ${url.hostname}. Add property details, photos, and booking information before launch.`,
+      booking_message_template: category.defaultBookingMessage(name),
+    };
+  }
 
   return {
     name,
@@ -216,10 +327,12 @@ function extractOutputText(response: unknown) {
 }
 
 export function summarizeSource(source: ListingSource) {
+  const url = new URL(source.url);
   return JSON.stringify(
     {
       url: source.url,
       host: source.host,
+      urlNameCandidate: titleFromUrl(url),
       title: source.title,
       metaDescription: source.metaDescription,
       ogTitle: source.ogTitle,
@@ -380,6 +493,104 @@ function compactList(value: unknown, limit: number) {
   return Array.isArray(value) ? value.map(String).map((item) => item.trim()).filter(Boolean).slice(0, limit) : [];
 }
 
+function shouldUseFallbackName(value: unknown, fallbackName: string, url: URL) {
+  if (typeof value !== "string" || !value.trim()) {
+    return true;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  const fallbackNormalized = fallbackName.trim().toLowerCase();
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  const platformNames = [
+    "agoda",
+    "booking",
+    "booking.com",
+    "airbnb",
+    "expedia",
+    "hotels.com",
+    "tripadvisor",
+    "trivago",
+    "vrbo",
+  ];
+
+  return (
+    normalized === host ||
+    normalized === host.replace(/\.[a-z.]+$/, "") ||
+    normalized === fallbackNormalized && fallbackNormalized.includes(".") ||
+    platformNames.includes(normalized)
+  );
+}
+
+function weakSourceCopy(value: unknown, url: URL) {
+  if (typeof value !== "string" || !value.trim()) {
+    return true;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  const platformNames = ["agoda", "booking.com", "booking", "airbnb", "expedia", "hotels.com", "tripadvisor", "trivago", "vrbo"];
+
+  return (
+    normalized.length < 16 ||
+    normalized === host ||
+    platformNames.includes(normalized) ||
+    normalized === "hotel" ||
+    normalized === "hotels" ||
+    normalized.includes("review and refine this ai-ready draft")
+  );
+}
+
+function cleanSourceDescription(value: string, url: URL) {
+  const trimmed = value.replace(/\s+/g, " ").trim();
+  const normalized = trimmed.toLowerCase();
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+
+  if (
+    trimmed.length < 40 ||
+    normalized === host ||
+    normalized.includes("javascript") ||
+    normalized.includes("enable cookies") ||
+    normalized.includes("access denied") ||
+    normalized.includes("captcha")
+  ) {
+    return "";
+  }
+
+  return trimmed.slice(0, 420);
+}
+
+function sourceDescriptionCandidate(source: ListingSource, url: URL) {
+  const candidates = [
+    source.metaDescription,
+    source.ogDescription,
+    source.bodyText.split(". ").slice(0, 2).join(". "),
+  ];
+
+  return candidates.map((candidate) => cleanSourceDescription(candidate, url)).find(Boolean) ?? "";
+}
+
+function fallbackCopyFor(siteName: string, source: ListingSource, url: URL, accommodation: boolean) {
+  const sourceDescription = sourceDescriptionCandidate(source, url);
+
+  if (accommodation) {
+    return {
+      hero_title: `Stay at ${siteName}`,
+      hero_subtitle: "Ask for direct rates, availability, and stay details on WhatsApp.",
+      description:
+        sourceDescription ||
+        `${siteName} is an accommodation listing imported from ${source.host}. Review room details, amenities, location notes, photos, and booking information before publishing.`,
+    };
+  }
+
+  return {
+    hero_title: `Contact ${siteName} on WhatsApp`,
+    hero_subtitle: "Ask questions, request details, and continue directly with the business.",
+    description:
+      sourceDescription ||
+      `${siteName} was imported from ${source.host}. Review the business details, services, photos, and WhatsApp inquiry information before publishing.`,
+  };
+}
+
 export function normalizeListingServices(services: unknown, imageUrls: string[] = [], businessType?: string | null): ListingServiceDraft[] {
   if (!Array.isArray(services)) {
     return [];
@@ -416,13 +627,45 @@ export function normalizeListingServices(services: unknown, imageUrls: string[] 
   }).filter((service) => service.title);
 }
 
-export async function createAiListingDraft(url: URL, source: ListingSource): Promise<ListingImportDraft | null> {
-  const prompt = `Create a WhatsApp-first business website draft and editable offer draft from this public business source.
+function accommodationListingPrompt(source: ListingSource) {
+  return `Create a direct-booking resort website draft and bookable offer draft from this OTA listing.
 
 Return only compact JSON with these keys:
 site, services.
 
 Rules:
+- If page title, body text, or metadata is sparse, blocked, or platform-branded, use urlNameCandidate as the property name.
+- Never use Agoda, Booking.com, Airbnb, Tripadvisor, or another platform name as site.name.
+- site.template_id must be one of: boutique-villa, boutique-resort, surf-camp, minimal-stay.
+- site.description must be a polished short description of 2-4 sentences for the form's Short description field.
+- site.hero_title must be emotional and specific, not just "Direct booking for X".
+- site.hero_subtitle must summarize the strongest stay promise in one sentence.
+- site.features must contain 6-10 guest-facing amenities or stay strengths. Use exact amenities from the source when available; otherwise infer only broad, reasonable strengths from the property type and description.
+- site.experiences must contain 4-8 nearby activities, destination themes, or guest use cases.
+- site.capacity, site.bedrooms, site.bathrooms should be numeric strings only if known. Leave blank if not present.
+- site.booking_message_template must start with "Hello, I would like to make a reservation at {property name}." and include Check-in, Check-out, Guests, and Airport Pickup fields.
+- services must contain 3-5 room, package, or service items suitable for direct WhatsApp booking.
+- Use room kind for accommodation units only. Use package kind for bundles. Use service kind for add-ons, activities, transfers, or rentals.
+- Use exact price labels only if present. Otherwise use "Ask for rates" or "Ask for pricing".
+- Do not invent exact amenities, ratings, awards, room counts, distances, or prices unless present in the source.
+- Prefer structured data, meta description, OG description, and visible listing text over URL guesses.
+- Do not leave useful copy fields empty if the source contains enough context to create a useful draft.
+- Use polished boutique hospitality copy, not generic SaaS copy.
+
+Listing source:
+${summarizeSource(source)}`;
+}
+
+function businessListingPrompt(source: ListingSource) {
+  return `Create a WhatsApp-first business website draft and editable offer draft from this public business source.
+
+Return only compact JSON with these keys:
+site, services.
+
+Rules:
+- The source includes urlNameCandidate. If page title, body text, or metadata is sparse, blocked, or platform-branded, use urlNameCandidate as the business name.
+- Never use Agoda, Booking.com, Airbnb, Tripadvisor, Instagram, Google, or another platform name as site.name.
+- If source text is sparse, still produce useful baseline hero_title, hero_subtitle, and description from the business name, but keep concrete claims broad unless present.
 - site.type must be one of these canonical categories when possible: Resort / Villa / Hotel, Cafe / Restaurant, Tour Operator, Shop / Local Service, Wellness / Salon. Use a more specific type only when none of these fits.
 - site.template_id must be one of: boutique-villa, boutique-resort, surf-camp, minimal-stay.
 - Use minimal-stay for general local businesses unless the source is clearly a resort, villa, hotel, surf camp, or multi-page hospitality brand.
@@ -444,10 +687,18 @@ Rules:
 
 Business source:
 ${summarizeSource(source)}`;
+}
+
+export async function createAiListingDraft(url: URL, source: ListingSource): Promise<ListingImportDraft | null> {
+  const accommodationSource = detectAccommodationSource(url, source);
+  const prompt = accommodationSource ? accommodationListingPrompt(source) : businessListingPrompt(source);
+  const system = accommodationSource
+    ? "You turn OTA listing information into complete structured direct-booking website drafts for accommodation operators. Always return valid JSON only."
+    : "You turn public business information into complete structured WhatsApp-first website drafts. Always return valid JSON only.";
 
   const generated = await requestJsonObject<ListingImportDraft>(
     prompt,
-    "You turn public business information into complete structured WhatsApp-first website drafts. Always return valid JSON only.",
+    system,
     "listing_import_draft",
     listingImportSchema,
   );
@@ -457,12 +708,22 @@ ${summarizeSource(source)}`;
   }
 
   const category = businessCategoryFromType({ type: generated.site.type, templateId: generated.site.template_id });
+  const accommodation = accommodationSource || category.id === "accommodation";
+  const fallbackName = titleFromUrl(url);
+  const generatedName = typeof generated.site.name === "string" ? generated.site.name.trim() : "";
+  const siteName = shouldUseFallbackName(generatedName, fallbackName, url) ? fallbackName : generatedName;
+  const fallbackCopy = fallbackCopyFor(siteName, source, url, accommodation);
   const site = {
     ...generated.site,
-    type: category.label,
-    capacity: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.capacity : "",
-    bedrooms: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.bedrooms : "",
-    bathrooms: isAccommodationBusiness({ type: generated.site.type, templateId: generated.site.template_id }) ? generated.site.bathrooms : "",
+    name: siteName,
+    slug: siteName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+    type: accommodation ? businessCategoryFromType("Resort / Villa / Hotel").label : category.label,
+    hero_title: !accommodation && weakSourceCopy(generated.site.hero_title, url) ? fallbackCopy.hero_title : generated.site.hero_title,
+    hero_subtitle: !accommodation && weakSourceCopy(generated.site.hero_subtitle, url) ? fallbackCopy.hero_subtitle : generated.site.hero_subtitle,
+    description: !accommodation && weakSourceCopy(generated.site.description, url) ? fallbackCopy.description : generated.site.description,
+    capacity: accommodation ? generated.site.capacity : "",
+    bedrooms: accommodation ? generated.site.bedrooms : "",
+    bathrooms: accommodation ? generated.site.bathrooms : "",
   };
 
   return { site, services: normalizeListingServices(generated.services, source.imageUrls, site.type) };

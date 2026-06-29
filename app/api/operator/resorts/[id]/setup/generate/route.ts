@@ -100,7 +100,7 @@ export async function POST(request: Request, { params }: RouteContext) {
 
         if (aiDraft) {
           return NextResponse.json({
-            draft: { ...fallbackDraft(url), ...aiDraft.site },
+            draft: { ...fallbackDraft(url, listingSource), ...aiDraft.site },
             servicesDraft: aiDraft.services,
             sourceTextAvailable: Boolean(
               listingSource.bodyText ||
@@ -118,7 +118,7 @@ export async function POST(request: Request, { params }: RouteContext) {
       }
 
       return NextResponse.json({
-        draft: fallbackDraft(url),
+        draft: fallbackDraft(url, listingSource),
         servicesDraft: [],
         sourceTextAvailable: Boolean(listingSource.bodyText),
         warning: "OPENAI_API_KEY is not configured yet, so Travelseed created a basic source draft.",
