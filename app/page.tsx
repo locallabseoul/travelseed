@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { TravelseedWordmark } from "@/components/brand/TravelseedWordmark";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 const localizedHomeContent = {
@@ -180,7 +181,7 @@ function HeroSection({
         <div className="absolute inset-0 bg-neutral-900/70" />
       </div>
       <div className="relative z-10">
-        <AppHeader />
+        <AppHeader brandTone="light" />
         <div className="mx-auto flex min-h-[calc(88svh-96px)] max-w-5xl flex-col items-center justify-center py-16 text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-sm font-medium text-white shadow-sm backdrop-blur">
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
@@ -387,7 +388,7 @@ function Footer() {
     <footer className="bg-white px-5 py-12 sm:px-6">
       <div className="mx-auto grid max-w-7xl gap-8 text-sm text-slate-500 md:grid-cols-[1fr_auto] md:items-center">
         <div>
-          <p className="text-base font-bold text-slate-950">Travelseed</p>
+          <TravelseedWordmark className="text-[1.2rem]" />
           <p className="mt-2 max-w-lg">The WhatsApp-first website builder empowering independent hospitality and local commerce in Indonesia.</p>
         </div>
         <div className="flex flex-wrap gap-5">

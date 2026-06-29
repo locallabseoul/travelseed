@@ -1,5 +1,6 @@
 "use client";
 
+import { TravelseedWordmark } from "@/components/brand/TravelseedWordmark";
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import type { TranslationKey } from "@/components/i18n/LanguageProvider";
@@ -43,7 +44,7 @@ export function Sidebar({
   return (
     <aside className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm lg:sticky lg:top-6 lg:flex lg:h-[calc(100vh-48px)] lg:flex-col lg:overflow-hidden">
       <div className="hidden shrink-0 px-3 pb-4 pt-2 lg:block">
-        <p className="text-sm font-bold tracking-tight text-slate-950">Travelseed</p>
+        <TravelseedWordmark className="text-[1.15rem]" />
         <p className="mt-2 text-xs leading-5 text-slate-500">{t("dashboard.sidebar.subtitle")}</p>
       </div>
       <nav className="flex gap-2 overflow-x-auto pb-1 lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-1.5 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain lg:pb-1 lg:pr-1">

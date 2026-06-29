@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { TravelseedWordmark } from "@/components/brand/TravelseedWordmark";
 import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { savePreviewResort } from "@/components/create/preview-storage";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
@@ -853,9 +854,8 @@ function StartChoice({
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
             <div className="col-span-2 lg:col-span-2">
-              <Link href="/" className="mb-6 flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-xs font-bold text-white">T</span>
-                <span className="text-xl font-bold text-slate-950">Travelseed</span>
+              <Link href="/" className="mb-6 inline-flex items-center">
+                <TravelseedWordmark className="text-xl" />
               </Link>
               <p className="max-w-xs text-sm leading-6 text-slate-500">{t("create.footer.description")}</p>
             </div>

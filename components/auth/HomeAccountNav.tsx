@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { TravelseedWordmark } from "@/components/brand/TravelseedWordmark";
 import { LanguageToggle, useLanguage } from "@/components/i18n/LanguageProvider";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
@@ -91,12 +92,19 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
   );
 }
 
-export function AppHeader({ className = "", notificationCount = 0 }: { className?: string; notificationCount?: number }) {
+export function AppHeader({
+  className = "",
+  notificationCount = 0,
+  brandTone = "dark",
+}: {
+  className?: string;
+  notificationCount?: number;
+  brandTone?: "dark" | "light";
+}) {
   return (
     <header className={`mx-auto flex max-w-7xl items-center justify-between ${className}`}>
-      <Link href="/" className="flex items-center gap-2 text-sm font-bold tracking-tight text-slate-950">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-xs text-white shadow-lg shadow-emerald-500/25">T</span>
-        <span>Travelseed</span>
+      <Link href="/" className="inline-flex items-center">
+        <TravelseedWordmark tone={brandTone} />
       </Link>
       <HomeAccountNav notificationCount={notificationCount} />
     </header>

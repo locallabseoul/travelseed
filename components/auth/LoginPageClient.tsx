@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppHeader } from "@/components/auth/HomeAccountNav";
+import { TravelseedWordmark } from "@/components/brand/TravelseedWordmark";
 import { postLoginRedirectPath } from "@/components/auth/post-login-redirect";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -93,7 +94,7 @@ export function LoginPageClient({ redirectPath = "/create" }: { redirectPath?: s
       <AppHeader />
       <section className="mx-auto mt-16 grid w-full max-w-md gap-5 rounded-xl border border-slate-200 bg-white p-6 shadow-[0_20px_40px_-10px_rgba(15,23,42,0.12)]">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 text-lg font-bold text-white shadow-lg shadow-emerald-500/20">T</div>
+          <TravelseedWordmark className="mx-auto block text-[1.5rem]" />
           <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">
             {authMode === "sign-in" ? t("auth.signInTitle") : t("auth.signUpTitle")}
           </h1>
