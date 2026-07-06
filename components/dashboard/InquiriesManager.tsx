@@ -31,6 +31,7 @@ export function InquiriesManager({
   const [inquiries, setInquiries] = useState<BookingInquiry[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<"all" | InquiryStatus>("all");
+  const [query, setQuery] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState("Loading inquiries...");
   const [saving, setSaving] = useState(false);
@@ -40,8 +41,17 @@ export function InquiriesManager({
   const accommodation = category.id === "accommodation";
   const selectedInquiry = inquiries.find((inquiry) => inquiry.id === selectedId) ?? inquiries[0] ?? null;
   const filteredInquiries = useMemo(
-    () => inquiries.filter((inquiry) => (activeFilter === "all" ? true : inquiry.status === activeFilter)),
-    [activeFilter, inquiries],
+    () => inquiries.filter((inquiry) => {
+      const matchesFilter = activeFilter === "all" ? true : inquiry.status === activeFilter;
+      const normalizedQuery = query.trim().toLowerCase();
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        [inquiry.guestName, inquiry.guestContact, inquiry.notes, inquiry.source]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(normalizedQuery));
+      return matchesFilter && matchesQuery;
+    }),
+    [activeFilter, inquiries, query],
   );
   const summary = useMemo(
     () => ({
@@ -133,63 +143,92 @@ export function InquiriesManager({
   }
 
   return (
-    <div className="grid gap-6">
-      <Panel>
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Inquiries</p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Central Inbox</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              Track WhatsApp-ready customer conversations, manual requests, and confirmed follow-ups in one operating inbox.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+    <section className="flex flex-col gap-6 pb-12">
+      <div className="flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="mb-1 text-2xl font-bold text-slate-950">Central Inbox</h1>
+          <p className="text-sm text-slate-500">Manage all your WhatsApp leads and inquiries.</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex rounded-lg border border-slate-200 bg-slate-100 p-1">
             {filterOptions.map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setActiveFilter(option)}
-                className={`min-h-9 rounded-md px-3 text-sm font-semibold transition ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
                   activeFilter === option
                     ? "border border-slate-200 bg-white text-slate-950 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                    : "text-slate-600 hover:text-slate-950"
                 }`}
               >
-                {filterLabel(option)} ({summary[option]})
+                {filterLabel(option)}{option === "all" || option === "new" ? ` (${summary[option]})` : ""}
               </button>
             ))}
           </div>
+          <label className="relative">
+            <InboxIcon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search inquiries..."
+              className="min-h-10 w-52 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+            />
+          </label>
+          <button type="button" className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50" aria-label="Filter inquiries">
+            <InboxIcon name="filter" className="h-4 w-4" />
+          </button>
         </div>
-      </Panel>
+      </div>
 
-      <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <Panel className="p-0">
-          <div className="border-b border-slate-200 p-5">
-            <h2 className="text-base font-semibold text-slate-950">Inbox queue</h2>
-            <p className="mt-1 text-sm text-slate-500">{filteredInquiries.length} visible conversations</p>
+      <div className="grid gap-6 xl:grid-cols-[390px_minmax(0,1fr)]">
+        <div className="flex max-h-[780px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/60 p-4">
+            <span className="text-sm font-semibold text-slate-700">Recent Messages</span>
+            <span className="text-xs text-slate-500">Showing {filteredInquiries.length} of {inquiries.length}</span>
           </div>
-          <div className="grid max-h-[680px] overflow-y-auto">
+
+          <div className="flex-1 overflow-y-auto">
             {filteredInquiries.length > 0 ? (
               filteredInquiries.map((inquiry) => (
                 <button
                   key={inquiry.id}
                   type="button"
                   onClick={() => setSelectedId(inquiry.id)}
-                  className={`border-b border-slate-100 p-4 text-left transition last:border-b-0 ${
-                    inquiry.id === selectedInquiry?.id ? "bg-emerald-50/70" : "bg-white hover:bg-slate-50"
+                  className={`relative w-full border-b border-slate-100 p-4 text-left transition last:border-b-0 ${
+                    inquiry.id === selectedInquiry?.id
+                      ? "border-l-4 border-l-emerald-500 bg-emerald-50"
+                      : "bg-white hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-950">{inquiry.guestName || "Unnamed customer"}</p>
-                      <p className="mt-1 truncate text-xs text-slate-500">{inquiry.guestContact || "No contact saved"}</p>
+                  {inquiry.status === "new" ? <span className="absolute right-4 top-4 h-2.5 w-2.5 rounded-full bg-emerald-500" /> : null}
+                  <div className="mb-2 flex items-start gap-3">
+                    <Avatar name={inquiry.guestName} />
+                    <div className="min-w-0 flex-1 pr-6">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <h2 className={`truncate text-sm ${inquiry.status === "new" ? "font-bold text-slate-950" : "font-semibold text-slate-700"}`}>
+                          {inquiry.guestName || "Unnamed customer"}
+                        </h2>
+                        <span className={`shrink-0 text-xs ${inquiry.status === "new" ? "font-medium text-emerald-600" : "text-slate-400"}`}>
+                          {relativeTime(inquiry.createdAt)}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 truncate text-xs text-slate-500">{inquiry.guestContact || "No contact saved"}</p>
                     </div>
-                    <Badge tone={toneForStatus(inquiry.status)}>{statusLabel(inquiry.status)}</Badge>
                   </div>
-                  <p className="mt-3 line-clamp-2 text-sm leading-5 text-slate-600">{inquiry.notes || inquirySummary(inquiry, category)}</p>
-                  <div className="mt-3 flex items-center justify-between gap-3 text-xs text-slate-400">
-                    <span>{sourceLabel(inquiry.source)}</span>
-                    <span>{formatShortDate(inquiry.createdAt)}</span>
+                  <p className={`mb-3 line-clamp-2 text-sm leading-relaxed ${inquiry.status === "new" ? "text-slate-800" : "text-slate-600"}`}>
+                    {inquiry.notes || inquirySummary(inquiry, category)}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-600">
+                      <InboxIcon name="file" className="h-3 w-3" />
+                      {sourceLabel(inquiry.source)}
+                    </span>
+                    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium ${inquiry.status === "confirmed" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-100 text-slate-700"}`}>
+                      {statusLabel(inquiry.status)}
+                    </span>
                   </div>
                 </button>
               ))
@@ -197,26 +236,24 @@ export function InquiriesManager({
               <p className="p-5 text-sm leading-6 text-slate-500">No inquiries match this filter.</p>
             )}
           </div>
-        </Panel>
+        </div>
 
         <div className="grid gap-6">
-          <Panel>
-            {selectedInquiry ? (
-              <InquiryDetail
-                inquiry={selectedInquiry}
-                category={category}
-                quickReplyLabels={dashboardCopy.inquiries.quickReplyLabels}
-                saving={saving}
-                onStatusChange={(nextStatus) => void updateStatus(selectedInquiry, nextStatus)}
-                onCreateVoucher={() => void createVoucherFromInquiry(selectedInquiry)}
-              />
-            ) : (
-              <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
-                Select an inquiry to view the conversation detail.
-              </div>
-            )}
-            {status ? <p className="mt-5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">{status}</p> : null}
-          </Panel>
+          {selectedInquiry ? (
+            <InquiryDetail
+              inquiry={selectedInquiry}
+              category={category}
+              quickReplyLabels={dashboardCopy.inquiries.quickReplyLabels}
+              saving={saving}
+              onStatusChange={(nextStatus) => void updateStatus(selectedInquiry, nextStatus)}
+              onCreateVoucher={() => void createVoucherFromInquiry(selectedInquiry)}
+            />
+          ) : (
+            <div className="flex min-h-[620px] items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-white text-sm text-slate-500 shadow-sm">
+              Select an inquiry to view the conversation detail.
+            </div>
+          )}
+          {status ? <p className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-600 shadow-sm">{status}</p> : null}
 
           <Panel>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -245,13 +282,13 @@ export function InquiriesManager({
                 <Field label="Request notes" value={form.notes} onChange={(notes) => setForm((current) => ({ ...current, notes }))} textarea />
               </div>
             </div>
-            <button type="button" disabled={saving} onClick={() => void createInquiry()} className="mt-5 min-h-11 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="button" disabled={saving} onClick={() => void createInquiry()} className="mt-5 min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
               {saving ? "Saving..." : "Save inquiry"}
             </button>
           </Panel>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -272,23 +309,36 @@ function InquiryDetail({
 }) {
   const accommodation = category.id === "accommodation";
   const whatsappUrl = whatsappReplyUrl(inquiry, category.inquiry.quickReplies[0]);
+  const primaryDetail = inquiry.checkIn ? formatDateLabel(inquiry.checkIn) : "Not provided";
+  const secondaryDetail = accommodation && inquiry.checkOut ? formatDateLabel(inquiry.checkOut) : "";
+  const sizeDetail = accommodation ? inquiry.guests || "Not provided" : inquiry.guests || "Open request";
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-semibold text-slate-950">{inquiry.guestName || "Unnamed customer"}</h2>
-            <Badge tone={toneForStatus(inquiry.status)}>{statusLabel(inquiry.status)}</Badge>
-            <Badge tone="gray">{sourceLabel(inquiry.source)}</Badge>
+    <article className="flex min-h-[620px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+      <header className="flex flex-col gap-4 border-b border-slate-200 bg-slate-50/50 p-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex items-center gap-4">
+          <Avatar name={inquiry.guestName} size="lg" />
+          <div>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-950">{inquiry.guestName || "Unnamed customer"}</h2>
+              <Badge tone={toneForStatus(inquiry.status)}>{statusLabel(inquiry.status)}</Badge>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+              <span>{inquiry.guestContact || "No contact saved"}</span>
+              <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" />
+              <span>{sourceLabel(inquiry.source)}</span>
+            </div>
           </div>
-          <p className="mt-2 text-sm text-slate-500">{inquiry.guestContact || "No contact saved"}</p>
         </div>
+
         <div className="flex flex-wrap gap-2">
+          <button type="button" className="min-h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
+            Mark as spam
+          </button>
           <select
             value={inquiry.status}
             onChange={(event) => onStatusChange(event.target.value as InquiryStatus)}
-            className="min-h-10 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            className="min-h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
           >
             {statusOptions.map((option) => (
               <option key={option} value={option}>
@@ -297,41 +347,41 @@ function InquiryDetail({
             ))}
           </select>
           {inquiry.status === "confirmed" ? (
-            <button type="button" disabled={saving} onClick={onCreateVoucher} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="button" disabled={saving} onClick={onCreateVoucher} className="min-h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60">
               {accommodation ? "Issue voucher" : "Create confirmation"}
             </button>
           ) : null}
-          {whatsappUrl ? (
-            <a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-md bg-[#25D366] px-4 text-sm font-semibold text-white shadow-sm">
-              Reply on WhatsApp
-            </a>
-          ) : (
-            <span className="inline-flex min-h-10 items-center rounded-md border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-400">
-              No WhatsApp number
-            </span>
-          )}
         </div>
+      </header>
+
+      <div className="flex-1 space-y-6 overflow-y-auto bg-slate-50/40 p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-4 text-sm font-semibold text-slate-950">Inquiry Context</h3>
+          <div className="grid gap-4 text-sm md:grid-cols-2">
+            <ContextItem icon="file" label="Source page" value={sourceLabel(inquiry.source)} />
+            <ContextItem icon="calendar" label="Timestamp" value={formatFullDate(inquiry.createdAt)} />
+            <ContextItem icon="calendar" label={category.inquiry.preferredDateLabel} value={primaryDetail} />
+            {accommodation ? <ContextItem icon="calendar" label="Check-out" value={secondaryDetail || "Not provided"} /> : null}
+            <ContextItem icon="users" label={category.inquiry.sizeLabel} value={sizeDetail} />
+            <ContextItem icon="location" label="Site" value={inquiry.resortId ? "Current site" : "Not linked"} />
+          </div>
+        </section>
+
+        <section>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Original Message</p>
+          <div className="max-w-2xl rounded-2xl rounded-tl-none border border-slate-200 bg-white p-5 text-sm leading-7 text-slate-700 shadow-sm">
+            <p className="whitespace-pre-line">{inquiry.notes || inquirySummary(inquiry, category)}</p>
+          </div>
+        </section>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <DetailCard label={category.inquiry.preferredDateLabel} value={inquiry.checkIn ? formatDateLabel(inquiry.checkIn) : "Not provided"} />
-        {accommodation ? <DetailCard label="Check-out" value={inquiry.checkOut ? formatDateLabel(inquiry.checkOut) : "Not provided"} /> : null}
-        <DetailCard label={category.inquiry.sizeLabel} value={accommodation ? inquiry.guests || "Not provided" : inquiry.guests || "Open request"} />
-      </div>
-
-      <section className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Original message</p>
-        <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">{inquiry.notes || "No notes saved yet."}</p>
-      </section>
-
-      <section className="mt-6">
-        <p className="text-sm font-semibold text-slate-950">Quick replies</p>
-        <div className="mt-3 flex flex-wrap gap-2">
+      <footer className="border-t border-slate-200 bg-white p-6">
+        <div className="mb-4 flex flex-wrap gap-2">
           {category.inquiry.quickReplies.map((reply, index) => {
             const replyUrl = whatsappReplyUrl(inquiry, reply);
             const label = quickReplyLabels[index] ?? replyLabel(reply);
             return replyUrl ? (
-              <a key={reply} href={replyUrl} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+              <a key={reply} href={replyUrl} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
                 {label}
               </a>
             ) : (
@@ -341,7 +391,55 @@ function InquiryDetail({
             );
           })}
         </div>
-      </section>
+        <div className="relative">
+          <textarea
+            rows={3}
+            placeholder="Type a reply or select a template..."
+            className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 pr-32 text-sm leading-6 outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            readOnly
+          />
+          {whatsappUrl ? (
+            <a href={whatsappUrl} target="_blank" rel="noreferrer" className="absolute bottom-3 right-3 inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#25D366] px-4 text-sm font-bold text-white shadow-sm">
+              <InboxIcon name="whatsapp" className="h-4 w-4" />
+              Reply
+            </a>
+          ) : (
+            <span className="absolute bottom-3 right-3 inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-400">
+              No WhatsApp
+            </span>
+          )}
+        </div>
+      </footer>
+    </article>
+  );
+}
+
+function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
+  const initials = (name || "Guest")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("") || "G";
+  const sizeClass = size === "lg" ? "h-14 w-14 text-lg" : "h-10 w-10 text-sm";
+
+  return (
+    <div className={`flex shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700 ${sizeClass}`}>
+      {initials}
+    </div>
+  );
+}
+
+function ContextItem({ icon, label, value }: { icon: InboxIconName; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+        <InboxIcon name={icon} className="h-4 w-4" />
+      </div>
+      <div>
+        <p className="text-xs font-medium text-slate-500">{label}</p>
+        <p className="mt-0.5 font-semibold text-slate-950">{value}</p>
+      </div>
     </div>
   );
 }
@@ -425,6 +523,32 @@ function formatShortDate(value: string) {
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(date);
 }
 
+function formatFullDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
+}
+
+function relativeTime(value: string) {
+  const date = new Date(value);
+  const diff = Date.now() - date.getTime();
+  if (Number.isNaN(diff)) {
+    return "";
+  }
+  const minutes = Math.max(1, Math.floor(diff / 60000));
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+  const days = Math.floor(hours / 24);
+  return days < 7 ? `${days}d ago` : formatShortDate(value);
+}
+
 function whatsappReplyUrl(inquiry: BookingInquiry, message: string) {
   const digits = inquiry.guestContact.replace(/[^\d+]/g, "").replace(/^\+/, "");
   if (digits.length < 8) {
@@ -440,12 +564,63 @@ function replyLabel(reply: string) {
   return "Confirm follow-up";
 }
 
-function DetailCard({ label, value }: { label: string; value: string }) {
+type InboxIconName = "calendar" | "file" | "filter" | "location" | "search" | "users" | "whatsapp";
+
+function InboxIcon({ name, className }: { name: InboxIconName; className?: string }) {
+  const icons: Record<InboxIconName, React.ReactNode> = {
+    calendar: (
+      <>
+        <path d="M8 2v4" />
+        <path d="M16 2v4" />
+        <rect width="18" height="18" x="3" y="4" rx="2" />
+        <path d="M3 10h18" />
+      </>
+    ),
+    file: (
+      <>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <path d="M14 2v6h6" />
+      </>
+    ),
+    filter: (
+      <>
+        <path d="M3 5h18" />
+        <path d="M7 12h10" />
+        <path d="M10 19h4" />
+      </>
+    ),
+    location: (
+      <>
+        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="3" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </>
+    ),
+    users: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    ),
+    whatsapp: (
+      <>
+        <path d="M3 21l1.65-3.8A8 8 0 1 1 7 19.35L3 21Z" />
+        <path d="M9 9.5c.4 2 2 3.6 4 4l1.1-1.1a1 1 0 0 1 1-.24c1.1.37 1.9.83 2.4 1.34a1 1 0 0 1 .15 1.21c-.48.78-1.33 1.3-2.25 1.29-4.5-.05-8.35-3.9-8.4-8.4-.01-.92.51-1.77 1.29-2.25a1 1 0 0 1 1.21.15c.51.5.97 1.3 1.34 2.4a1 1 0 0 1-.24 1L9 9.5Z" />
+      </>
+    ),
+  };
+
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
-      <p className="mt-2 text-sm font-semibold text-slate-950">{value}</p>
-    </div>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {icons[name]}
+    </svg>
   );
 }
 

@@ -39,12 +39,6 @@ type RawPage = {
   settings?: SitePageSettings;
 };
 
-const structureCopy = {
-  landing: "One focused page with guided sections for WhatsApp inquiry conversion.",
-  multipage: "A brand website with dedicated content pages and SEO-ready operations.",
-  custom: "A flexible business website for premium campaigns and custom navigation.",
-};
-
 export function SiteStructureManager({
   site,
   accessToken,
@@ -162,28 +156,6 @@ export function SiteStructureManager({
 
   return (
     <div className="grid gap-6">
-      <Panel>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Pages</p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-950">Website Pages</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{config.positioning}</p>
-            {status ? <p className="mt-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">{status}</p> : null}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="green">{config.label}</Badge>
-            <Badge tone="sand">{config.siteType}</Badge>
-          </div>
-        </div>
-      </Panel>
-
-      <section className="grid gap-4 lg:grid-cols-3">
-        <PlanStructureCard title="Current plan" value={config.label} helper={config.positioning} />
-        <PlanStructureCard title="Site type" value={config.structureLabel} helper={structureCopy[config.siteType]} />
-        <PlanStructureCard title="Upgrade path" value={config.upgradeTarget ? `Upgrade to ${config.upgradeTarget}` : "Fully unlocked"} helper={config.upgradeTarget ? "Unlock the next site structure tier." : "All site structure controls are available."} />
-      </section>
-
-      <div className="grid gap-6">
         {isLanding ? (
           <LandingSectionsView sections={sections} dashboardCopy={dashboardCopy} onToggle={toggleSection} />
         ) : (
@@ -204,8 +176,8 @@ export function SiteStructureManager({
             }}
           />
         )}
+      {status ? <p className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">{status}</p> : null}
         <FeatureAccessDisclosure planType={planType} />
-      </div>
     </div>
   );
 }
@@ -295,7 +267,16 @@ function PagesView({
   const [uploadingSlug, setUploadingSlug] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [showNavigation, setShowNavigation] = useState(false);
+  const [pageFilter, setPageFilter] = useState<"all" | "draft">("all");
+  const [query, setQuery] = useState("");
   const selectedPage = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
+  const filteredPages = pages.filter((page) => {
+    const pageName = dashboardPageNameFor(page, dashboardCopy);
+    const matchesQuery = [pageName, page.slug, page.pageType].some((value) => value.toLowerCase().includes(query.trim().toLowerCase()));
+    const matchesFilter = pageFilter === "all" || !page.isPublished;
+    return matchesQuery && matchesFilter;
+  });
+  const draftCount = pages.filter((page) => !page.isPublished).length;
 
   useEffect(() => {
     if (!pages.some((page) => page.slug === selectedSlug)) {
@@ -358,63 +339,256 @@ function PagesView({
   }
 
   return (
-    <Panel>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="grid gap-6">
+      <section className="flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-950">Page list</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">Manage page content, publishing, SEO, and public previews for this business site.</p>
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-500">{site.name}</span>
+            <span className="text-xs text-slate-400">/</span>
+            <span className="text-sm font-semibold text-slate-950">Pages</span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-950">Website Pages</h1>
+          <p className="mt-1 text-sm text-slate-500">Manage your website&apos;s content and structure.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={onAddCustomPage} disabled={!isForest} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:bg-slate-200 disabled:text-slate-500">
-            Add Custom Page
-          </button>
-          <button type="button" onClick={() => setShowNavigation((current) => !current)} disabled={!isForest} className="min-h-10 rounded-md bg-white px-4 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 disabled:text-slate-400">
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setShowNavigation((current) => !current)} disabled={!isForest} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:text-slate-400">
+            <PageIcon name="folder" className="h-4 w-4 text-slate-400" />
             Navigation
           </button>
+          <button type="button" onClick={onAddCustomPage} disabled={!isForest} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-500">
+            <PageIcon name="plus" className="h-4 w-4" />
+            Create Page
+          </button>
         </div>
-      </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <nav aria-label="Page submenu" className="flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-2 lg:grid lg:content-start lg:overflow-visible">
-          {pages.map((page) => {
-            const isSelected = page.slug === selectedPage?.slug;
-            const pageName = dashboardPageNameFor(page, dashboardCopy);
-            return (
-              <button
-                key={page.slug}
-                type="button"
-                onClick={() => setSelectedSlug(page.slug)}
-                className={`flex min-h-11 shrink-0 items-center justify-between gap-3 rounded-xl px-3 text-left text-sm font-semibold transition ${
-                  isSelected ? "bg-slate-950 text-white shadow-sm" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:text-slate-950"
-                }`}
-              >
-                <span>{pageName}</span>
-                <span className={`h-2 w-2 rounded-full ${page.isPublished ? "bg-emerald-500" : "bg-amber-400"} ${isSelected ? "ring-2 ring-white/30" : ""}`} />
-              </button>
-            );
-          })}
-        </nav>
+      </section>
+
+      <section className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setPageFilter("all")} className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${pageFilter === "all" ? "border border-slate-200 bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"}`}>
+              All Pages ({pages.length})
+            </button>
+            <button type="button" onClick={() => setPageFilter("draft")} className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${pageFilter === "draft" ? "border border-slate-200 bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"}`}>
+              Drafts ({draftCount})
+            </button>
+          </div>
+          <label className="relative sm:w-64">
+            <PageIcon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} type="search" placeholder="Search pages..." className="min-h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-950 shadow-sm outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20" />
+          </label>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-slate-200 bg-white">
+                <th className="w-12 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500" />
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Page Name</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                <th className="hidden px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 md:table-cell">Last Edited</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredPages.map((page) => {
+                const pageName = dashboardPageNameFor(page, dashboardCopy);
+                const isSelected = page.slug === selectedPage?.slug;
+                return (
+                  <tr key={page.slug} onClick={() => setSelectedSlug(page.slug)} className={`group cursor-pointer transition hover:bg-slate-50 ${isSelected ? "bg-emerald-50/50" : ""} ${page.isPublished ? "" : "opacity-80"}`}>
+                    <td className="px-6 py-4 text-slate-400"><PageIcon name="grip" className="h-4 w-4" /></td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <PageIcon name={isHomePage(page) ? "home" : iconForPage(page)} className="h-5 w-5 text-slate-400" />
+                        <div>
+                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                            {pageName}
+                            {isHomePage(page) ? <span className="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">Index</span> : null}
+                          </div>
+                          <div className="mt-0.5 text-xs text-slate-500">{page.slug}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${page.isPublished ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-100 text-slate-700"}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${page.isPublished ? "bg-emerald-500" : "bg-slate-400"}`} />
+                        {page.isPublished ? "Published" : "Draft"}
+                      </span>
+                    </td>
+                    <td className="hidden px-6 py-4 text-sm text-slate-500 md:table-cell">Recently by Travelseed</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button type="button" onClick={(event) => { event.stopPropagation(); setSelectedSlug(page.slug); }} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-950" title="Edit">
+                          <PageIcon name="edit" className="h-4 w-4" />
+                        </button>
+                        <button type="button" onClick={(event) => { event.stopPropagation(); onToggle(page); }} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-950" title={page.isPublished ? "Unpublish" : "Publish"}>
+                          <PageIcon name={page.isPublished ? "hidden" : "eye"} className="h-4 w-4" />
+                        </button>
+                        <a href={publicPathForPage(site, page)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-950" title="Preview">
+                          <PageIcon name="more" className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {selectedPage ? (
-          <PageDetail
-            site={site}
-            dashboardCopy={dashboardCopy}
-            page={selectedPage}
-            isForest={isForest}
-            uploading={uploadingSlug === selectedPage.slug}
-            uploadStatus={uploadStatus}
-            accessToken={accessToken}
-            onSiteUpdate={onSiteUpdate}
-            onTabChange={onTabChange}
-            onUnsavedChangesChange={onUnsavedChangesChange}
-            onUpload={(file) => uploadPageHero(selectedPage, file)}
-            onSaveSeo={(seoTitle, seoDescription) => updatePageSeo(selectedPage, seoTitle, seoDescription)}
-            onSaveSettings={(settings) => updatePageSettings(selectedPage, settings)}
-            onToggle={() => onToggle(selectedPage)}
-          />
+          <>
+            <PageEditorEntry page={selectedPage} site={site} dashboardCopy={dashboardCopy} onOpen={() => setSelectedSlug(selectedPage.slug)} />
+            <SeoSummaryCard site={site} page={selectedPage} dashboardCopy={dashboardCopy} onEdit={() => setSelectedSlug(selectedPage.slug)} />
+          </>
         ) : null}
       </div>
+
+      {selectedPage ? (
+        <PageDetail
+          site={site}
+          dashboardCopy={dashboardCopy}
+          page={selectedPage}
+          isForest={isForest}
+          uploading={uploadingSlug === selectedPage.slug}
+          uploadStatus={uploadStatus}
+          accessToken={accessToken}
+          onSiteUpdate={onSiteUpdate}
+          onTabChange={onTabChange}
+          onUnsavedChangesChange={onUnsavedChangesChange}
+          onUpload={(file) => uploadPageHero(selectedPage, file)}
+          onSaveSeo={(seoTitle, seoDescription) => updatePageSeo(selectedPage, seoTitle, seoDescription)}
+          onSaveSettings={(settings) => updatePageSettings(selectedPage, settings)}
+          onToggle={() => onToggle(selectedPage)}
+        />
+      ) : null}
       {showNavigation && isForest ? <NavigationPreview site={site} pages={pages} dashboardCopy={dashboardCopy} /> : null}
-    </Panel>
+    </div>
   );
+}
+
+function PageEditorEntry({
+  page,
+  site,
+  dashboardCopy,
+  onOpen,
+}: {
+  page: SiteStructurePage;
+  site: ResortConsoleData;
+  dashboardCopy: DashboardCategoryCopy;
+  onOpen: () => void;
+}) {
+  const pageName = dashboardPageNameFor(page, dashboardCopy);
+  const sections = editorSectionsFor(page, site, dashboardCopy);
+
+  return (
+    <article className="flex h-full flex-col rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
+          <PageIcon name="layers" className="h-5 w-5 text-emerald-500" />
+          Edit &quot;{pageName}&quot; Content
+        </h2>
+        <button type="button" onClick={onOpen} className="text-sm font-medium text-emerald-600 transition hover:text-emerald-700">
+          Open Full Editor →
+        </button>
+      </div>
+      <div className="flex-1 space-y-3">
+        {sections.map((section) => (
+          <button key={section.title} type="button" onClick={onOpen} className="group flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-emerald-300">
+            <span className="flex items-center gap-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded bg-slate-100 text-slate-500 transition group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                <PageIcon name={section.icon} className="h-4 w-4" />
+              </span>
+              <span>
+                <span className="block text-sm font-semibold text-slate-950">{section.title}</span>
+                <span className="mt-0.5 block text-xs text-slate-500">{section.description}</span>
+              </span>
+            </span>
+            <PageIcon name="chevronRight" className="h-4 w-4 text-slate-300 transition group-hover:text-emerald-500" />
+          </button>
+        ))}
+        <button type="button" onClick={onOpen} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-sm font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-950">
+          <PageIcon name="plus" className="h-4 w-4" />
+          Add Section
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function SeoSummaryCard({
+  site,
+  page,
+  dashboardCopy,
+  onEdit,
+}: {
+  site: ResortConsoleData;
+  page: SiteStructurePage;
+  dashboardCopy: DashboardCategoryCopy;
+  onEdit: () => void;
+}) {
+  const pageName = dashboardPageNameFor(page, dashboardCopy);
+  const preview = seoPreviewForPage(site, page, pageName);
+  const publicPath = publicPathForPage(site, page);
+  const titleLength = preview.title.length;
+  const descriptionLength = preview.description.length;
+
+  return (
+    <article className="flex h-full flex-col rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
+          <span className="text-blue-500">G</span>
+          Search Preview
+        </h2>
+        <button type="button" onClick={onEdit} className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 transition hover:text-slate-950">
+          <PageIcon name="edit" className="h-3.5 w-3.5" />
+          Edit SEO
+        </button>
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-2 flex items-center gap-3">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-[10px] font-bold text-slate-600">{site.name.slice(0, 2).toUpperCase()}</div>
+          <div>
+            <p className="mb-0.5 text-[13px] font-medium leading-none text-[#202124]">{site.name}</p>
+            <p className="text-[12px] leading-none text-[#4d5156]">{publicPath}</p>
+          </div>
+        </div>
+        <h3 className="mb-1 cursor-pointer text-[20px] font-normal leading-tight text-[#1a0dab] hover:underline">{preview.title}</h3>
+        <p className="text-[14px] leading-[1.58] text-[#4d5156]">{preview.description}</p>
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <div>
+          <p className="mb-1.5 text-xs font-semibold text-slate-700">Page Title</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900">{preview.title}</div>
+          <p className="mt-1 flex justify-between text-[10px] text-slate-500"><span>Recommended: 50-60 characters</span><span className={titleLength <= 60 ? "text-emerald-600" : "text-amber-600"}>{titleLength}/60</span></p>
+        </div>
+        <div>
+          <p className="mb-1.5 text-xs font-semibold text-slate-700">Meta Description</p>
+          <div className="min-h-20 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900">{preview.description}</div>
+          <p className="mt-1 flex justify-between text-[10px] text-slate-500"><span>Recommended: 150-160 characters</span><span className={descriptionLength <= 160 ? "text-emerald-600" : "text-amber-600"}>{descriptionLength}/160</span></p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function editorSectionsFor(page: SiteStructurePage, site: ResortConsoleData, dashboardCopy: DashboardCategoryCopy): Array<{ title: string; description: string; icon: PageIconName }> {
+  if (isHomePage(page)) {
+    return [
+      { title: "Hero Header", description: "Main image, title, and WhatsApp CTA", icon: "image" },
+      { title: "About Us", description: "Welcome text and short description", icon: "text" },
+      { title: dashboardCopy.pages.offersLabel, description: `${site.services.length || 0} selected offers and services`, icon: "bed" },
+    ];
+  }
+
+  return [
+    { title: "Page Header", description: "Hero image, page title, and intro copy", icon: "image" },
+    { title: "Page Body", description: "Visible content and structured sections", icon: "text" },
+    { title: "Inquiry CTA", description: "WhatsApp action and customer message path", icon: "bed" },
+  ];
 }
 
 function FeatureAccessDisclosure({ planType }: { planType: PlanType }) {
@@ -462,16 +636,6 @@ function FeatureAccessDisclosure({ planType }: { planType: PlanType }) {
           </div>
         </div>
       ) : null}
-    </Panel>
-  );
-}
-
-function PlanStructureCard({ title, value, helper }: { title: string; value: string; helper: string }) {
-  return (
-    <Panel>
-      <p className="text-sm text-slate-500">{title}</p>
-      <p className="mt-3 text-2xl font-semibold text-slate-950">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{helper}</p>
     </Panel>
   );
 }
@@ -1051,6 +1215,55 @@ function sectionToApi(section: SiteStructureSection, index: number) {
 
 function sectionKeyFor(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+type PageIconName = "bed" | "chevronRight" | "edit" | "eye" | "file" | "folder" | "grip" | "hidden" | "home" | "image" | "layers" | "more" | "plus" | "search" | "text" | "utensils";
+
+function iconForPage(page: SiteStructurePage): PageIconName {
+  const slug = page.slug.toLowerCase();
+  if (slug.includes("dining") || slug.includes("menu")) return "utensils";
+  if (slug.includes("gallery")) return "image";
+  if (slug.includes("offer") || slug.includes("villa") || slug.includes("room") || slug.includes("service")) return "bed";
+  return "file";
+}
+
+function PageIcon({ name, className }: { name: PageIconName; className: string }) {
+  const strokeProps = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+
+  switch (name) {
+    case "bed":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M3 7v11" /><path d="M21 11v7" /><path d="M3 14h18" /><path d="M7 11h4" /><path d="M7 7h4a2 2 0 0 1 2 2v5H5V9a2 2 0 0 1 2-2Z" /></svg>;
+    case "chevronRight":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="m9 18 6-6-6-6" /></svg>;
+    case "edit":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>;
+    case "eye":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>;
+    case "file":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h5" /></svg>;
+    case "folder":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /></svg>;
+    case "grip":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM8 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM8 16a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" /></svg>;
+    case "hidden":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M3 3l18 18" /><path d="M10.6 10.6A2 2 0 0 0 12 14a2 2 0 0 0 1.4-.6" /><path d="M9.9 5.2A9.8 9.8 0 0 1 12 5c6.5 0 10 7 10 7a16.2 16.2 0 0 1-3.1 4.2" /><path d="M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 4.4-1" /></svg>;
+    case "home":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>;
+    case "image":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="m21 15-5-5L5 19" /></svg>;
+    case "layers":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 17 9 5 9-5" /></svg>;
+    case "more":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" /></svg>;
+    case "plus":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M12 5v14" /><path d="M5 12h14" /></svg>;
+    case "search":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
+    case "text":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h10" /></svg>;
+    case "utensils":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M4 3v8" /><path d="M8 3v8" /><path d="M4 7h4" /><path d="M6 11v10" /><path d="M17 3c-2 2-3 4-3 7v4h4V3" /><path d="M18 14v7" /></svg>;
+  }
 }
 
 function pageFromApi(page: RawPage): SiteStructurePage {

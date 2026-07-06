@@ -340,8 +340,8 @@ export function OffersManager({
             <p className="mt-1 text-sm leading-6 text-slate-500">{category.offerSectionBody}. {dashboardCopy.offers.roomSelectHint}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => void generateSampleOffers()} disabled={generating} className="min-h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
-              {generating ? "Generating..." : "Generate sample items"}
+            <button type="button" onClick={() => void generateSampleOffers()} disabled={generating} className="min-h-10 shrink-0 whitespace-nowrap rounded-md bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
+              {generating ? "Generating..." : "Generate samples"}
             </button>
           </div>
         </div>
@@ -497,7 +497,7 @@ function OfferKindSection({
           </div>
           <p className="mt-1 text-xs leading-5 text-slate-600">{section.description}</p>
         </div>
-        <button type="button" onClick={onAdd} className="min-h-9 rounded-md bg-white px-3 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
+        <button type="button" onClick={onAdd} className="min-h-9 shrink-0 whitespace-nowrap rounded-md bg-white px-3 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
           {section.addLabel}
         </button>
       </div>
@@ -621,7 +621,7 @@ function OfferDetailEditor({
         </select>
       </div>
 
-      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid gap-4">
         <div className="grid content-start gap-4">
           <OfferImagePanel imageUrl={offer.imageUrl} uploading={uploading} onUpload={onUploadImage} onClear={() => onChange({ imageUrl: "" })} />
           {canShowOnPromotions(offer) ? (
@@ -773,7 +773,7 @@ function OfferCardPreview({ offer, category, dashboardCopy }: { offer: ResortOff
     : [];
 
   return (
-    <aside className="grid content-start gap-3 2xl:sticky 2xl:top-4">
+    <aside className="grid max-w-2xl content-start gap-3">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Card preview</p>
         <p className="mt-1 text-xs leading-5 text-slate-600">This updates as you edit the offer fields.</p>

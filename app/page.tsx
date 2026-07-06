@@ -43,17 +43,17 @@ const localizedHomeContent = {
       {
         title: "WhatsApp-first design",
         text: "Every template guides customers from browsing to direct WhatsApp conversations without a complex booking engine.",
-        icon: "WA",
+        icon: "whatsapp",
       },
       {
         title: "Own your web presence",
         text: "Turn scattered social, marketplace, and OTA information into one polished business website you control.",
-        icon: "OWN",
+        icon: "scissors",
       },
       {
         title: "Instant management",
         text: "Update services, offers, photos, and pages from a simple operator console without a developer.",
-        icon: "CMS",
+        icon: "bolt",
       },
     ],
     dashboardStats: [
@@ -101,17 +101,17 @@ const localizedHomeContent = {
       {
         title: "Desain WhatsApp-first",
         text: "Setiap template membawa pelanggan dari browsing ke percakapan WhatsApp tanpa booking engine rumit.",
-        icon: "WA",
+        icon: "whatsapp",
       },
       {
         title: "Presence web milik sendiri",
         text: "Ubah informasi sosial, marketplace, dan OTA yang tersebar menjadi satu website bisnis yang rapi.",
-        icon: "OWN",
+        icon: "scissors",
       },
       {
         title: "Manajemen instan",
         text: "Update layanan, offer, foto, dan halaman dari console operator sederhana tanpa developer.",
-        icon: "CMS",
+        icon: "bolt",
       },
     ],
     dashboardStats: [
@@ -125,6 +125,34 @@ const localizedHomeContent = {
       ["Business Pro", "Rp 149k", "Custom domain, analytics lanjutan, review tools, voucher"],
     ],
   },
+} satisfies Record<
+  "en" | "id",
+  {
+    trust: string;
+    linkPlaceholder: string;
+    linkHelper: string;
+    categories: Array<{ title: string; text: string; tags: string[]; image: string }>;
+    valueProps: Array<{ title: string; text: string; icon: ValuePropIconKind }>;
+    dashboardStats: string[][];
+    recent: string[];
+    plans: string[][];
+  }
+>;
+
+type TrustIconKind = "hotel" | "store" | "spa" | "map";
+type ValuePropIconKind = "whatsapp" | "scissors" | "bolt";
+
+const trustExamples: Array<{ label: string; icon: TrustIconKind }> = [
+  { label: "Bali Retreat", icon: "hotel" },
+  { label: "Jakarta Local", icon: "store" },
+  { label: "Ubud Wellness", icon: "spa" },
+  { label: "Lombok Tours", icon: "map" },
+];
+
+const valuePropIconTone: Record<ValuePropIconKind, string> = {
+  whatsapp: "bg-green-50 text-green-600 ring-green-100",
+  scissors: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  bolt: "bg-blue-50 text-blue-600 ring-blue-100",
 };
 
 export default function HomePage() {
@@ -219,18 +247,20 @@ function TrustSection({ label }: { label: string }) {
     <section className="border-b border-slate-200 bg-white px-5 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</p>
-        <div className="mt-6 grid gap-3 text-center text-sm font-bold text-slate-700 sm:grid-cols-4">
-          <p>Bali Retreat</p>
-          <p>Jakarta Local</p>
-          <p>Ubud Wellness</p>
-          <p>Lombok Tours</p>
+        <div className="mt-6 grid gap-4 text-center text-sm font-bold text-slate-700 sm:grid-cols-4">
+          {trustExamples.map((example) => (
+            <div key={example.label} className="inline-flex items-center justify-center gap-2">
+              <TrustLogoIcon kind={example.icon} />
+              <span>{example.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function ValuePropsSection({ items }: { items: Array<{ title: string; text: string; icon: string }> }) {
+function ValuePropsSection({ items }: { items: Array<{ title: string; text: string; icon: ValuePropIconKind }> }) {
   const { t } = useLanguage();
 
   return (
@@ -240,8 +270,8 @@ function ValuePropsSection({ items }: { items: Array<{ title: string; text: stri
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {items.map((item) => (
             <article key={item.title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50 text-xs font-black text-emerald-700 ring-1 ring-emerald-100">
-                {item.icon}
+              <div className={`flex h-12 w-12 items-center justify-center rounded-lg ring-1 ${valuePropIconTone[item.icon]}`}>
+                <ValuePropIcon kind={item.icon} />
               </div>
               <h3 className="mt-7 text-xl font-semibold text-slate-950">{item.title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">{item.text}</p>
@@ -364,16 +394,28 @@ function FinalCtaSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="bg-emerald-50 px-5 py-20 sm:px-6 lg:py-24">
-      <div className="mx-auto max-w-4xl text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">{t("home.cta.label")}</p>
-        <h2 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">{t("home.cta.title")}</h2>
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/create" className="inline-flex min-h-12 items-center justify-center rounded-md bg-neutral-900 px-6 text-sm font-semibold text-white hover:bg-neutral-800">
-            {t("home.hero.cta")}
+    <section className="relative overflow-hidden bg-emerald-50 px-5 py-20 sm:px-6 lg:py-24">
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.2) 1px, transparent 0), radial-gradient(circle at 18px 22px, rgba(15, 23, 42, 0.12) 1px, transparent 0)",
+          backgroundSize: "36px 36px, 44px 44px",
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-xl shadow-emerald-500/30">
+          <RocketIcon />
+        </div>
+        <h2 className="mt-8 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">{t("home.cta.title")}</h2>
+        <p className="mx-auto mt-6 max-w-2xl text-lg leading-7 text-slate-600 sm:text-xl">{t("home.cta.body")}</p>
+        <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+          <Link href="/create" className="inline-flex min-h-16 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-8 text-lg font-medium text-white shadow-lg transition hover:bg-neutral-800 hover:shadow-xl">
+            {t("home.cta.primary")}
+            <ArrowRightIcon />
           </Link>
-          <Link href="/pricing" className="inline-flex min-h-12 items-center justify-center rounded-md border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-950">
-            {t("nav.pricing")}
+          <Link href="/preview" className="inline-flex min-h-16 items-center justify-center rounded-xl border border-slate-200 bg-white px-8 text-lg font-medium text-slate-950 transition hover:bg-slate-50">
+            {t("home.cta.secondary")}
           </Link>
         </div>
       </div>
@@ -398,6 +440,99 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function TrustLogoIcon({ kind }: { kind: TrustIconKind }) {
+  const commonClassName = "h-4 w-4 shrink-0 text-slate-700";
+
+  switch (kind) {
+    case "hotel":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M4 21V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14" />
+          <path d="M16 10h2a2 2 0 0 1 2 2v9" />
+          <path d="M8 9h.01" />
+          <path d="M12 9h.01" />
+          <path d="M8 13h.01" />
+          <path d="M12 13h.01" />
+          <path d="M9 21v-4h2v4" />
+        </svg>
+      );
+    case "store":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M4 10h16l-1.5-5h-13L4 10Z" />
+          <path d="M5 10v9h14v-9" />
+          <path d="M8 19v-5h4v5" />
+          <path d="M4 10c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2" />
+        </svg>
+      );
+    case "spa":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 21c0-5 3-8 8-8 0 5-3 8-8 8Z" />
+          <path d="M12 21c0-5-3-8-8-8 0 5 3 8 8 8Z" />
+          <path d="M12 14c-3-3-3-7 0-10 3 3 3 7 0 10Z" />
+        </svg>
+      );
+    case "map":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z" />
+          <path d="M9 3v15" />
+          <path d="M15 6v15" />
+          <path d="M17.5 10.5 19 9" />
+        </svg>
+      );
+  }
+}
+
+function ValuePropIcon({ kind }: { kind: ValuePropIconKind }) {
+  const commonClassName = "h-6 w-6";
+
+  switch (kind) {
+    case "whatsapp":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5.4 18.6A8.5 8.5 0 1 1 8 20l-4 1 1.4-2.4Z" />
+          <path d="M9.5 8.8c.2 3 2.7 5.5 5.7 5.7l1.1-1.5c.2-.3.1-.7-.2-.9l-1.7-1c-.3-.2-.7-.1-.9.2l-.5.7c-.9-.4-1.6-1.1-2-2l.7-.5c.3-.2.4-.6.2-.9l-1-1.7c-.2-.3-.6-.4-.9-.2L8.5 7.7c.3.4.6.8 1 1.1Z" />
+        </svg>
+      );
+    case "scissors":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="6" cy="6" r="3" />
+          <circle cx="6" cy="18" r="3" />
+          <path d="M8.2 8.2 19 19" />
+          <path d="M8.2 15.8 19 5" />
+        </svg>
+      );
+    case "bolt":
+      return (
+        <svg className={commonClassName} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M13.8 2.5 4.6 13.1c-.5.6-.1 1.5.7 1.5h5.5l-.7 6.7c-.1.9 1 1.3 1.6.6l8.7-10.8c.5-.6.1-1.5-.7-1.5h-5.2l.8-6.5c.1-.9-1-1.3-1.5-.6Z" />
+        </svg>
+      );
+  }
+}
+
+function RocketIcon() {
+  return (
+    <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.5 3.1c2.4-.9 5.1-.8 7.4.3.3 2.5-.2 5.1-1.6 7.3l-1.2 1.9.9 3.5c.1.4 0 .8-.3 1l-2.1 2.1c-.5.5-1.3.3-1.6-.3l-1.4-2.8-3.3 1.1c-.4.1-.8 0-1.1-.3l-1.2-1.2c-.3-.3-.4-.7-.3-1.1l1.1-3.3L5 9.9c-.6-.3-.8-1.1-.3-1.6l2.1-2.1c.3-.3.7-.4 1-.3l3.5.9 1.2-3.7Z" />
+      <path d="M5.5 15.7c-1.3.4-2.3 1.4-2.8 2.7l-.6 1.6 1.6-.6c1.3-.5 2.3-1.5 2.7-2.8l-.9-.9Z" />
+      <circle cx="15.8" cy="7.8" r="1.6" fill="rgb(16 185 129)" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
   );
 }
 

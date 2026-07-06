@@ -17,7 +17,6 @@ import { PlanBillingView } from "@/components/dashboard/PlanBillingView";
 import { ReviewsView } from "@/components/dashboard/ReviewsView";
 import { SettingsView } from "@/components/dashboard/SettingsView";
 import { SiteStructureManager } from "@/components/dashboard/SiteStructureManager";
-import { SiteSwitcher } from "@/components/dashboard/SiteSwitcher";
 import { SetupWizard } from "@/components/dashboard/SetupWizard";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { VouchersManager } from "@/components/dashboard/VouchersManager";
@@ -263,24 +262,30 @@ export function DashboardShell({ siteId }: { siteId: string }) {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <DashboardHeader notificationCount={notifications.total} />
-      <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-8">
-        <Sidebar activeTab={activeTab} site={selectedSite} notificationsByTab={notifications.byTab} onTabChange={handleTabChange} />
-        <section className="grid min-w-0 gap-5 pb-10">
+      <div className="mx-auto w-full max-w-[1440px] p-4 sm:p-6">
+        {authReady && accessToken && selectedSite ? (
+          <DashboardUtilityBar
+            sites={sites}
+            selectedSite={selectedSite}
+            selectedSiteId={selectedSite.id}
+            notificationCount={notifications.total}
+            onSiteChange={(nextSiteId) => runWithUnsavedGuard(() => router.push(`/dashboard/${nextSiteId}`))}
+          />
+        ) : null}
+        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <Sidebar activeTab={activeTab} site={selectedSite} notificationsByTab={notifications.byTab} onTabChange={handleTabChange} />
+          <section className="grid min-w-0 gap-6 pb-10">
           {!authReady ? <DashboardMessage text="Checking account session..." /> : null}
           {authReady && !accessToken ? <DashboardMessage text={status} actionHref="/login?next=/dashboard" actionLabel="Sign in" /> : null}
           {authReady && accessToken && !selectedSite ? <DashboardMessage text={status} actionHref="/dashboard" actionLabel="Back to sites" /> : null}
           {authReady && accessToken && selectedSite ? (
             <>
-              <SiteSwitcher
-                sites={sites}
-                selectedSiteId={selectedSite.id}
-                onSiteChange={(nextSiteId) => runWithUnsavedGuard(() => router.push(`/dashboard/${nextSiteId}`))}
-              />
               {status ? <p className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">{status}</p> : null}
               {renderTab(activeTab, selectedSite, updateSelectedSite, handleTabChange, accessToken, operatorFetch, setUnsavedChanges, requestConfirmation, () => void loadNotifications(selectedSite.id))}
             </>
           ) : null}
-        </section>
+          </section>
+        </div>
       </div>
       <ConfirmDialog
         open={Boolean(confirmRequest)}
@@ -293,6 +298,68 @@ export function DashboardShell({ siteId }: { siteId: string }) {
         }}
       />
     </main>
+  );
+}
+
+function DashboardUtilityBar({
+  sites,
+  selectedSite,
+  selectedSiteId,
+  notificationCount,
+  onSiteChange,
+}: {
+  sites: ResortConsoleData[];
+  selectedSite: ResortConsoleData;
+  selectedSiteId: string;
+  notificationCount: number;
+  onSiteChange: (siteId: string) => void;
+}) {
+  const displayEmail = selectedSite.contactEmail || "operator@travelseed.app";
+  const displayName = displayEmail.split("@")[0] || "Operator";
+  const initials = displayName
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase() || "OP";
+
+  return (
+    <div className="mb-6 flex w-full flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="relative min-w-0 md:w-72">
+        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+          <UtilityIcon name="search" className="h-4 w-4" />
+        </span>
+        <select
+          value={selectedSiteId}
+          onChange={(event) => onSiteChange(event.target.value)}
+          className="min-h-10 w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 py-0 pl-9 pr-8 text-sm font-medium text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+          aria-label="Switch site"
+        >
+          {sites.map((site) => (
+            <option key={site.id} value={site.id}>
+              {site.name}
+            </option>
+          ))}
+        </select>
+        <UtilityIcon name="chevron" className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400" />
+      </div>
+
+      <div className="flex items-center justify-between gap-4 md:justify-end">
+        <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
+          <UtilityIcon name="bell" className="h-4 w-4" />
+          {notificationCount > 0 ? <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-700 px-1 text-[10px] font-bold text-white">{notificationCount > 99 ? "99+" : notificationCount}</span> : null}
+        </button>
+        <div className="flex items-center gap-3 rounded-lg p-1.5 transition hover:bg-slate-50">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-emerald-600 text-xs font-bold text-white">{initials}</span>
+          <span className="hidden min-w-0 sm:block">
+            <span className="block max-w-44 truncate text-sm font-semibold text-slate-950">{displayName}</span>
+            <span className="block max-w-44 truncate text-xs text-slate-500">{displayEmail}</span>
+          </span>
+          <UtilityIcon name="chevron" className="h-3 w-3 text-slate-400" />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -322,4 +389,17 @@ function normalizeNotifications(notifications?: DashboardNotificationSummary): D
     items: Array.isArray(notifications.items) ? notifications.items : [],
     byTab: notifications.byTab ?? {},
   };
+}
+
+function UtilityIcon({ name, className }: { name: "bell" | "chevron" | "search"; className: string }) {
+  const strokeProps = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+
+  switch (name) {
+    case "bell":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>;
+    case "chevron":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><path d="m6 9 6 6 6-6" /></svg>;
+    case "search":
+      return <svg className={className} viewBox="0 0 24 24" aria-hidden="true" {...strokeProps}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>;
+  }
 }

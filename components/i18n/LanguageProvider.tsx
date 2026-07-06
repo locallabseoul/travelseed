@@ -46,6 +46,9 @@ export type TranslationKey =
   | "home.how.text"
   | "home.cta.label"
   | "home.cta.title"
+  | "home.cta.body"
+  | "home.cta.primary"
+  | "home.cta.secondary"
   | "home.footer.about"
   | "home.footer.contact"
   | "create.auth.kicker"
@@ -182,7 +185,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     "home.how.title": "Launch a business website without rebuilding your operations.",
     "home.how.text": "Travelseed starts from the information operators already have, then creates a stronger owned web presence and inquiry flow.",
     "home.cta.label": "Direct customer action starts here",
-    "home.cta.title": "Start growing your direct business",
+    "home.cta.title": "Ready to grow your direct business?",
+    "home.cta.body": "Join hundreds of independent Indonesian businesses taking control of their online presence.",
+    "home.cta.primary": "Create Your Site Now",
+    "home.cta.secondary": "View Demo",
     "home.footer.about": "About",
     "home.footer.contact": "Contact",
     "create.auth.kicker": "Create your site",
@@ -318,7 +324,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     "home.how.title": "Luncurkan website bisnis tanpa membangun ulang operasional.",
     "home.how.text": "Travelseed memulai dari informasi yang sudah dimiliki operator, lalu membuat presence web dan alur inquiry yang lebih kuat.",
     "home.cta.label": "Aksi pelanggan langsung dimulai di sini",
-    "home.cta.title": "Mulai tumbuhkan bisnis langsung Anda",
+    "home.cta.title": "Siap menumbuhkan bisnis langsung Anda?",
+    "home.cta.body": "Bergabung dengan ratusan bisnis independen Indonesia yang mengambil kendali atas presence online mereka.",
+    "home.cta.primary": "Buat Situs Anda Sekarang",
+    "home.cta.secondary": "Lihat Demo",
     "home.footer.about": "Tentang",
     "home.footer.contact": "Kontak",
     "create.auth.kicker": "Buat situs Anda",
@@ -460,13 +469,17 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <div aria-label={t("nav.language")} className={`inline-flex rounded-full border border-[#d8cebb] bg-white/80 p-1 text-xs font-semibold text-[#18352f] ${className}`}>
+    <div aria-label={t("nav.language")} className={`inline-flex items-center gap-1 rounded-full border border-slate-200/70 bg-slate-100 p-1 text-[10px] font-bold ${className}`}>
       {(["en", "id"] as const).map((option) => (
         <button
           key={option}
           type="button"
           onClick={() => setLanguage(option)}
-          className={`min-h-8 rounded-full px-3 transition ${language === option ? "bg-[#18352f] text-white" : "text-[#52615a] hover:bg-[#f8f5ef]"}`}
+          className={`min-h-6 rounded-full px-2.5 transition ${
+            language === option
+              ? "bg-white text-slate-950 shadow-sm"
+              : "text-slate-500 hover:text-slate-950"
+          }`}
         >
           {option.toUpperCase()}
         </button>

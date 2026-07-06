@@ -39,39 +39,48 @@ export function HomeAccountNav({ notificationCount = 0 }: { notificationCount?: 
 
   if (!session) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <LanguageToggle />
-        <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 sm:inline-flex">
-          {t("nav.pricing")}
-        </Link>
-        <Link href="/login?next=/create" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200">
+        <Link href="/login?next=/create" className="hidden text-sm font-medium text-slate-600 transition hover:text-slate-950 sm:inline-flex">
           {t("nav.login")}
         </Link>
-        <Link href="/create" className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-emerald-500/10 hover:bg-neutral-800">
+        <Link href="/create" className="rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-white shadow-md transition hover:bg-neutral-800 hover:shadow-lg">
           {t("nav.build")}
         </Link>
       </div>
     );
   }
 
+  const email = session.user.email ?? "";
+  const metadata = session.user.user_metadata as { full_name?: string; name?: string } | null;
+  const displayName = metadata?.full_name?.trim() || metadata?.name?.trim() || email.split("@")[0] || t("nav.profile");
+  const initials = displayName
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase() || "U";
+
   return (
-    <div className="flex items-center gap-2">
-      <LanguageToggle className="hidden sm:inline-flex" />
-      <Link href="/pricing" className="hidden rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 md:inline-flex">
-        {t("nav.pricing")}
-      </Link>
+    <div className="flex items-center gap-4 sm:gap-6">
+      <LanguageToggle />
       <details className="group relative">
-        <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">
-            {(session.user.email ?? "U").slice(0, 1).toUpperCase()}
+        <summary className="relative flex min-h-10 cursor-pointer list-none items-center gap-3 border-l border-slate-200 pl-4">
+          <span className="hidden text-right sm:block">
+            <span className="block max-w-36 truncate text-xs font-bold leading-tight text-slate-950">{displayName}</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-wider text-emerald-600">Business Pro</span>
           </span>
-          {t("nav.profile")}
+          <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-sm ring-2 ring-white transition group-hover:ring-emerald-500/30">
+            {initials}
+            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+          </span>
           {hasNotifications ? <NotificationCountBadge count={notificationCount} className="-right-1 -top-1" /> : null}
         </summary>
         <div className="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-2xl border border-slate-200 bg-white p-2 text-sm shadow-[0_18px_55px_rgba(15,23,42,0.12)]">
-          <p className="truncate px-3 py-2 text-xs font-medium text-slate-500">{session.user.email}</p>
-          <div className="px-3 py-2 sm:hidden">
-            <LanguageToggle />
+          <div className="px-3 py-2">
+            <p className="truncate text-sm font-semibold text-slate-950">{displayName}</p>
+            <p className="mt-1 truncate text-xs font-medium text-slate-500">{email}</p>
           </div>
           <Link href="/dashboard" className="rounded-xl px-3 py-2 font-semibold text-slate-900 hover:bg-slate-50">
             {t("nav.management")}
@@ -101,11 +110,23 @@ export function AppHeader({
   notificationCount?: number;
   brandTone?: "dark" | "light";
 }) {
+  const { t } = useLanguage();
+  const navLinkClassName = brandTone === "light"
+    ? "text-white/72 hover:text-white"
+    : "text-slate-600 hover:text-slate-950";
+
   return (
     <header className={`mx-auto flex max-w-7xl items-center justify-between ${className}`}>
-      <Link href="/" className="inline-flex items-center">
-        <TravelseedWordmark tone={brandTone} />
-      </Link>
+      <div className="flex items-center gap-8">
+        <Link href="/" className="inline-flex items-center">
+          <TravelseedWordmark tone={brandTone} />
+        </Link>
+        <nav className="hidden items-center gap-6 md:flex">
+          <Link href="/pricing" className={`text-sm font-medium transition ${navLinkClassName}`}>
+            {t("nav.pricing")}
+          </Link>
+        </nav>
+      </div>
       <HomeAccountNav notificationCount={notificationCount} />
     </header>
   );
