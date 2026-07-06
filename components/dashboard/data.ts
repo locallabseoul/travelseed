@@ -86,6 +86,7 @@ Name:
 Contact:
 Request:
 Preferred date or time:`,
+    contentTranslations: resort.content_translations ?? {},
     language: "English",
     timezone: "Asia/Makassar",
     contactEmail: resort.owner_email ?? "",
@@ -120,6 +121,7 @@ export function resortPayloadFromSite(site: ResortConsoleData): ResortUpsert {
     experiences: site.experiences,
     booking_message_template: site.bookingMessageTemplate || null,
     design_settings: site.designSettings,
+    content_translations: site.contentTranslations,
     is_active: site.isActive,
     domain_status: site.domainStatus,
     ssl_status: site.sslStatus,

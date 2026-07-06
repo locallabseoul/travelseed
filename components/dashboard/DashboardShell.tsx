@@ -259,6 +259,31 @@ export function DashboardShell({ siteId }: { siteId: string }) {
     }
   }
 
+  async function generateIndonesianTranslation() {
+    if (!selectedSite) {
+      return;
+    }
+
+    setStatus("Generating Indonesian translation...");
+    try {
+      const data = await operatorFetch(`/api/operator/resorts/${selectedSite.id}/translations`, {
+        method: "POST",
+        body: JSON.stringify({ locale: "id" }),
+      }) as { status?: string; contentTranslations?: ResortConsoleData["contentTranslations"] };
+
+      if (data.contentTranslations) {
+        setSites((currentSites) => currentSites.map((site) => (
+          site.id === selectedSite.id ? { ...site, contentTranslations: data.contentTranslations ?? site.contentTranslations } : site
+        )));
+      }
+
+      setStatus(data.status === "unchanged" ? "Indonesian translation is already up to date." : "Indonesian translation generated.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not generate Indonesian translation.";
+      setStatus(message);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <DashboardHeader notificationCount={notifications.total} />
@@ -270,6 +295,7 @@ export function DashboardShell({ siteId }: { siteId: string }) {
             selectedSiteId={selectedSite.id}
             notificationCount={notifications.total}
             onSiteChange={(nextSiteId) => runWithUnsavedGuard(() => router.push(`/dashboard/${nextSiteId}`))}
+            onGenerateTranslation={() => void generateIndonesianTranslation()}
           />
         ) : null}
         <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -307,12 +333,14 @@ function DashboardUtilityBar({
   selectedSiteId,
   notificationCount,
   onSiteChange,
+  onGenerateTranslation,
 }: {
   sites: ResortConsoleData[];
   selectedSite: ResortConsoleData;
   selectedSiteId: string;
   notificationCount: number;
   onSiteChange: (siteId: string) => void;
+  onGenerateTranslation: () => void;
 }) {
   const displayEmail = selectedSite.contactEmail || "operator@travelseed.app";
   const displayName = displayEmail.split("@")[0] || "Operator";
@@ -346,6 +374,13 @@ function DashboardUtilityBar({
       </div>
 
       <div className="flex items-center justify-between gap-4 md:justify-end">
+        <button
+          type="button"
+          onClick={onGenerateTranslation}
+          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+        >
+          Generate ID
+        </button>
         <button type="button" className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
           <UtilityIcon name="bell" className="h-4 w-4" />
           {notificationCount > 0 ? <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-700 px-1 text-[10px] font-bold text-white">{notificationCount > 99 ? "99+" : notificationCount}</span> : null}

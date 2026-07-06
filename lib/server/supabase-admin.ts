@@ -123,6 +123,7 @@ export function sanitizeResortPayload(payload: Partial<ResortUpsert>): ResortUps
       ? String(payload.booking_message_template)
       : null,
     design_settings: typeof payload.design_settings === "object" && payload.design_settings ? payload.design_settings : {},
+    content_translations: typeof payload.content_translations === "object" && payload.content_translations ? payload.content_translations : {},
     is_active: Boolean(payload.is_active),
     domain_status: payload.domain_status ?? (payload.domain ? "pending" : "not_connected"),
     ssl_status: payload.ssl_status ?? "pending",

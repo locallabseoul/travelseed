@@ -1,3 +1,5 @@
+import type { ResortContentTranslations } from "@/types/resort";
+
 export type DashboardTab =
   | "dashboard"
   | "setup"
@@ -114,6 +116,7 @@ export type ResortConsoleData = {
   gallery: string[];
   experiences: string[];
   bookingMessageTemplate: string;
+  contentTranslations: ResortContentTranslations;
   language: string;
   timezone: string;
   contactEmail: string;

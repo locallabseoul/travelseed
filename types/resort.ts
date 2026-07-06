@@ -23,6 +23,51 @@ export type ResortDesignSettings = {
   templateCatalogName?: string;
 };
 
+export type ResortContentTranslationLocale = "id";
+
+export type ResortContentTranslationPack = {
+  generatedAt: string;
+  sourceHash: string;
+  translatedHash: string;
+  locale: ResortContentTranslationLocale;
+  resort: {
+    name?: string;
+    location?: string;
+    type?: string;
+    description?: string;
+    hero_title?: string;
+    hero_subtitle?: string;
+    features?: string[];
+    experiences?: string[];
+    booking_message_template?: string;
+  };
+  services?: Record<string, {
+    title?: string;
+    description?: string;
+    price_label?: string;
+    highlight?: string;
+    duration?: string;
+    included?: string[];
+    cta_label?: string;
+    bed_type?: string;
+    room_size?: string;
+    view_type?: string;
+    bathroom_info?: string;
+    room_amenities?: string[];
+  }>;
+  pages?: Record<string, {
+    title?: string;
+    seo_title?: string;
+    seo_description?: string;
+    settings?: Record<string, unknown>;
+  }>;
+  navigation_items?: Record<string, {
+    label?: string;
+  }>;
+};
+
+export type ResortContentTranslations = Partial<Record<ResortContentTranslationLocale, ResortContentTranslationPack>>;
+
 export type Resort = {
   id: string;
   owner_user_id: string | null;
@@ -49,6 +94,7 @@ export type Resort = {
   experiences: string[];
   booking_message_template: string | null;
   design_settings?: ResortDesignSettings;
+  content_translations?: ResortContentTranslations;
   is_active: boolean;
   domain_status?: DomainStatus;
   ssl_status?: SslStatus;

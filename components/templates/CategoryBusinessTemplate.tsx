@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { BusinessCategoryIcon } from "@/components/business/BusinessCategoryIcon";
-import { LanguageToggle } from "@/components/i18n/LanguageProvider";
+import { LanguageToggle, useLanguage } from "@/components/i18n/LanguageProvider";
 import { BookingInquiryModal } from "@/components/resort/BookingInquiryForm";
 import { TrackedWhatsAppLink } from "@/components/resort/TrackedWhatsAppLink";
 import { businessCategoryFromType, type BusinessCategory, type BusinessCategoryId } from "@/lib/business-categories";
+import { applyContentTranslation } from "@/lib/content-translations";
 import { designTokensFor } from "@/lib/design-settings";
 import { isSiteSectionEnabled, publicNavigationLinks } from "@/lib/site-structure";
 import { createWhatsAppBookingUrl } from "@/lib/whatsapp";
@@ -156,54 +159,59 @@ const templateCopy: Record<BusinessCategoryId, CategoryTemplateCopy> = {
 };
 
 export function CategoryBusinessTemplate({ resort }: TemplateProps) {
-  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const { language } = useLanguage();
+  const localizedResort = language === "id" ? applyContentTranslation(resort, "id") : resort;
+  const category = businessCategoryFromType({ type: localizedResort.type, templateId: localizedResort.template_id });
   const copy = templateCopy[category.id];
-  const showAbout = isSiteSectionEnabled(resort, "about");
-  const showOffers = isSiteSectionEnabled(resort, "rooms");
-  const showDetails = isSiteSectionEnabled(resort, "experiences");
-  const showGallery = isSiteSectionEnabled(resort, "gallery") && publicGallery(resort).length > 0;
-  const showReviews = isSiteSectionEnabled(resort, "reviews") && publicReviews(resort).length > 0;
+  const showAbout = isSiteSectionEnabled(localizedResort, "about");
+  const showOffers = isSiteSectionEnabled(localizedResort, "rooms");
+  const showDetails = isSiteSectionEnabled(localizedResort, "experiences");
+  const showGallery = isSiteSectionEnabled(localizedResort, "gallery") && publicGallery(localizedResort).length > 0;
+  const showReviews = isSiteSectionEnabled(localizedResort, "reviews") && publicReviews(localizedResort).length > 0;
 
   return (
-    <main className="min-h-screen bg-[var(--category-page)] pb-20 text-[var(--category-text)] antialiased md:pb-0" style={templateStyle(resort, category.id)}>
-      <CategoryHeader resort={resort} category={category} />
-      <CategoryHero resort={resort} category={category} copy={copy} />
-      <TrustRail resort={resort} category={category} />
-      {showAbout ? <AboutBlock resort={resort} category={category} copy={copy} /> : null}
-      {showOffers ? <OfferShowcase resort={resort} category={category} /> : null}
-      {showDetails ? <CategoryDetails resort={resort} category={category} copy={copy} /> : null}
-      {showGallery ? <GalleryBlock resort={resort} /> : null}
-      <WhatsAppBlock resort={resort} category={category} copy={copy} />
-      {showReviews ? <ReviewBlock resort={resort} category={category} copy={copy} /> : <ProofBlock resort={resort} category={category} copy={copy} />}
-      <LocationBlock resort={resort} category={category} copy={copy} />
+    <main className="min-h-screen bg-[var(--category-page)] pb-20 text-[var(--category-text)] antialiased md:pb-0" style={templateStyle(localizedResort, category.id)}>
+      <CategoryHeader resort={localizedResort} category={category} />
+      <CategoryHero resort={localizedResort} category={category} copy={copy} />
+      <TrustRail resort={localizedResort} category={category} />
+      {showAbout ? <AboutBlock resort={localizedResort} category={category} copy={copy} /> : null}
+      {showOffers ? <OfferShowcase resort={localizedResort} category={category} /> : null}
+      {showDetails ? <CategoryDetails resort={localizedResort} category={category} copy={copy} /> : null}
+      {showGallery ? <GalleryBlock resort={localizedResort} /> : null}
+      <WhatsAppBlock resort={localizedResort} category={category} copy={copy} />
+      {showReviews ? <ReviewBlock resort={localizedResort} category={category} copy={copy} /> : <ProofBlock resort={localizedResort} category={category} copy={copy} />}
+      <LocationBlock resort={localizedResort} category={category} copy={copy} />
       <FaqBlock copy={copy} />
-      <CategoryFooter resort={resort} category={category} />
-      <MobileBottomBar resort={resort} category={category} />
+      <CategoryFooter resort={localizedResort} category={category} />
+      <MobileBottomBar resort={localizedResort} category={category} />
     </main>
   );
 }
 
 export function CategoryBusinessSubPage({ resort, page }: { resort: Resort; page: ResortSitePage }) {
-  const category = businessCategoryFromType({ type: resort.type, templateId: resort.template_id });
+  const { language } = useLanguage();
+  const localizedResort = language === "id" ? applyContentTranslation(resort, "id") : resort;
+  const localizedPage = localizedResort.pages?.find((item) => item.id === page.id) ?? page;
+  const category = businessCategoryFromType({ type: localizedResort.type, templateId: localizedResort.template_id });
   const copy = templateCopy[category.id];
-  const slug = page.slug.replace(/^\/+|\/+$/g, "").toLowerCase();
+  const slug = localizedPage.slug.replace(/^\/+|\/+$/g, "").toLowerCase();
 
   return (
-    <main className="min-h-screen bg-[var(--category-page)] pb-20 text-[var(--category-text)] antialiased md:pb-0" style={templateStyle(resort, category.id)}>
-      <CategoryHeader resort={resort} category={category} />
-      <PageHero resort={resort} page={page} category={category} />
-      {slug === "rooms" ? <OfferShowcase resort={resort} category={category} title={category.landingNav.offers} /> : null}
-      {slug === "experiences" ? <CategoryDetails resort={resort} category={category} copy={copy} /> : null}
-      {slug === "gallery" ? <GalleryBlock resort={resort} forceEmptyState /> : null}
-      {slug === "reviews" ? <ReviewBlock resort={resort} category={category} copy={copy} forceEmptyState /> : null}
-      {slug === "about" ? <AboutBlock resort={resort} category={category} copy={copy} /> : null}
-      {slug === "contact" ? <LocationBlock resort={resort} category={category} copy={copy} /> : null}
+    <main className="min-h-screen bg-[var(--category-page)] pb-20 text-[var(--category-text)] antialiased md:pb-0" style={templateStyle(localizedResort, category.id)}>
+      <CategoryHeader resort={localizedResort} category={category} />
+      <PageHero resort={localizedResort} page={localizedPage} category={category} />
+      {slug === "rooms" ? <OfferShowcase resort={localizedResort} category={category} title={category.landingNav.offers} /> : null}
+      {slug === "experiences" ? <CategoryDetails resort={localizedResort} category={category} copy={copy} /> : null}
+      {slug === "gallery" ? <GalleryBlock resort={localizedResort} forceEmptyState /> : null}
+      {slug === "reviews" ? <ReviewBlock resort={localizedResort} category={category} copy={copy} forceEmptyState /> : null}
+      {slug === "about" ? <AboutBlock resort={localizedResort} category={category} copy={copy} /> : null}
+      {slug === "contact" ? <LocationBlock resort={localizedResort} category={category} copy={copy} /> : null}
       {!["rooms", "experiences", "gallery", "reviews", "about", "contact"].includes(slug) ? (
-        <GenericPageBlock resort={resort} page={page} category={category} />
+        <GenericPageBlock resort={localizedResort} page={localizedPage} category={category} />
       ) : null}
-      {slug !== "contact" ? <WhatsAppBlock resort={resort} category={category} copy={copy} compact /> : null}
-      <CategoryFooter resort={resort} category={category} />
-      <MobileBottomBar resort={resort} category={category} />
+      {slug !== "contact" ? <WhatsAppBlock resort={localizedResort} category={category} copy={copy} compact /> : null}
+      <CategoryFooter resort={localizedResort} category={category} />
+      <MobileBottomBar resort={localizedResort} category={category} />
     </main>
   );
 }
