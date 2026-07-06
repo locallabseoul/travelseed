@@ -13,9 +13,10 @@ import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { renderResortTemplate } from "@/components/templates";
 import { businessCategories, businessCategoryFromType, businessTypeOptions } from "@/lib/business-categories";
 import { defaultTemplateIdForBusinessType } from "@/lib/category-templates";
+import { defaultEditableColorsForTemplate } from "@/lib/design-settings";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { templateCatalogForCategory } from "@/lib/template-catalog";
-import type { Resort, ResortOfferInput } from "@/types/resort";
+import type { Resort, ResortDesignSettings, ResortOfferInput } from "@/types/resort";
 
 type BuilderForm = {
   name: string;
@@ -44,6 +45,9 @@ type ImportDraft = Partial<Omit<BuilderForm, "features" | "experiences" | "galle
 type ServiceDraft = ResortOfferInput & {
   draftId: string;
 };
+
+type CreateColorKey = "primary" | "accent" | "page" | "text";
+type CreateCustomColors = NonNullable<ResortDesignSettings["customColors"]>;
 
 type StepCopy = {
   title: string;
@@ -135,6 +139,44 @@ function slugify(value: string) {
 
 const maxImageDimension = 1800;
 const publishedSitePayloadLimit = 3_800_000;
+const createColorLabels = {
+  primary: "Primary",
+  accent: "Accent",
+  page: "Background",
+  text: "Text",
+} satisfies Record<CreateColorKey, string>;
+
+function isHexColor(value: string | undefined) {
+  return !!value && /^#[0-9a-f]{6}$/i.test(value);
+}
+
+function normalizedCreateColors(colors: CreateCustomColors) {
+  return {
+    ...(isHexColor(colors.primary) ? { primary: colors.primary } : {}),
+    ...(isHexColor(colors.accent) ? { accent: colors.accent } : {}),
+    ...(isHexColor(colors.page) ? { page: colors.page } : {}),
+    ...(isHexColor(colors.text) ? { text: colors.text } : {}),
+  };
+}
+
+function createTemplateCatalogName(form: Pick<BuilderForm, "template_id" | "type">) {
+  const category = businessCategoryFromType(form.type);
+  return templateCatalogForCategory(category.id).find((template) => template.planType === "seed" && template.templateId === form.template_id)?.name ??
+    templateCatalogForCategory(category.id).find((template) => template.templateId === form.template_id)?.name ??
+    "";
+}
+
+function createDesignSettings(form: Pick<BuilderForm, "template_id" | "type">, customColors: CreateCustomColors): ResortDesignSettings {
+  return {
+    colorTheme: "Tropical Green",
+    customColors: normalizedCreateColors(customColors),
+    logoUrl: "",
+    fontStyle: "Editorial Sans",
+    buttonStyle: "Pill",
+    imageStyle: "Soft Corners",
+    templateCatalogName: createTemplateCatalogName(form),
+  };
+}
 
 function readFileAsDataUrl(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -270,7 +312,7 @@ function serviceDraftsFromApi(value: unknown): ServiceDraft[] {
   }).filter((service) => service.title);
 }
 
-function createPreviewResort(form: BuilderForm): Resort {
+function createPreviewResort(form: BuilderForm, designSettings?: ResortDesignSettings): Resort {
   const gallery = textareaList(form.gallery_images);
   const category = businessCategoryFromType(form.type);
   const accommodation = category.id === "accommodation";
@@ -298,6 +340,7 @@ function createPreviewResort(form: BuilderForm): Resort {
     gallery,
     experiences: textareaList(form.experiences),
     booking_message_template: category.defaultBookingMessage(businessName),
+    design_settings: designSettings,
     is_active: true,
   };
 }
@@ -321,7 +364,9 @@ export function CreateSiteBuilder() {
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authStatus, setAuthStatus] = useState("");
-  const previewResort = useMemo(() => createPreviewResort(form), [form]);
+  const [customColors, setCustomColors] = useState<CreateCustomColors>({});
+  const designSettings = useMemo(() => createDesignSettings(form, customColors), [customColors, form]);
+  const previewResort = useMemo(() => createPreviewResort(form, designSettings), [designSettings, form]);
   const galleryImages = useMemo(() => textareaList(form.gallery_images), [form.gallery_images]);
 
   useEffect(() => {
@@ -558,7 +603,7 @@ export function CreateSiteBuilder() {
     }
 
     const slug = slugify(form.slug || form.name);
-    const resort = createPreviewResort({ ...form, slug });
+    const resort = createPreviewResort({ ...form, slug }, designSettings);
     const services = serviceDrafts.filter((service) => selectedServiceDrafts.has(service.draftId));
     const payloadSize = new Blob([JSON.stringify({ resort, services })]).size;
 
@@ -707,6 +752,8 @@ export function CreateSiteBuilder() {
             selectedServiceDrafts,
             setSelectedServiceDrafts,
             previewResort,
+            customColors,
+            setCustomColors,
             openFullPreview,
             accountPanel,
             stepCopies,
@@ -1155,6 +1202,8 @@ function renderStep(
   selectedServiceDrafts: Set<string>,
   setSelectedServiceDrafts: (value: Set<string>) => void,
   previewResort: Resort,
+  customColors: CreateCustomColors,
+  setCustomColors: (updater: CreateCustomColors | ((current: CreateCustomColors) => CreateCustomColors)) => void,
   openFullPreview: () => void,
   accountPanel: ReactNode,
   stepCopies: StepCopy[],
@@ -1382,7 +1431,7 @@ function renderStep(
               {uploadStatus ? <p className="mt-3 text-sm leading-6 text-slate-600">{uploadStatus}</p> : null}
             </div>
 
-            <StylePreviewControls />
+            <StylePreviewControls form={form} customColors={customColors} onCustomColorsChange={setCustomColors} />
             <GalleryPreview gallery={galleryImages} onRemove={removeGalleryImage} />
           </div>
 
@@ -1595,7 +1644,30 @@ function MobileOfferPreview({
   );
 }
 
-function StylePreviewControls() {
+function StylePreviewControls({
+  form,
+  customColors,
+  onCustomColorsChange,
+}: {
+  form: Pick<BuilderForm, "template_id" | "type">;
+  customColors: CreateCustomColors;
+  onCustomColorsChange: (updater: CreateCustomColors | ((current: CreateCustomColors) => CreateCustomColors)) => void;
+}) {
+  const catalogName = createTemplateCatalogName(form);
+  const defaultColors = defaultEditableColorsForTemplate(form.template_id, { templateCatalogName: catalogName });
+  const editableColors = {
+    primary: customColors.primary ?? defaultColors.primary,
+    accent: customColors.accent ?? defaultColors.accent,
+    page: customColors.page ?? defaultColors.page,
+    text: customColors.text ?? defaultColors.text,
+  } satisfies Record<CreateColorKey, string>;
+  const swatches = [
+    { label: "Fresh green", colors: { primary: "#16a34a", accent: "#22c55e", page: "#f8fafc", text: "#0f172a" } },
+    { label: "Warm orange", colors: { primary: "#ea580c", accent: "#f97316", page: "#fff7ed", text: "#0f172a" } },
+    { label: "Ocean blue", colors: { primary: "#0891b2", accent: "#06b6d4", page: "#ecfeff", text: "#0f172a" } },
+    { label: "Wellness rose", colors: { primary: "#db2777", accent: "#ec4899", page: "#fff1f2", text: "#0f172a" } },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -1620,19 +1692,51 @@ function StylePreviewControls() {
       <div>
         <h3 className="mb-3 text-sm font-semibold text-slate-950">Color Accent</h3>
         <div className="grid grid-cols-4 gap-3">
-          {["bg-emerald-500", "bg-slate-900", "bg-amber-600", "bg-sky-500"].map((color, index) => (
+          {swatches.map((swatch) => {
+            const selected = normalizedCreateColors(customColors).primary === swatch.colors.primary;
+            return (
             <button
-              key={color}
+              key={swatch.label}
               type="button"
-              className={`aspect-square rounded-xl ${color} shadow-sm ${index === 0 ? "ring-2 ring-slate-900 ring-offset-2" : "ring-1 ring-slate-200"}`}
-              aria-label={`Color option ${index + 1}`}
+              onClick={() => onCustomColorsChange(swatch.colors)}
+              className={`aspect-square rounded-xl shadow-sm ${selected ? "ring-2 ring-slate-900 ring-offset-2" : "ring-1 ring-slate-200"}`}
+              style={{ background: `linear-gradient(135deg, ${swatch.colors.primary}, ${swatch.colors.accent})` }}
+              aria-label={swatch.label}
             >
-              {index === 0 ? <CheckIcon className="mx-auto h-4 w-4 text-white" /> : null}
+              {selected ? <CheckIcon className="mx-auto h-4 w-4 text-white" /> : null}
             </button>
+            );
+          })}
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {(Object.keys(createColorLabels) as CreateColorKey[]).map((key) => (
+            <CreateColorField
+              key={key}
+              label={createColorLabels[key]}
+              value={editableColors[key]}
+              onChange={(value) => onCustomColorsChange((current) => ({ ...current, [key]: value }))}
+            />
           ))}
         </div>
+        <button type="button" onClick={() => onCustomColorsChange({})} className="mt-3 min-h-9 rounded-lg bg-white px-3 text-xs font-semibold text-slate-950 ring-1 ring-slate-200">
+          Reset to category default
+        </button>
       </div>
     </div>
+  );
+}
+
+function CreateColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  const colorPickerValue = isHexColor(value) ? value : "#000000";
+
+  return (
+    <label className="grid gap-2 text-xs font-semibold text-slate-700">
+      {label}
+      <div className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-100">
+        <input type="color" value={colorPickerValue} onChange={(event) => onChange(event.target.value)} className="h-7 w-8 cursor-pointer rounded border-0 bg-transparent p-0" aria-label={`${label} color picker`} />
+        <input value={value} onChange={(event) => onChange(event.target.value)} maxLength={7} className="min-w-0 flex-1 bg-transparent font-mono text-xs uppercase outline-none" />
+      </div>
+    </label>
   );
 }
 
@@ -1648,7 +1752,7 @@ function DesktopPreviewFrame({
   label: string;
 }) {
   return (
-    <div className="flex min-h-[760px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-slate-100 p-6 xl:col-span-7">
+    <div className="flex h-[640px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-slate-100 p-4 sm:p-6 xl:sticky xl:top-6 xl:col-span-7 xl:h-[760px] xl:max-h-[calc(100vh-3rem)]">
       <div className="relative z-20 mb-6 flex items-center justify-between">
         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
           <button type="button" className="rounded-md border border-slate-200 bg-slate-100 px-4 py-1.5 text-xs font-medium text-slate-950 shadow-sm">

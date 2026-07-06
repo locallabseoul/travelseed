@@ -1,6 +1,8 @@
 "use client";
 
 import { effectivePlanType, planConfig } from "@/components/dashboard/subscriptionConfig";
+import { BusinessCategoryIcon } from "@/components/business/BusinessCategoryIcon";
+import { businessCategoryFromType } from "@/lib/business-categories";
 import type { DashboardTab, ResortConsoleData } from "@/types/dashboard";
 
 type SidebarIcon =
@@ -86,12 +88,15 @@ export function Sidebar({
 
 function SiteContextCard({ site }: { site?: ResortConsoleData | null }) {
   const isPublished = site?.status === "Published";
+  const category = businessCategoryFromType({ type: site?.type, templateId: site?.template });
 
   return (
     <section className="flex items-center gap-4 rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-600">
-        <Icon name={siteIconFor(site?.type ?? "")} className="h-6 w-6" />
-      </div>
+      <BusinessCategoryIcon
+        categoryId={category.id}
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 text-emerald-600"
+        iconClassName="h-6 w-6"
+      />
       <div className="min-w-0">
         <h2 className="truncate text-sm font-bold text-slate-950">{site?.name ?? "Loading site"}</h2>
         <p className={`mt-0.5 flex items-center gap-1 text-xs font-medium ${isPublished ? "text-emerald-600" : "text-slate-500"}`}>
@@ -164,14 +169,6 @@ function MenuNotificationBadge({ count, active }: { count: number; active: boole
       {count > 99 ? "99+" : count}
     </span>
   );
-}
-
-function siteIconFor(type: string): SidebarIcon {
-  const lower = type.toLowerCase();
-  if (lower.includes("restaurant") || lower.includes("cafe") || lower.includes("food")) return "edit";
-  if (lower.includes("tour")) return "domain";
-  if (lower.includes("shop") || lower.includes("store")) return "globe";
-  return "hotel";
 }
 
 function Icon({ name, className }: { name: SidebarIcon; className: string }) {

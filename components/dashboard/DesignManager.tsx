@@ -29,6 +29,14 @@ const colorControlLabels = {
 
 type ColorControlKey = "primary" | "accent" | "page" | "text";
 type CustomColors = ResortConsoleData["designSettings"]["customColors"];
+const colorControlKeys = Object.keys(colorControlLabels) as ColorControlKey[];
+
+const colorPresets: Array<{ label: string; colors: Required<CustomColors> }> = [
+  { label: "Fresh green", colors: { primary: "#16a34a", accent: "#22c55e", page: "#f8fafc", text: "#0f172a" } },
+  { label: "Warm orange", colors: { primary: "#ea580c", accent: "#f97316", page: "#fff7ed", text: "#0f172a" } },
+  { label: "Ocean blue", colors: { primary: "#0891b2", accent: "#06b6d4", page: "#ecfeff", text: "#0f172a" } },
+  { label: "Wellness rose", colors: { primary: "#db2777", accent: "#ec4899", page: "#fff1f2", text: "#0f172a" } },
+];
 
 function isHexColor(value: string | undefined) {
   return !!value && /^#[0-9a-f]{6}$/i.test(value);
@@ -83,6 +91,12 @@ function normalizedCustomColors(colors: CustomColors) {
 
 function customColorsEqual(left: CustomColors, right: CustomColors) {
   return JSON.stringify(normalizedCustomColors(left)) === JSON.stringify(normalizedCustomColors(right));
+}
+
+function colorPresetSelected(customColors: CustomColors, presetColors: Required<CustomColors>) {
+  const normalized = normalizedCustomColors(customColors);
+
+  return colorControlKeys.every((key) => normalized[key] === presetColors[key]);
 }
 
 export function DesignManager({
@@ -321,7 +335,36 @@ export function DesignManager({
                 </button>
               </div>
               <div className="mt-4 grid gap-3">
-                {(Object.keys(colorControlLabels) as ColorControlKey[]).map((key) => (
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Preset colors</p>
+                  <div className="grid grid-cols-4 gap-3">
+                    {colorPresets.map((preset) => {
+                      const selected = colorPresetSelected(customColors, preset.colors);
+
+                      return (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => setCustomColors(preset.colors)}
+                          className={`group relative aspect-square overflow-hidden rounded-xl shadow-sm transition ${
+                            selected ? "ring-2 ring-slate-950 ring-offset-2" : "ring-1 ring-slate-200 hover:ring-slate-300"
+                          }`}
+                          style={{ background: `linear-gradient(135deg, ${preset.colors.primary}, ${preset.colors.accent})` }}
+                          aria-label={preset.label}
+                          title={preset.label}
+                        >
+                          <span className="absolute inset-x-0 bottom-0 h-1/3" style={{ backgroundColor: preset.colors.page }} />
+                          {selected ? (
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <CheckIcon className="h-4 w-4 text-white drop-shadow" />
+                            </span>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                {colorControlKeys.map((key) => (
                   <ColorField
                     key={key}
                     label={colorControlLabels[key]}
@@ -575,5 +618,13 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+function CheckIcon({ className }: { className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="m4.5 10.5 3.2 3.2 7.8-8.4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

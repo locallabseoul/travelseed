@@ -415,16 +415,37 @@ export function designTokensFor(settings?: ResortDesignSettings): DesignTokens {
 
 export function templatePaletteFor(templateId: string, settings?: ResortDesignSettings): TemplatePalette {
   const colorTheme = settings?.colorTheme ?? "Tropical Green";
+  const catalogName = settings?.templateCatalogName?.toLowerCase() ?? "";
 
-  if (templateId === "minimal-stay" || settings?.templateCatalogName?.toLowerCase().includes("sunset")) {
+  if (catalogName.includes("hospitality")) {
+    return applyCustomTemplatePalette(categoryPalette("#16a34a", "#22c55e", "#f8fafc", "#0f172a"), settings);
+  }
+
+  if (catalogName.includes("cafe") || catalogName.includes("restaurant")) {
+    return applyCustomTemplatePalette(categoryPalette("#ea580c", "#f97316", "#f8fafc", "#0f172a"), settings);
+  }
+
+  if (catalogName.includes("tour")) {
+    return applyCustomTemplatePalette(categoryPalette("#0891b2", "#06b6d4", "#f8fafc", "#0f172a"), settings);
+  }
+
+  if (catalogName.includes("local service")) {
+    return applyCustomTemplatePalette(categoryPalette("#16a34a", "#22c55e", "#f8fafc", "#0f172a"), settings);
+  }
+
+  if (catalogName.includes("wellness") || catalogName.includes("salon")) {
+    return applyCustomTemplatePalette(categoryPalette("#db2777", "#ec4899", "#f8fafc", "#0f172a"), settings);
+  }
+
+  if (templateId === "minimal-stay" || catalogName.includes("sunset")) {
     return applyCustomTemplatePalette(sunsetPalettes[colorTheme] ?? sunsetPalettes["Tropical Green"], settings);
   }
 
-  if (templateId === "boutique-villa" || settings?.templateCatalogName?.toLowerCase().includes("tropical")) {
+  if (templateId === "boutique-villa" || catalogName.includes("tropical")) {
     return applyCustomTemplatePalette(tropicalPalettes[colorTheme] ?? tropicalPalettes["Tropical Green"], settings);
   }
 
-  if (templateId === "boutique-resort" || settings?.templateCatalogName?.toLowerCase().includes("boutique resort")) {
+  if (templateId === "boutique-resort" || catalogName.includes("boutique resort")) {
     return applyCustomTemplatePalette(boutiqueResortPalettes[colorTheme] ?? boutiqueResortPalettes["Tropical Green"], settings);
   }
 
@@ -443,6 +464,23 @@ export function templatePaletteFor(templateId: string, settings?: ResortDesignSe
     cta: base.primary,
     ctaText: base.buttonText,
   }, settings);
+}
+
+function categoryPalette(primary: string, accent: string, page: string, text: string): TemplatePalette {
+  return {
+    page,
+    section: "#ffffff",
+    hero: primary,
+    primary,
+    accent,
+    accentSoft: `${accent}1f`,
+    text,
+    muted: "#64748b",
+    border: "#e2e8f0",
+    inverseText: "#ffffff",
+    cta: primary,
+    ctaText: "#ffffff",
+  };
 }
 
 export function defaultEditableColorsForTemplate(templateId: string, settings?: ResortDesignSettings): TemplateEditableColors {
